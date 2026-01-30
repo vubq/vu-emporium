@@ -134,10 +134,14 @@
 
                 <!-- Buttons -->
                 <div class="lg:col-span-1 flex gap-2">
-                    <button @click="fetchProducts" class="flex-1 py-2 bg-indigo-600 text-white rounded-xl font-medium shadow-sm hover:bg-indigo-700 transition-all flex items-center justify-center text-sm">
+                    <button @click="fetchProducts" class="flex-1 py-2 bg-indigo-600 text-white rounded-xl font-medium shadow-sm hover:bg-indigo-700 transition-all flex items-center justify-center text-sm" :disabled="loading">
+                        <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                         Filter
                     </button>
-                     <button @click="resetFilters" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium transition-all text-sm">
+                     <button @click="resetFilters" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium transition-all text-sm" :disabled="loading">
                         Reset
                     </button>
                 </div>
@@ -145,7 +149,27 @@
       </div>
 
       <!-- Product List -->
-      <div class="flex-1 flex flex-col min-h-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex-1 flex flex-col min-h-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+        <!-- Loading Overlay -->
+        <Transition
+            enter-active-class="transition ease-out duration-200"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition ease-in duration-150"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div v-if="loading" class="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                <div class="flex flex-col items-center">
+                    <svg class="animate-spin h-8 w-8 text-indigo-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-indigo-600">Loading products...</span>
+                </div>
+            </div>
+        </Transition>
+
         <div class="flex-1 overflow-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -162,7 +186,7 @@
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="loading" v-for="i in 5" :key="i">
+                <tr v-if="loading && products.length === 0" v-for="i in 5" :key="i">
                     <td class="px-6 py-4 whitespace-nowrap"><div class="h-10 w-48 bg-gray-100 rounded-lg animate-pulse"></div></td>
                     <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-20 bg-gray-100 rounded animate-pulse"></div></td>
                     <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-24 bg-gray-100 rounded animate-pulse"></div></td>
@@ -371,6 +395,18 @@
             </div>
         </Dialog>
       </TransitionRoot>
+
+      <!-- Confirmation Modal -->
+      <ConfirmModal 
+        :isOpen="showDeleteModal" 
+        title="Delete Product" 
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+        :loading="deleteLoading"
+        @close="closeDeleteModal"
+        @confirm="confirmDelete"
+      />
     </div>
   </div>
 </template>
@@ -380,6 +416,7 @@ import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { adminProductApi, categoryApi } from '@/api/productApi';
 import type { Product, Category } from '@/types/product';
 import ProductForm from '../components/ProductForm.vue';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 import { 
     Menu, MenuButton, MenuItems, MenuItem,
     Dialog, DialogPanel, TransitionRoot, TransitionChild,
@@ -406,6 +443,11 @@ const query = ref('');
 
 const showModal = ref(false);
 const selectedProduct = ref<Product | null>(null);
+
+// Delete Modal State
+const showDeleteModal = ref(false);
+const productToDelete = ref<number | null>(null);
+const deleteLoading = ref(false);
 
 const filteredCategories = computed(() =>
   query.value === ''
@@ -507,15 +549,31 @@ const handleFormSubmit = async (payload: any) => {
     }
 };
 
-const deleteProduct = async (id: number) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-        try {
-            await adminProductApi.deleteProduct(id);
-            fetchProducts();
-        } catch (error) {
-             console.error("Failed to delete product:", error);
-             alert("Failed to delete product.");
-        }
+const deleteProduct = (id: number) => {
+    productToDelete.value = id;
+    showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    productToDelete.value = null;
+    deleteLoading.value = false;
+};
+
+const confirmDelete = async () => {
+    if (!productToDelete.value) return;
+    
+    deleteLoading.value = true;
+    try {
+        await adminProductApi.deleteProduct(productToDelete.value);
+        fetchProducts();
+        closeDeleteModal();
+    } catch (error) {
+            console.error("Failed to delete product:", error);
+            // Could add an error toast/state here if needed
+            alert("Failed to delete product."); // Fallback for now, could be improved
+    } finally {
+        deleteLoading.value = false;
     }
 };
 

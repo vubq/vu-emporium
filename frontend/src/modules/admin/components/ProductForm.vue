@@ -1,6 +1,30 @@
 <template>
-  <div class="bg-gray-50 min-h-screen p-6">
-    <div class="max-w-7xl mx-auto">
+  <div class="bg-gray-50 min-h-screen p-6 relative">
+    
+    <!-- Initial Loading State -->
+    <div v-if="isLoadingData" class="absolute inset-0 flex items-center justify-center bg-gray-50 z-50">
+         <div class="flex flex-col items-center">
+            <svg class="animate-spin h-10 w-10 text-indigo-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-sm font-medium text-gray-500">Preparing product data...</span>
+        </div>
+    </div>
+
+    <div v-else class="max-w-7xl mx-auto animate-fade-in relative">
+        
+       <!-- Submitting Overlay -->
+       <div v-if="submitting" class="absolute inset-0 z-40 bg-white/50 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+            <div class="bg-white px-5 py-3 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3">
+                 <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-sm font-bold text-gray-700">Saving...</span>
+            </div>
+       </div>
+
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
@@ -8,10 +32,10 @@
            <p class="text-sm text-gray-500 mt-2">Fill in the details to configure your product.</p>
         </div>
         <div class="flex space-x-4">
-             <button type="button" @click="$emit('cancel')" class="px-6 py-2.5 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm">
+             <button type="button" @click="$emit('cancel')" class="px-6 py-2.5 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm" :disabled="submitting">
                 Cancel
              </button>
-             <button type="submit" @click="submitForm" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+             <button type="submit" @click="submitForm" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" :disabled="submitting">
                 {{ isEdit ? 'Save Changes' : 'Publish Product' }}
              </button>
         </div>
@@ -34,11 +58,11 @@
             <div class="space-y-6">
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
-                  <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Premium Cotton T-Shirt" />
+                  <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Premium Cotton T-Shirt" :disabled="submitting" />
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                  <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="Describe your product..."></textarea>
+                  <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="Describe your product..." :disabled="submitting"></textarea>
                 </div>
             </div>
           </div>
@@ -68,7 +92,7 @@
                     <span class="text-sm">No image selected</span>
                  </div>
 
-                 <input v-model="form.images[0]" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="https://example.com/image.jpg" />
+                 <input v-model="form.images[0]" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="https://example.com/image.jpg" :disabled="submitting" />
                  <p class="text-xs text-gray-500">Enter a direct URL to an image.</p>
              </div>
           </div>
@@ -84,7 +108,7 @@
                 </h3>
                 <SwitchGroup as="div" class="flex items-center">
                     <SwitchLabel as="span" class="mr-3 text-sm font-medium text-gray-700">Enable Variants</SwitchLabel>
-                    <Switch v-model="hasVariants" :class="[hasVariants ? 'bg-blue-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500']">
+                    <Switch v-model="hasVariants" :class="[hasVariants ? 'bg-blue-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500']" :disabled="submitting">
                         <span aria-hidden="true" :class="[hasVariants ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                     </Switch>
                 </SwitchGroup>
@@ -94,17 +118,17 @@
                 <!-- Option Definitions -->
                 <div class="space-y-4">
                     <div v-for="(option, index) in options" :key="index" class="bg-gray-50 p-5 rounded-xl border border-gray-200 relative group transition-all hover:bg-white hover:shadow-sm hover:border-blue-200">
-                         <button type="button" @click="removeOption(index)" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50">
+                         <button type="button" @click="removeOption(index)" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50" :disabled="submitting">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Option Name</label>
-                                <input v-model="option.name" type="text" placeholder="e.g. Size" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                <input v-model="option.name" type="text" placeholder="e.g. Size" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Values (comma separated)</label>
-                                <input v-model="option.valuesInput" type="text" placeholder="e.g. Small, Medium, Large" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" @change="processOptionValues(index)" />
+                                <input v-model="option.valuesInput" type="text" placeholder="e.g. Small, Medium, Large" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" @change="processOptionValues(index)" :disabled="submitting" />
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     <span v-for="(val, vIdx) in option.values" :key="vIdx" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
                                         {{ val.value }}
@@ -116,7 +140,7 @@
                 </div>
 
                 <div class="flex justify-between items-center pt-2">
-                     <button type="button" @click="addOption" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center">
+                     <button type="button" @click="addOption" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center" :disabled="submitting">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                         Add Another Option
                      </button>
@@ -143,13 +167,13 @@
                                         <input v-model="variant.sku" type="text" readonly class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none transition-all" />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model.number="variant.price" type="number" step="0.01" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                        <input v-model.number="variant.price" type="number" step="0.01" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model.number="variant.stockQuantity" type="number" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                        <input v-model.number="variant.stockQuantity" type="number" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model="variant.image" type="text" placeholder="https://..." class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                        <input v-model="variant.image" type="text" placeholder="https://..." class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                                     </td>
                                 </tr>
                             </tbody>
@@ -171,7 +195,7 @@
                     <!-- Status -->
                     <div>
                              <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                             <Listbox v-model="form.status">
+                             <Listbox v-model="form.status" :disabled="submitting">
                                 <div class="relative mt-1">
                                 <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     <span class="block truncate font-medium" :class="{'text-green-600': form.status === 'ACTIVE', 'text-yellow-600': form.status === 'DRAFT', 'text-gray-500': form.status === 'ARCHIVED'}">{{ form.status }}</span>
@@ -198,7 +222,7 @@
                     <!-- Category -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                        <Combobox v-model="selectedCategory" nullable by="id">
+                        <Combobox v-model="selectedCategory" nullable by="id" :disabled="submitting">
                             <div class="relative mt-1">
                                 <div class="relative w-full text-left">
                                     <ComboboxInput
@@ -255,7 +279,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <span class="text-gray-500 sm:text-sm">$</span>
                         </div>
-                        <input v-model.number="form.price" type="number" step="0.01" min="0" required class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" />
+                        <input v-model.number="form.price" type="number" step="0.01" min="0" required class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
                       </div>
                     </div>
                     <div>
@@ -264,7 +288,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <span class="text-gray-500 sm:text-sm">$</span>
                         </div>
-                        <input v-model.number="form.compareAtPrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" />
+                        <input v-model.number="form.compareAtPrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
                       </div>
                     </div>
                  </div>
@@ -276,11 +300,11 @@
                 <div class="space-y-4">
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">SKU</label>
-                    <input v-model="form.sku" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" />
+                    <input v-model="form.sku" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                   </div>
                    <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Quantity</label>
-                    <input v-model.number="form.stockQuantity" type="number" min="0" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" />
+                    <input v-model.number="form.stockQuantity" type="number" min="0" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                   </div>
                 </div>
             </div>
@@ -322,6 +346,10 @@ interface OptionInput {
 const options = ref<OptionInput[]>([]);
 const variants = ref<any[]>([]);
 
+// Loading States
+const isLoadingData = ref(true);
+const submitting = ref(false);
+
 const form = reactive({
   name: '',
   description: '',
@@ -354,55 +382,69 @@ const handleImageError = (e: Event) => {
 };
 
 onMounted(async () => {
+    isLoadingData.value = true;
     try {
+        // 1. Fetch Categories
         const res = await categoryApi.getCategories();
         categories.value = res.data.data.content || res.data.data;
+        
+        // 2. Initialize Form Data
+        if (props.initialData) {
+            Object.assign(form, props.initialData);
+            // Fix for numbers that might come as strings or undefined
+            if(form.price === undefined) form.price = 0;
+            if(form.compareAtPrice === undefined) form.compareAtPrice = 0;
+            
+            if (props.initialData.category) {
+                form.categoryId = props.initialData.category.id;
+                selectedCategory.value = props.initialData.category;
+            } else if (form.categoryId) {
+                const found = categories.value.find(c => c.id === form.categoryId);
+                if (found) selectedCategory.value = found;
+            }
+            
+            if (!form.images || form.images.length === 0) {
+                form.images = [''];
+            }
+
+            if (props.initialData.hasVariants) {
+                hasVariants.value = true;
+                if (props.initialData.options) {
+                    options.value = props.initialData.options.map((opt: any) => ({
+                        name: opt.name,
+                        values: Array.isArray(opt.values) && typeof opt.values[0] === 'string' 
+                            ? opt.values.map((v: string) => ({ value: v }))
+                            : opt.values,
+                        valuesInput: Array.isArray(opt.values) 
+                            ? opt.values.map((v: any) => typeof v === 'string' ? v : v.value).join(', ') 
+                            : ''
+                    }));
+                }
+                if (props.initialData.variants) {
+                    variants.value = props.initialData.variants.map((v: any) => ({
+                       ...v,
+                        optionValues: Array.isArray(v.optionValues) && typeof v.optionValues[0] === 'string'
+                            ? v.optionValues.map((val: string) => ({ value: val }))
+                            : v.optionValues,
+                        imagesInput: v.images ? v.images.join(', ') : ''
+                    }));
+                }
+            }
+            
+            // Run normalization once to ensure initial data is sorted and consistent
+            if (hasVariants.value) {
+                updateVariantsMatrix();
+            }
+        }
     } catch (e) {
-        console.error("Failed to load categories", e);
+        console.error("Failed to load initial data", e);
+    } finally {
+        // Enforce a minimum loading time for smoother UX (optional, but prevents flicker)
+        setTimeout(() => {
+            isLoadingData.value = false;
+        }, 500);
     }
 
-    if (props.initialData) {
-        Object.assign(form, props.initialData);
-        // Fix for numbers that might come as strings or undefined
-        if(form.price === undefined) form.price = 0;
-        if(form.compareAtPrice === undefined) form.compareAtPrice = 0;
-        
-        if (props.initialData.category) {
-            form.categoryId = props.initialData.category.id;
-            selectedCategory.value = props.initialData.category;
-        } else if (form.categoryId) {
-            const found = categories.value.find(c => c.id === form.categoryId);
-            if (found) selectedCategory.value = found;
-        }
-        
-        if (!form.images || form.images.length === 0) {
-            form.images = [''];
-        }
-
-    if (props.initialData.hasVariants) {
-            hasVariants.value = true;
-            if (props.initialData.options) {
-                options.value = props.initialData.options.map((opt: any) => ({
-                    name: opt.name,
-                    values: Array.isArray(opt.values) && typeof opt.values[0] === 'string' 
-                        ? opt.values.map((v: string) => ({ value: v }))
-                        : opt.values,
-                    valuesInput: Array.isArray(opt.values) 
-                        ? opt.values.map((v: any) => typeof v === 'string' ? v : v.value).join(', ') 
-                        : ''
-                }));
-            }
-            if (props.initialData.variants) {
-                variants.value = props.initialData.variants.map((v: any) => ({
-                   ...v,
-                    optionValues: Array.isArray(v.optionValues) && typeof v.optionValues[0] === 'string'
-                        ? v.optionValues.map((val: string) => ({ value: val }))
-                        : v.optionValues,
-                    imagesInput: v.images ? v.images.join(', ') : ''
-                }));
-            }
-        }
-    }
     // Register watchers AFTER loading initial data
     watch(options, debounce(() => {
         if (hasVariants.value) {
@@ -422,11 +464,6 @@ onMounted(async () => {
             updateVariantsMatrix();
         }
     }, 500));
-
-    // Run normalization once to ensure initial data is sorted and consistent
-    if (hasVariants.value) {
-        updateVariantsMatrix();
-    }
 });
 
 function addOption() {
@@ -452,8 +489,6 @@ function debounce(fn: Function, delay: number) {
         timeoutId = setTimeout(() => fn.apply(null, args), delay);
     };
 }
-
-// Watchers moved to onMounted
 
 
 function updateVariantsMatrix() {
@@ -628,19 +663,30 @@ function getVariantName(variant: any) {
 }
 
 function submitForm() {
-    const payload = {
-        ...form,
-        hasVariants: hasVariants.value,
-        options: hasVariants.value ? options.value.map(o => ({
-            name: o.name,
-            values: o.values.map(v => v.value)
-        })) : [],
-        variants: hasVariants.value ? variants.value.map(v => ({
-            ...v,
-            optionValues: v.optionValues.map((ov: any) => ov.value),
-            images: v.imagesInput ? v.imagesInput.split(',').map((s: string) => s.trim()).filter((s: string) => s) : []
-        })) : []
-    };
-    emit('submit', payload);
+    submitting.value = true;
+    try {
+        const payload = {
+            ...form,
+            hasVariants: hasVariants.value,
+            options: hasVariants.value ? options.value.map(o => ({
+                name: o.name,
+                values: o.values.map(v => v.value)
+            })) : [],
+            variants: hasVariants.value ? variants.value.map(v => ({
+                ...v,
+                optionValues: v.optionValues.map((ov: any) => ov.value),
+                images: v.imagesInput ? v.imagesInput.split(',').map((s: string) => s.trim()).filter((s: string) => s) : []
+            })) : []
+        };
+        emit('submit', payload);
+        
+        // Auto-reset submitting if parent doesn't close modal immediately (fallback)
+        setTimeout(() => {
+             submitting.value = false; 
+        }, 5000);
+    } catch (e) {
+        console.error("Submission Error", e);
+        submitting.value = false;
+    }
 }
 </script>
