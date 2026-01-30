@@ -1,0 +1,63 @@
+<template>
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+      <h1 class="text-3xl font-bold text-center mb-8">Login</h1>
+      
+      <form @submit.prevent="handleSubmit">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Email</label>
+          <input v-model="form.email" type="email" required class="input" placeholder="your@email.com" />
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-gray-700 mb-2">Password</label>
+          <input v-model="form.password" type="password" required class="input" placeholder="••••••••" />
+        </div>
+        
+        <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {{ error }}
+        </div>
+        
+        <button type="submit" :disabled="loading" class="btn btn-primary w-full">
+          {{ loading ? 'Logging in...' : 'Login' }}
+        </button>
+      </form>
+      
+      <p class="text-center mt-4 text-gray-600">
+        Don't have an account?
+        <router-link to="/register" class="text-primary-600 hover:underline">Sign up</router-link>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const form = ref({
+  email: '',
+  password: '',
+});
+
+const loading = ref(false);
+const error = ref('');
+
+async function handleSubmit() {
+  loading.value = true;
+  error.value = '';
+  
+  try {
+    await authStore.login(form.value);
+    router.push('/');
+  } catch (err: any) {
+    error.value = err.response?.data?.message || 'Login failed';
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
