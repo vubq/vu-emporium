@@ -15,7 +15,7 @@
         <div class="lg:col-span-2 space-y-4">
           <div 
             v-for="(item, index) in cartStore.items" 
-            :key="item.product.id"
+            :key="`${item.productId}-${item.variantId}`"
             class="bg-white rounded-2xl shadow-card p-6 animate-fade-in hover:shadow-card-hover transition-all duration-300"
             :style="{ animationDelay: `${index * 50}ms` }"
           >
@@ -24,9 +24,9 @@
               <div class="flex-shrink-0">
                 <div class="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
                   <img 
-                    v-if="item.product.images[0]" 
-                    :src="item.product.images[0]" 
-                    :alt="item.product.name" 
+                    v-if="item.image" 
+                    :src="item.image" 
+                    :alt="item.name" 
                     class="w-full h-full object-cover"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center">
@@ -37,18 +37,24 @@
               
               <!-- Product Info -->
               <div class="flex-1 min-w-0">
-                <h3 class="font-display font-bold text-lg text-gray-900 mb-2 line-clamp-1">
-                  {{ item.product.name }}
+                <h3 class="font-display font-bold text-lg text-gray-900 mb-1 line-clamp-1">
+                  {{ item.name }}
                 </h3>
+                
+                <!-- Variant Info display -->
+                <p v-if="item.variantName" class="text-sm text-gray-500 mb-2 font-medium">
+                    {{ item.variantName }}
+                </p>
+
                 <p class="text-2xl font-bold gradient-text mb-4">
-                  ${{ item.product.price.toFixed(2) }}
+                  ${{ item.price.toFixed(2) }}
                 </p>
                 
                 <!-- Quantity Controls -->
                 <div class="flex items-center gap-4">
                   <div class="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button 
-                      @click="cartStore.updateQuantity(item.product.id, item.quantity - 1)" 
+                      @click="cartStore.updateQuantity(item.productId, item.variantId || null, item.quantity - 1)" 
                       class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors"
                       :disabled="item.quantity <= 1"
                     >
@@ -58,9 +64,8 @@
                     </button>
                     <span class="px-4 py-2 font-semibold min-w-[3rem] text-center">{{ item.quantity }}</span>
                     <button 
-                      @click="cartStore.updateQuantity(item.product.id, item.quantity + 1)" 
+                      @click="cartStore.updateQuantity(item.productId, item.variantId || null, item.quantity + 1)" 
                       class="px-3 py-2 bg-gray-100 hover:bg-gray-200 transition-colors"
-                      :disabled="item.quantity >= item.product.stockQuantity"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -70,7 +75,7 @@
                   
                   <!-- Remove Button -->
                   <button 
-                    @click="cartStore.removeFromCart(item.product.id)" 
+                    @click="cartStore.removeFromCart(item.productId, item.variantId || null)" 
                     class="text-red-600 hover:text-red-700 font-medium transition-colors flex items-center gap-2 group"
                   >
                     <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +90,7 @@
               <div class="text-right">
                 <p class="text-sm text-gray-600 mb-1">Subtotal</p>
                 <p class="text-2xl font-bold gradient-text">
-                  ${{ (item.product.price * item.quantity).toFixed(2) }}
+                  ${{ (item.price * item.quantity).toFixed(2) }}
                 </p>
               </div>
             </div>

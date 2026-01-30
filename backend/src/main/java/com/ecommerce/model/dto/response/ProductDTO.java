@@ -31,4 +31,9 @@ public class ProductDTO {
     private Integer soldCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // New fields for variants
+    private Boolean hasVariants;
+    private List<ProductOptionDTO> options;
+    private List<ProductVariantDTO> variants;
 }

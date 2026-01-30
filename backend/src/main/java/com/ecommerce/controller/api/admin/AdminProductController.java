@@ -1,10 +1,12 @@
 package com.ecommerce.controller.api.admin;
 
+import com.ecommerce.model.dto.request.ProductRequest;
 import com.ecommerce.model.dto.response.ApiResponse;
 import com.ecommerce.model.dto.response.ProductDTO;
 import com.ecommerce.model.entity.Product;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.interfaces.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.ecommerce.model.enums.ProductStatus;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -27,14 +32,17 @@ public class AdminProductController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) ProductStatus status,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // Admin can see all products regardless of status
-        Page<ProductDTO> products = productService.getAllProducts(categoryId, search, pageable);
+        Page<ProductDTO> products = productService.getAllProducts(categoryId, search, minPrice, maxPrice, status,
+                pageable);
         return ResponseEntity.ok(ApiResponse.success(products));
     }
 
@@ -44,6 +52,22 @@ public class AdminProductController {
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 
-    // TODO: Add create, update, delete endpoints
-    // These will be implemented in the next phase
+    @PostMapping
+    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@RequestBody @Valid ProductRequest request) {
+        ProductDTO product = productService.createProduct(request);
+        return ResponseEntity.ok(ApiResponse.success(product));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDTO>> updateProduct(@PathVariable Long id,
+            @RequestBody @Valid ProductRequest request) {
+        ProductDTO product = productService.updateProduct(id, request);
+        return ResponseEntity.ok(ApiResponse.success(product));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

@@ -77,6 +77,18 @@ public class Product {
     @Builder.Default
     private Integer soldCount = 0;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean hasVariants = false;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductOption> options = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariant> variants = new ArrayList<>();
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

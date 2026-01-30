@@ -1,0 +1,32 @@
+Picked up _JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true
+
+> Task :compileJava FAILED
+D:\Vubq\New111\vu-emporium\backend\src\main\java\com\ecommerce\controller\api\admin\AdminProductController.java:48: error: wrong receiver parameter name
+    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@RequestBody jakarta.validation.Valid com.ecommerce.model.dto.request.ProductRequest request) {
+                                                                                                                                                      ^
+D:\Vubq\New111\vu-emporium\backend\src\main\java\com\ecommerce\controller\api\admin\AdminProductController.java:48: error: ',', ')', or '[' expected
+    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@RequestBody jakarta.validation.Valid com.ecommerce.model.dto.request.ProductRequest request) {
+                                                                                                                                                     ^
+D:\Vubq\New111\vu-emporium\backend\src\main\java\com\ecommerce\controller\api\admin\AdminProductController.java:54: error: ',', ')', or '[' expected
+    public ResponseEntity<ApiResponse<ProductDTO>> updateProduct(@PathVariable Long id, @RequestBody jakarta.validation.Valid com.ecommerce.model.dto.request.ProductRequest request) {
+                                                                                                                                                                            ^
+3 errors
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2s
+1 actionable task: 1 executed

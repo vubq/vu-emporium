@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.ecommerce.repository.spec.ProductSpecification;
+import org.springframework.data.jpa.domain.Specification;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -23,19 +26,20 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final com.ecommerce.repository.CategoryRepository categoryRepository;
 
     @Override
     public Page<ProductDTO> getAllProducts(Long categoryId, String search, Pageable pageable) {
-        Page<Product> products;
+        // Delegate to the more specific method with default behavior (Active status)
+        return getAllProducts(categoryId, search, null, null, ProductStatus.ACTIVE, pageable);
+    }
 
-        if (search != null && !search.isEmpty()) {
-            products = productRepository.searchProducts(search, ProductStatus.ACTIVE, pageable);
-        } else if (categoryId != null) {
-            products = productRepository.findByCategoryIdAndStatus(categoryId, ProductStatus.ACTIVE, pageable);
-        } else {
-            products = productRepository.findByStatus(ProductStatus.ACTIVE, pageable);
-        }
-
+    @Override
+    public Page<ProductDTO> getAllProducts(Long categoryId, String search, BigDecimal minPrice, BigDecimal maxPrice,
+            ProductStatus status, Pageable pageable) {
+        Specification<Product> spec = ProductSpecification.getSpecifications(categoryId, search, minPrice, maxPrice,
+                status);
+        Page<Product> products = productRepository.findAll(spec, pageable);
         return products.map(this::convertToDTO);
     }
 
@@ -61,8 +65,193 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public ProductDTO createProduct(com.ecommerce.model.dto.request.ProductRequest request) {
+        Product product = new Product();
+        updateProductFromRequest(product, request);
+
+        // Handle Options and Variants
+        handleProductOptionsAndVariants(product, request);
+
+        product = productRepository.save(product);
+        return convertToDTO(product);
+    }
+
+    @Override
+    @Transactional
+    public ProductDTO updateProduct(Long id, com.ecommerce.model.dto.request.ProductRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+        updateProductFromRequest(product, request);
+
+        // Smart merge of Options and Variants logic
+        handleProductOptionsAndVariants(product, request);
+
+        product = productRepository.save(product);
+        return convertToDTO(product);
+    }
+
+    @Override
+    @Transactional
+    public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+        productRepository.deleteById(id);
+    }
+
+    private void updateProductFromRequest(Product product, com.ecommerce.model.dto.request.ProductRequest request) {
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setCompareAtPrice(request.getCompareAtPrice());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setSku(request.getSku());
+
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+            product.setCategory(category);
+        }
+
+        if (request.getImages() != null) {
+            product.setImages(new java.util.ArrayList<>(request.getImages()));
+        }
+        if (request.getStatus() != null) {
+            product.setStatus(request.getStatus());
+        }
+        if (request.getFeatured() != null) {
+            product.setFeatured(request.getFeatured());
+        }
+
+        // Slug generation (simplistic)
+        if (product.getSlug() == null || !product.getName().equals(request.getName())) {
+            String baseSlug = request.getName().toLowerCase().replaceAll("[^a-z0-9]", "-").replaceAll("-+", "-");
+            // Add randomness or check unique in real app
+            product.setSlug(baseSlug + "-" + System.currentTimeMillis());
+        }
+    }
+
+    private void handleProductOptionsAndVariants(Product product,
+            com.ecommerce.model.dto.request.ProductRequest request) {
+        if (request.getOptions() == null || request.getOptions().isEmpty()) {
+            product.setHasVariants(false);
+            // If clearing options, archive all variants
+            product.getVariants().forEach(v -> {
+                v.setStatus(ProductStatus.ARCHIVED);
+                v.setStockQuantity(0);
+            });
+            // We can choose to clear options or keep them orphaned. Clearing is simpler for
+            // structure.
+            product.getOptions().clear();
+            return;
+        }
+
+        product.setHasVariants(true);
+
+        // 1. Merge Options (Preserve IDs if Name matches)
+        List<com.ecommerce.model.entity.ProductOption> currentOptions = product.getOptions();
+        List<com.ecommerce.model.entity.ProductOption> updatedOptions = new java.util.ArrayList<>();
+
+        for (com.ecommerce.model.dto.request.ProductOptionRequest optionReq : request.getOptions()) {
+            // Find existing option by name
+            com.ecommerce.model.entity.ProductOption option = currentOptions.stream()
+                    .filter(o -> o.getName().equalsIgnoreCase(optionReq.getName()))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        com.ecommerce.model.entity.ProductOption newOpt = new com.ecommerce.model.entity.ProductOption();
+                        newOpt.setName(optionReq.getName());
+                        newOpt.setProduct(product);
+                        return newOpt;
+                    });
+
+            // Merge Values for this option
+            List<com.ecommerce.model.entity.ProductOptionValue> currentValues = option.getValues();
+            List<com.ecommerce.model.entity.ProductOptionValue> newValuesList = new java.util.ArrayList<>();
+
+            if (optionReq.getValues() != null) {
+                for (String valStr : optionReq.getValues()) {
+                    com.ecommerce.model.entity.ProductOptionValue val = currentValues.stream()
+                            .filter(v -> v.getValue().equalsIgnoreCase(valStr))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                com.ecommerce.model.entity.ProductOptionValue newVal = new com.ecommerce.model.entity.ProductOptionValue();
+                                newVal.setValue(valStr);
+                                newVal.setProductOption(option);
+                                return newVal;
+                            });
+                    newValuesList.add(val);
+                }
+            }
+            // Update option's values
+            option.getValues().clear();
+            option.getValues().addAll(newValuesList);
+
+            updatedOptions.add(option);
+        }
+
+        // Apply updated options list
+        product.getOptions().clear();
+        product.getOptions().addAll(updatedOptions);
+
+        // 2. Merge Variants (Match by SKU, Soft Delete others)
+        // First, mark all as ARCHIVED
+        product.getVariants().forEach(v -> v.setStatus(ProductStatus.ARCHIVED));
+
+        if (request.getVariants() != null) {
+            for (com.ecommerce.model.dto.request.ProductVariantRequest variantReq : request.getVariants()) {
+                // Find existing variant by SKU
+                java.util.Optional<com.ecommerce.model.entity.ProductVariant> existingVariant = product.getVariants()
+                        .stream()
+                        .filter(v -> v.getSku() != null && v.getSku().equalsIgnoreCase(variantReq.getSku()))
+                        .findFirst();
+
+                com.ecommerce.model.entity.ProductVariant variant;
+                if (existingVariant.isPresent()) {
+                    variant = existingVariant.get();
+                } else {
+                    variant = new com.ecommerce.model.entity.ProductVariant();
+                    variant.setProduct(product);
+                    product.getVariants().add(variant);
+                }
+
+                // Update fields
+                variant.setSku(variantReq.getSku());
+                variant.setPrice(variantReq.getPrice());
+                variant.setStockQuantity(variantReq.getStockQuantity());
+                if (variantReq.getImages() != null) {
+                    variant.setImages(new java.util.ArrayList<>(variantReq.getImages()));
+                }
+                variant.setStatus(ProductStatus.ACTIVE);
+
+                // Update Option Values
+                variant.getOptionValues().clear();
+                if (variantReq.getOptionValues() != null) {
+                    for (String valStr : variantReq.getOptionValues()) {
+                        findOptionValue(product.getOptions(), valStr)
+                                .ifPresent(ov -> variant.getOptionValues().add(ov));
+                    }
+                }
+            }
+        }
+    }
+
+    private java.util.Optional<com.ecommerce.model.entity.ProductOptionValue> findOptionValue(
+            List<com.ecommerce.model.entity.ProductOption> options, String value) {
+        for (com.ecommerce.model.entity.ProductOption option : options) {
+            for (com.ecommerce.model.entity.ProductOptionValue ov : option.getValues()) {
+                if (ov.getValue().equals(value)) {
+                    return java.util.Optional.of(ov);
+                }
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
     private ProductDTO convertToDTO(Product product) {
-        return ProductDTO.builder()
+        ProductDTO.ProductDTOBuilder builder = ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .slug(product.getSlug())
@@ -80,6 +269,46 @@ public class ProductServiceImpl implements ProductService {
                 .soldCount(product.getSoldCount())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
+                .hasVariants(product.getHasVariants());
+
+        if (Boolean.TRUE.equals(product.getHasVariants())) {
+            builder.options(product.getOptions().stream().map(this::convertOptionToDTO).collect(Collectors.toList()));
+            builder.variants(
+                    product.getVariants().stream().map(this::convertVariantToDTO).collect(Collectors.toList()));
+        }
+
+        return builder.build();
+    }
+
+    private com.ecommerce.model.dto.response.ProductOptionDTO convertOptionToDTO(
+            com.ecommerce.model.entity.ProductOption option) {
+        return com.ecommerce.model.dto.response.ProductOptionDTO.builder()
+                .id(option.getId())
+                .name(option.getName())
+                .values(option.getValues().stream()
+                        .map(v -> com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
+                                .id(v.getId())
+                                .value(v.getValue())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private com.ecommerce.model.dto.response.ProductVariantDTO convertVariantToDTO(
+            com.ecommerce.model.entity.ProductVariant variant) {
+        return com.ecommerce.model.dto.response.ProductVariantDTO.builder()
+                .id(variant.getId())
+                .sku(variant.getSku())
+                .price(variant.getPrice())
+                .stockQuantity(variant.getStockQuantity())
+                .images(variant.getImages() != null ? new java.util.ArrayList<>(variant.getImages())
+                        : new java.util.ArrayList<>())
+                .optionValues(variant.getOptionValues().stream()
+                        .map(v -> com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
+                                .id(v.getId())
+                                .value(v.getValue())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 

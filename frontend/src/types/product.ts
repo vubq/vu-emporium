@@ -1,3 +1,23 @@
+export interface ProductOptionValue {
+    id: number;
+    value: string;
+}
+
+export interface ProductOption {
+    id: number;
+    name: string;
+    values: ProductOptionValue[];
+}
+
+export interface ProductVariant {
+    id: number;
+    sku: string;
+    price: number;
+    stockQuantity: number;
+    image: string;
+    optionValues: ProductOptionValue[];
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -7,14 +27,18 @@ export interface Product {
     compareAtPrice?: number;
     stockQuantity: number;
     sku?: string;
+    category?: Category;
     categoryId?: number;
     images: string[];
-    status: 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK' | 'DISCONTINUED';
+    status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
     featured: boolean;
     viewCount: number;
     soldCount: number;
     createdAt: string;
     updatedAt: string;
+    hasVariants: boolean;
+    options: ProductOption[];
+    variants: ProductVariant[];
 }
 
 export interface Category {

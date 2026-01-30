@@ -43,4 +43,8 @@ public class ProductRequest {
     private ProductStatus status;
 
     private Boolean featured;
+
+    private List<ProductOptionRequest> options;
+
+    private List<ProductVariantRequest> variants;
 }

@@ -3,8 +3,14 @@ import { ref, computed } from 'vue';
 import type { Product } from '@/types/product';
 
 export interface CartItem {
-    product: Product;
+    productId: number;
+    variantId?: number | null;
+    name: string;
+    price: number;
+    image: string;
     quantity: number;
+    slug: string;
+    variantName?: string;
 }
 
 export const useCartStore = defineStore('cart', () => {
@@ -15,32 +21,42 @@ export const useCartStore = defineStore('cart', () => {
     });
 
     const totalPrice = computed(() => {
-        return items.value.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        return items.value.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     });
 
-    function addToCart(product: Product, quantity: number = 1) {
-        const existingItem = items.value.find(item => item.product.id === product.id);
+    // Accept a partial item or full structure. 
+    // We expect the caller to provide current price/image/variant info.
+    function addItem(newItem: CartItem) {
+        const existingItem = items.value.find(item =>
+            item.productId === newItem.productId &&
+            item.variantId === newItem.variantId
+        );
 
         if (existingItem) {
-            existingItem.quantity += quantity;
+            existingItem.quantity += newItem.quantity;
         } else {
-            items.value.push({ product, quantity });
+            items.value.push({ ...newItem });
         }
 
         saveCart();
     }
 
-    function removeFromCart(productId: number) {
-        items.value = items.value.filter(item => item.product.id !== productId);
+    function removeFromCart(productId: number, variantId: number | null = null) {
+        items.value = items.value.filter(item =>
+            !(item.productId === productId && item.variantId === variantId)
+        );
         saveCart();
     }
 
-    function updateQuantity(productId: number, quantity: number) {
-        const item = items.value.find(item => item.product.id === productId);
+    function updateQuantity(productId: number, variantId: number | null, quantity: number) {
+        const item = items.value.find(item =>
+            item.productId === productId && item.variantId === variantId
+        );
+
         if (item) {
             item.quantity = quantity;
             if (item.quantity <= 0) {
-                removeFromCart(productId);
+                removeFromCart(productId, variantId);
             } else {
                 saveCart();
             }
@@ -71,7 +87,7 @@ export const useCartStore = defineStore('cart', () => {
         items,
         totalItems,
         totalPrice,
-        addToCart,
+        addItem,
         removeFromCart,
         updateQuantity,
         clearCart,

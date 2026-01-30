@@ -89,7 +89,7 @@ const router = createRouter({
                 {
                     path: 'products',
                     name: 'admin-products',
-                    component: () => import('@/pages/admin/AdminProductsPage.vue'),
+                    component: () => import('@/modules/admin/pages/ProductManagementPage.vue'),
                     meta: { title: 'Product Management' },
                 },
                 {
