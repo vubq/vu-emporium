@@ -14,7 +14,7 @@ export interface ProductVariant {
     sku: string;
     price: number;
     stockQuantity: number;
-    image: string;
+    images: string[]; // Changed from single image to array
     optionValues: ProductOptionValue[];
 }
 

@@ -303,18 +303,29 @@ const currentVariant = computed(() => {
     });
 });
 
+// Reset image index when variant changes
+watch(currentVariant, () => {
+    selectedImageIndex.value = 0;
+});
+
 const currentDisplayPrice = computed(() => {
     if (currentVariant.value) return currentVariant.value.price;
     return product.value?.price || 0;
 });
 
 const currentDisplayImage = computed(() => {
-    if (currentVariant.value && currentVariant.value.image) return currentVariant.value.image;
-    if (product.value?.images && product.value.images.length > 0) return product.value.images[selectedImageIndex.value];
+    // Priority: variant images > product images
+    const images = allImages.value;
+    if (images.length > 0) return images[selectedImageIndex.value] || images[0];
     return "https://via.placeholder.com/400?text=No+Image";
 });
 
 const allImages = computed(() => {
+    // If variant is selected and has images, show variant images
+    if (currentVariant.value && currentVariant.value.images && currentVariant.value.images.length > 0) {
+        return currentVariant.value.images;
+    }
+    // Otherwise show product images
     return product.value?.images || [];
 });
 
@@ -349,7 +360,7 @@ async function addToCart() {
     variantId: variantId, 
     name: product.value.name,
     price: currentDisplayPrice.value,
-    image: currentDisplayImage.value,
+    image: allImages.value[0] || currentDisplayImage.value, // Use first image from gallery
     quantity: quantity.value,
     slug: product.value.slug,
     variantName: currentVariant.value ? getVariantName(currentVariant.value) : undefined
