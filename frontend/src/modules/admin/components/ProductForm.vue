@@ -73,28 +73,40 @@
                 <span class="bg-pink-100 text-pink-600 p-2 rounded-lg mr-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </span>
-                Media
+                Product Images
             </h3>
-             <div class="space-y-4">
-                 <label class="block text-sm font-semibold text-gray-700 mb-2">Main Image</label>
-                 
-                 <!-- Image Preview (if available) -->
-                 <div v-if="form.images[0]" class="relative w-full h-64 bg-gray-50 rounded-xl overflow-hidden mb-4 border-2 border-dashed border-gray-200 group">
-                    <img :src="form.images[0]" class="w-full h-full object-contain" alt="Product Preview" @error="handleImageError"/>
-                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button type="button" @click="form.images[0] = ''" class="text-white bg-red-500 p-2 rounded-full hover:bg-red-600">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+             
+             <!-- Image Gallery -->
+             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                 <!-- Existing Images -->
+                 <div v-for="(img, idx) in form.images.filter(i => i)" :key="idx" 
+                      class="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 group hover:border-indigo-400 transition-colors cursor-pointer">
+                    <img :src="img" class="w-full h-full object-cover" @error="handleImageError" @click="openProductPreview(idx)" />
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" @click.stop="openProductPreview(idx)" 
+                                class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors" :disabled="submitting">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </button>
+                        <button type="button" @click.stop="removeProductImage(idx)" 
+                                class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors" :disabled="submitting">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     </div>
+                    <!-- Primary Badge -->
+                    <div v-if="idx === 0" class="absolute top-2 left-2 px-2 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full">
+                        Primary
+                    </div>
                  </div>
-                 <div v-else class="w-full h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400">
-                    <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <span class="text-sm">No image selected</span>
-                 </div>
-
-                 <input v-model="form.images[0]" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="https://example.com/image.jpg" :disabled="submitting" />
-                 <p class="text-xs text-gray-500">Enter a direct URL to an image.</p>
+                 
+                 <!-- Add Image Button -->
+                 <button type="button" @click="openMediaModal('product')" 
+                         class="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-indigo-500 hover:bg-indigo-50 transition-all group" :disabled="submitting">
+                    <svg class="w-10 h-10 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    <span class="text-sm text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">Add Image</span>
+                 </button>
              </div>
+             
+             <p class="text-xs text-gray-500 mt-4">Click "Add Image" to select from media library. First image will be the primary image.</p>
           </div>
 
           <!-- Variants Card -->
@@ -155,7 +167,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">SKU (Auto)</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Price</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image URL</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">Images</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -172,8 +184,44 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <input v-model.number="variant.stockQuantity" type="number" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model="variant.image" type="text" placeholder="https://..." class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <!-- Image Thumbnails -->
+                                            <div class="flex items-center gap-2">
+                                                <div v-if="!variant.images || variant.images.length === 0"
+                                                     class="w-16 h-16 rounded-lg bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                </div>
+                                                
+                                                <div v-else class="flex items-center gap-2">
+                                                    <!-- First thumbnail only -->
+                                                    <div class="relative w-16 h-16 rounded-lg border-2 border-gray-200 overflow-hidden group hover:border-indigo-400 transition-all cursor-pointer"
+                                                         @click="openVariantImageModal(index)">
+                                                        <img :src="variant.images[0]" 
+                                                             class="w-full h-full object-cover" 
+                                                             @error="handleImageError" />
+                                                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- More indicator -->
+                                                    <div v-if="(variant.images || []).length > 1" 
+                                                         class="w-16 h-16 rounded-lg bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center text-sm font-bold text-indigo-600 cursor-pointer hover:bg-indigo-100 transition-colors"
+                                                         @click="openVariantImageModal(index)">
+                                                        +{{ variant.images.length - 1 }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Manage Button - only show if no counter -->
+                                            <button v-if="!variant.images || variant.images.length <= 1" 
+                                                    type="button" @click="openVariantImageModal(index)" 
+                                                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-indigo-200 hover:border-indigo-300" :disabled="submitting"
+                                                    :title="'Manage images for ' + getVariantName(variant)">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -311,6 +359,309 @@
 
         </div>
       </form>
+      
+      <!-- MediaManager Modal -->
+      <TransitionRoot appear :show="showMediaModal" as="template">
+        <Dialog as="div" @close="closeMediaModal" class="relative z-50">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel class="w-full max-w-5xl h-[80vh] transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+                  <MediaManager 
+                    mode="select" 
+                    @select="handleMediaSelect" 
+                    @cancel="closeMediaModal" 
+                  />
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      
+      <!-- Product Image Preview Modal -->
+      <TransitionRoot appear :show="showProductPreview" as="template">
+        <Dialog as="div" @close="closeProductPreview" class="relative z-50">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel class="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+                  <div class="relative">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between p-4 border-b">
+                      <h3 class="text-lg font-bold text-gray-900">Product Images</h3>
+                      <button @click="closeProductPreview" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Image Display -->
+                    <div class="relative bg-gray-100 aspect-video flex items-center justify-center">
+                      <img v-if="previewImageIndex !== null && form.images.filter(i => i)[previewImageIndex]" 
+                           :src="form.images.filter(i => i)[previewImageIndex]" 
+                           class="max-h-[60vh] max-w-full object-contain" 
+                           @error="handleImageError" />
+                      
+                      <!-- Navigation Buttons -->
+                      <button v-if="form.images.filter(i => i).length > 1 && previewImageIndex > 0" 
+                              @click="prevImage" 
+                              class="absolute left-4 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                      </button>
+                      
+                      <button v-if="form.images.filter(i => i).length > 1 && previewImageIndex < form.images.filter(i => i).length - 1" 
+                              @click="nextImage" 
+                              class="absolute right-4 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Footer with Thumbnails and Actions -->
+                    <div class="p-4 border-t bg-gray-50">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-600">Image {{ (previewImageIndex || 0) + 1 }} of {{ form.images.filter(i => i).length }}</span>
+                        <button @click="removeProductImage(previewImageIndex || 0); closeProductPreview();" 
+                                class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          Delete Image
+                        </button>
+                      </div>
+                      
+                      <!-- Thumbnail Strip -->
+                      <div class="flex gap-2 overflow-x-auto pb-2">
+                        <div v-for="(img, idx) in form.images.filter(i => i)" :key="idx"
+                             @click="previewImageIndex = idx"
+                             class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+                             :class="previewImageIndex === idx ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-300 hover:border-indigo-300'">
+                          <img :src="img" class="w-full h-full object-cover" @error="handleImageError" />
+                          <div v-if="idx === 0" class="absolute top-1 left-1 px-1.5 py-0.5 bg-indigo-600 text-white text-xs font-bold rounded">
+                            Primary
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      
+      <!-- Variant Image Management Modal -->
+      <TransitionRoot appear :show="showVariantImageModal" as="template">
+        <Dialog as="div" @close="closeVariantImageModal" class="relative z-50">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel class="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+                  <div v-if="currentVariantIndex !== null && variants[currentVariantIndex]">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between p-6 border-b">
+                      <div>
+                        <h3 class="text-lg font-bold text-gray-900">Manage Variant Images</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ getVariantName(variants[currentVariantIndex]) }}</p>
+                      </div>
+                      <button @click="closeVariantImageModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Image Grid -->
+                    <div class="p-6">
+                      <div class="grid grid-cols-3 gap-4">
+                        <!-- Existing Images -->
+                        <div v-for="(img, imgIdx) in (variants[currentVariantIndex].images || [])" :key="imgIdx"
+                             class="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 group hover:border-indigo-400 transition-colors cursor-pointer">
+                          <img :src="img" class="w-full h-full object-cover" @error="handleImageError" @click="openVariantPreview(currentVariantIndex, imgIdx)" />
+                          <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button type="button" @click.stop="openVariantPreview(currentVariantIndex, imgIdx)" 
+                                    class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                            <button type="button" @click.stop="removeVariantImage(currentVariantIndex, imgIdx)" 
+                                    class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <!-- Add Image Button -->
+                        <button type="button" @click="openMediaModalForVariant" 
+                                class="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-indigo-500 hover:bg-indigo-50 transition-all group">
+                          <svg class="w-10 h-10 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                          <span class="text-sm text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">Add Image</span>
+                        </button>
+                      </div>
+                      
+                      <p class="text-xs text-gray-500 mt-4">Click on an image to preview. Hover to see delete option.</p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
+                      <button @click="closeVariantImageModal" 
+                              class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      
+      <!-- Variant Image Preview Modal -->
+      <TransitionRoot appear :show="showVariantPreview" as="template">
+        <Dialog as="div" @close="closeVariantPreview" class="relative z-50">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel class="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+                  <div v-if="previewVariantIndex !== null && variants[previewVariantIndex]" class="relative">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between p-4 border-b">
+                      <div>
+                        <h3 class="text-lg font-bold text-gray-900">Variant Images</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ getVariantName(variants[previewVariantIndex]) }}</p>
+                      </div>
+                      <button @click="closeVariantPreview" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Image Display -->
+                    <div class="relative bg-gray-100 aspect-video flex items-center justify-center">
+                      <img v-if="previewVariantImageIndex !== null && (variants[previewVariantIndex].images || [])[previewVariantImageIndex]" 
+                           :src="(variants[previewVariantIndex].images || [])[previewVariantImageIndex]" 
+                           class="max-h-[60vh] max-w-full object-contain" 
+                           @error="handleImageError" />
+                      
+                      <!-- Navigation Buttons -->
+                      <button v-if="(variants[previewVariantIndex].images || []).length > 1 && previewVariantImageIndex > 0" 
+                              @click="prevVariantImage" 
+                              class="absolute left-4 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                      </button>
+                      
+                      <button v-if="(variants[previewVariantIndex].images || []).length > 1 && previewVariantImageIndex < (variants[previewVariantIndex].images || []).length - 1" 
+                              @click="nextVariantImage" 
+                              class="absolute right-4 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Footer with Thumbnails and Actions -->
+                    <div class="p-4 border-t bg-gray-50">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-600">Image {{ (previewVariantImageIndex || 0) + 1 }} of {{ (variants[previewVariantIndex].images || []).length }}</span>
+                        <div class="flex gap-2">
+                          <button @click="openVariantImageModal(previewVariantIndex); closeVariantPreview();" 
+                                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            Manage Images
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <!-- Thumbnail Strip -->
+                      <div class="flex gap-2 overflow-x-auto pb-2">
+                        <div v-for="(img, idx) in (variants[previewVariantIndex].images || [])" :key="idx"
+                             @click="previewVariantImageIndex = idx"
+                             class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+                             :class="previewVariantImageIndex === idx ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-300 hover:border-indigo-300'">
+                          <img :src="img" class="w-full h-full object-cover" @error="handleImageError" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
     </div>
   </div>
 </template>
@@ -322,8 +673,10 @@ import type { Category } from '@/types/product';
 import { 
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
     Switch, SwitchGroup, SwitchLabel,
-    Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot
+    Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot,
+    Dialog, DialogPanel, TransitionChild
 } from '@headlessui/vue';
+import MediaManager from './MediaManager.vue';
 
 const props = defineProps<{
   initialData?: any;
@@ -345,6 +698,23 @@ interface OptionInput {
 
 const options = ref<OptionInput[]>([]);
 const variants = ref<any[]>([]);
+
+// MediaManager Modal State
+const showMediaModal = ref(false);
+const mediaTarget = ref<{ type: 'product' | 'variant', index?: number } | null>(null);
+
+// Product Preview Modal State
+const showProductPreview = ref(false);
+const previewImageIndex = ref<number | null>(null);
+
+// Variant Image Modal State
+const showVariantImageModal = ref(false);
+const currentVariantIndex = ref<number | null>(null);
+
+// Variant Preview Modal State
+const showVariantPreview = ref(false);
+const previewVariantIndex = ref<number | null>(null);
+const previewVariantImageIndex = ref<number | null>(null);
 
 // Loading States
 const isLoadingData = ref(true);
@@ -380,6 +750,125 @@ watch(selectedCategory, (newVal) => {
 const handleImageError = (e: Event) => {
     (e.target as HTMLImageElement).style.display = 'none';
 };
+
+// MediaManager Functions
+function openMediaModal(type: 'product' | 'variant', index?: number) {
+    mediaTarget.value = { type, index };
+    showMediaModal.value = true;
+}
+
+function closeMediaModal() {
+    showMediaModal.value = false;
+    mediaTarget.value = null;
+}
+
+function handleMediaSelect(item: any) {
+    if (!item || !mediaTarget.value) return;
+    
+    const { type, index } = mediaTarget.value;
+    
+    if (type === 'product') {
+        // Add to product images (filter out empty strings first)
+        const cleanImages = form.images.filter(img => img);
+        if (!cleanImages.includes(item.url)) {
+            form.images = [...cleanImages, item.url];
+        }
+    } else if (type === 'variant' && index !== undefined) {
+        // Add to variant images
+        if (!variants.value[index].images) {
+            variants.value[index].images = [];
+        }
+        if (!variants.value[index].images.includes(item.url)) {
+            variants.value[index].images.push(item.url);
+        }
+    }
+    
+    closeMediaModal();
+}
+
+function removeProductImage(index: number) {
+    form.images.splice(index, 1);
+    // Ensure at least one empty string if all removed
+    if (form.images.length === 0) {
+        form.images = [''];
+    }
+}
+
+function removeVariantImage(variantIndex: number, imageIndex: number) {
+    if (variants.value[variantIndex] && variants.value[variantIndex].images) {
+        variants.value[variantIndex].images.splice(imageIndex, 1);
+    }
+}
+
+// Product Preview Functions
+function openProductPreview(index: number) {
+    previewImageIndex.value = index;
+    showProductPreview.value = true;
+}
+
+function closeProductPreview() {
+    showProductPreview.value = false;
+    previewImageIndex.value = null;
+}
+
+function nextImage() {
+    const images = form.images.filter(i => i);
+    if (previewImageIndex.value !== null && previewImageIndex.value < images.length - 1) {
+        previewImageIndex.value++;
+    }
+}
+
+function prevImage() {
+    if (previewImageIndex.value !== null && previewImageIndex.value > 0) {
+        previewImageIndex.value--;
+    }
+}
+
+// Variant Image Modal Functions
+function openVariantImageModal(index: number) {
+    currentVariantIndex.value = index;
+    showVariantImageModal.value = true;
+}
+
+function closeVariantImageModal() {
+    showVariantImageModal.value = false;
+    currentVariantIndex.value = null;
+}
+
+function openMediaModalForVariant() {
+    if (currentVariantIndex.value !== null) {
+        mediaTarget.value = { type: 'variant', index: currentVariantIndex.value };
+        showMediaModal.value = true;
+    }
+}
+
+// Variant Preview Functions
+function openVariantPreview(variantIndex: number, imageIndex: number) {
+    previewVariantIndex.value = variantIndex;
+    previewVariantImageIndex.value = imageIndex;
+    showVariantPreview.value = true;
+}
+
+function closeVariantPreview() {
+    showVariantPreview.value = false;
+    previewVariantIndex.value = null;
+    previewVariantImageIndex.value = null;
+}
+
+function nextVariantImage() {
+    if (previewVariantIndex.value !== null && previewVariantImageIndex.value !== null) {
+        const images = variants.value[previewVariantIndex.value].images || [];
+        if (previewVariantImageIndex.value < images.length - 1) {
+            previewVariantImageIndex.value++;
+        }
+    }
+}
+
+function prevVariantImage() {
+    if (previewVariantImageIndex.value !== null && previewVariantImageIndex.value > 0) {
+        previewVariantImageIndex.value--;
+    }
+}
 
 onMounted(async () => {
     isLoadingData.value = true;
@@ -426,7 +915,8 @@ onMounted(async () => {
                         optionValues: Array.isArray(v.optionValues) && typeof v.optionValues[0] === 'string'
                             ? v.optionValues.map((val: string) => ({ value: val }))
                             : v.optionValues,
-                        imagesInput: v.images ? v.images.join(', ') : ''
+                        // Ensure images is always an array
+                        images: Array.isArray(v.images) ? v.images : (v.image ? [v.image] : [])
                     }));
                 }
             }
@@ -631,9 +1121,7 @@ function updateVariantsMatrix() {
                 sku: `${form.sku || 'SKU'}-${combo.map((c: any) => c.value).join('-')}`,
                 price: form.price,
                 stockQuantity: form.stockQuantity, 
-                image: '', 
                 images: [],
-                imagesInput: '',
                 optionValues: combo.map((c: any) => ({ value: c.value }))
             });
         }
@@ -668,6 +1156,8 @@ function submitForm() {
         const payload = {
             ...form,
             hasVariants: hasVariants.value,
+            // Filter empty strings from product images
+            images: form.images.filter(img => img),
             options: hasVariants.value ? options.value.map(o => ({
                 name: o.name,
                 values: o.values.map(v => v.value)
@@ -675,7 +1165,8 @@ function submitForm() {
             variants: hasVariants.value ? variants.value.map(v => ({
                 ...v,
                 optionValues: v.optionValues.map((ov: any) => ov.value),
-                images: v.imagesInput ? v.imagesInput.split(',').map((s: string) => s.trim()).filter((s: string) => s) : []
+                // Ensure images array is clean
+                images: Array.isArray(v.images) ? v.images.filter((img: string) => img) : []
             })) : []
         };
         emit('submit', payload);

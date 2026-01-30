@@ -52,7 +52,7 @@ public class SecurityConfig {
 
                         // Static resources and frontend routes
                         .requestMatchers("/", "/index.html", "/assets/**", "/*.js", "/*.css", "/*.ico", "/*.svg",
-                                "/*.png", "/*.jpg")
+                                "/*.png", "/*.jpg", "/uploads/**")
                         .permitAll()
                         .requestMatchers("/admin/**", "/products/**", "/cart/**", "/checkout/**", "/orders/**",
                                 "/profile/**", "/login", "/register")

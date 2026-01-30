@@ -104,6 +104,12 @@ const router = createRouter({
                     component: () => import('@/pages/admin/AdminUsersPage.vue'),
                     meta: { title: 'User Management' },
                 },
+                {
+                    path: 'media',
+                    name: 'admin-media',
+                    component: () => import('@/modules/admin/pages/MediaPage.vue'),
+                    meta: { title: 'Media Manager' },
+                },
             ],
         },
         // 404 Route

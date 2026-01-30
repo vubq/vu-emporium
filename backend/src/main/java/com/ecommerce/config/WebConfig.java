@@ -31,4 +31,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addViewController("/login").setViewName("forward:/index.html");
         registry.addViewController("/register").setViewName("forward:/index.html");
     }
+
+    @Override
+    public void addResourceHandlers(
+            org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
+    }
 }

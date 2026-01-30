@@ -151,50 +151,47 @@ public class ProductServiceImpl implements ProductService {
 
         product.setHasVariants(true);
 
-        // 1. Merge Options (Preserve IDs if Name matches)
-        List<com.ecommerce.model.entity.ProductOption> currentOptions = product.getOptions();
-        List<com.ecommerce.model.entity.ProductOption> updatedOptions = new java.util.ArrayList<>();
+        // 1. Merge Options - Mark all as ARCHIVED first, then reactivate
+        product.getOptions().forEach(o -> {
+            o.setStatus(ProductStatus.ARCHIVED);
+            o.getValues().forEach(v -> v.setStatus(ProductStatus.ARCHIVED));
+        });
 
         for (com.ecommerce.model.dto.request.ProductOptionRequest optionReq : request.getOptions()) {
             // Find existing option by name
-            com.ecommerce.model.entity.ProductOption option = currentOptions.stream()
+            com.ecommerce.model.entity.ProductOption option = product.getOptions().stream()
                     .filter(o -> o.getName().equalsIgnoreCase(optionReq.getName()))
                     .findFirst()
                     .orElseGet(() -> {
                         com.ecommerce.model.entity.ProductOption newOpt = new com.ecommerce.model.entity.ProductOption();
                         newOpt.setName(optionReq.getName());
                         newOpt.setProduct(product);
+                        product.getOptions().add(newOpt);
                         return newOpt;
                     });
 
-            // Merge Values for this option
-            List<com.ecommerce.model.entity.ProductOptionValue> currentValues = option.getValues();
-            List<com.ecommerce.model.entity.ProductOptionValue> newValuesList = new java.util.ArrayList<>();
+            // Reactivate option
+            option.setStatus(ProductStatus.ACTIVE);
 
+            // Merge Values for this option
             if (optionReq.getValues() != null) {
                 for (String valStr : optionReq.getValues()) {
-                    com.ecommerce.model.entity.ProductOptionValue val = currentValues.stream()
+                    com.ecommerce.model.entity.ProductOptionValue val = option.getValues().stream()
                             .filter(v -> v.getValue().equalsIgnoreCase(valStr))
                             .findFirst()
                             .orElseGet(() -> {
                                 com.ecommerce.model.entity.ProductOptionValue newVal = new com.ecommerce.model.entity.ProductOptionValue();
                                 newVal.setValue(valStr);
                                 newVal.setProductOption(option);
+                                option.getValues().add(newVal);
                                 return newVal;
                             });
-                    newValuesList.add(val);
+
+                    // Reactivate value
+                    val.setStatus(ProductStatus.ACTIVE);
                 }
             }
-            // Update option's values
-            option.getValues().clear();
-            option.getValues().addAll(newValuesList);
-
-            updatedOptions.add(option);
         }
-
-        // Apply updated options list
-        product.getOptions().clear();
-        product.getOptions().addAll(updatedOptions);
 
         // 2. Merge Variants (Match by SKU, Soft Delete others)
         // First, mark all as ARCHIVED
@@ -272,9 +269,15 @@ public class ProductServiceImpl implements ProductService {
                 .hasVariants(product.getHasVariants());
 
         if (Boolean.TRUE.equals(product.getHasVariants())) {
-            builder.options(product.getOptions().stream().map(this::convertOptionToDTO).collect(Collectors.toList()));
-            builder.variants(
-                    product.getVariants().stream().map(this::convertVariantToDTO).collect(Collectors.toList()));
+            // Filter only ACTIVE options and variants
+            builder.options(product.getOptions().stream()
+                    .filter(o -> o.getStatus() == ProductStatus.ACTIVE)
+                    .map(this::convertOptionToDTO)
+                    .collect(Collectors.toList()));
+            builder.variants(product.getVariants().stream()
+                    .filter(v -> v.getStatus() == ProductStatus.ACTIVE)
+                    .map(this::convertVariantToDTO)
+                    .collect(Collectors.toList()));
         }
 
         return builder.build();
@@ -285,7 +288,9 @@ public class ProductServiceImpl implements ProductService {
         return com.ecommerce.model.dto.response.ProductOptionDTO.builder()
                 .id(option.getId())
                 .name(option.getName())
+                // Filter only ACTIVE values
                 .values(option.getValues().stream()
+                        .filter(v -> v.getStatus() == ProductStatus.ACTIVE)
                         .map(v -> com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
                                 .id(v.getId())
                                 .value(v.getValue())
