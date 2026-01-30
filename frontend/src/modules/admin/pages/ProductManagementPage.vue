@@ -180,7 +180,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr v-else v-for="product in products" :key="product.id" class="group hover:bg-gray-50 transition-colors">
+                <tr v-else v-for="(product, index) in products" :key="product.id" class="group hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                         <div class="h-12 w-12 flex-shrink-0">
@@ -233,7 +233,12 @@
                         </div>
 
                         <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                            <MenuItems class="origin-top-right absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100">
+                            <MenuItems 
+                                class="absolute right-0 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100"
+                                :class="[
+                                    (Number(index) >= products.length - 3 && products.length > 4) ? 'bottom-full mb-2 origin-bottom-right' : 'mt-2 origin-top-right'
+                                ]"
+                            >
                                 <div class="py-1">
                                     <MenuItem v-slot="{ active }">
                                         <button @click="openEditModal(product)" :class="[active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors']">
