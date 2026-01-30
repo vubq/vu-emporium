@@ -388,7 +388,9 @@
               >
                 <DialogPanel class="w-full max-w-5xl h-[80vh] transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
                   <MediaManager 
-                    mode="select" 
+                    mode="select"
+                    :multi-select="true"
+                    :excluded-urls="getExcludedUrls()"
                     @select="handleMediaSelect" 
                     @cancel="closeMediaModal" 
                   />
@@ -762,25 +764,27 @@ function closeMediaModal() {
     mediaTarget.value = null;
 }
 
-function handleMediaSelect(item: any) {
-    if (!item || !mediaTarget.value) return;
+function handleMediaSelect(items: any) {
+    // Handle both single item (legacy) and array (multi-select)
+    const itemsArray = Array.isArray(items) ? items : [items];
+    
+    if (!itemsArray || itemsArray.length === 0 || !mediaTarget.value) return;
     
     const { type, index } = mediaTarget.value;
     
     if (type === 'product') {
         // Add to product images (filter out empty strings first)
         const cleanImages = form.images.filter(img => img);
-        if (!cleanImages.includes(item.url)) {
-            form.images = [...cleanImages, item.url];
-        }
+        const newUrls = itemsArray.map(item => item.url).filter(url => !cleanImages.includes(url));
+        form.images = [...cleanImages, ...newUrls];
     } else if (type === 'variant' && index !== undefined) {
         // Add to variant images
         if (!variants.value[index].images) {
             variants.value[index].images = [];
         }
-        if (!variants.value[index].images.includes(item.url)) {
-            variants.value[index].images.push(item.url);
-        }
+        const existingUrls = variants.value[index].images;
+        const newUrls = itemsArray.map(item => item.url).filter(url => !existingUrls.includes(url));
+        variants.value[index].images.push(...newUrls);
     }
     
     closeMediaModal();
@@ -798,6 +802,17 @@ function removeVariantImage(variantIndex: number, imageIndex: number) {
     if (variants.value[variantIndex] && variants.value[variantIndex].images) {
         variants.value[variantIndex].images.splice(imageIndex, 1);
     }
+}
+
+function getExcludedUrls(): string[] {
+    if (!mediaTarget.value) return [];
+    
+    if (mediaTarget.value.type === 'product') {
+        return form.images.filter(i => i);
+    } else if (mediaTarget.value.type === 'variant' && mediaTarget.value.index !== undefined) {
+        return variants.value[mediaTarget.value.index].images || [];
+    }
+    return [];
 }
 
 // Product Preview Functions

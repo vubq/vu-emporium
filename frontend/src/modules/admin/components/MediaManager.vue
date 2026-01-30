@@ -47,10 +47,29 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <div v-for="item in items" :key="item.path" 
-                class="group relative border rounded-xl p-3 flex flex-col gap-2 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer bg-white"
-                :class="{'ring-2 ring-indigo-500': selectedItem?.path === item.path}"
-                @click="item.type === 'file' ? selectItem(item) : enterFolder(item)"
+                class="group relative border rounded-xl p-3 flex flex-col gap-2 transition-all bg-white"
+                :class="{
+                    'ring-2 ring-indigo-500': isItemSelected(item),
+                    'opacity-50 cursor-not-allowed': item.type === 'file' && isItemExcluded(item),
+                    'hover:shadow-md hover:border-indigo-300 cursor-pointer': item.type === 'folder' || (item.type === 'file' && !isItemExcluded(item))
+                }"
+                @click="item.type === 'file' ? (isItemExcluded(item) ? null : selectItem(item)) : enterFolder(item)"
             >
+                <!-- Checkbox for multi-select -->
+                <div v-if="props.multiSelect && item.type === 'file' && !isItemExcluded(item)" 
+                     class="absolute top-2 left-2 z-10">
+                    <div class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                         :class="isItemSelected(item) ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-300'">
+                        <svg v-if="isItemSelected(item)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                </div>
+                
+                <!-- Excluded badge -->
+                <div v-if="item.type === 'file' && isItemExcluded(item)" 
+                     class="absolute top-2 right-2 z-10 px-2 py-0.5 bg-gray-600 text-white text-xs rounded-full font-medium">
+                    Selected
+                </div>
+                
                 <!-- Thumbnail -->
                 <div class="aspect-square rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
                     <svg v-if="item.type === 'folder'" class="w-12 h-12 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
@@ -60,7 +79,7 @@
                 <!-- Info -->
                 <div class="text-xs truncate text-center font-medium text-gray-700 select-none">{{ item.name }}</div>
 
-                <!-- Actions (Hover) -->
+                <!-- Actions (Hover) - only for manage mode or folders -->
                 <button v-if="isManageMode || item.type === 'folder'" @click.stop="handleDelete(item)" class="absolute top-1 right-1 p-1 bg-white rounded-full text-red-500 opacity-0 group-hover:opacity-100 shadow-sm hover:bg-red-50 transition-opacity">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
@@ -70,14 +89,21 @@
     
     <!-- Footer (Select Mode) -->
     <div v-if="!isManageMode" class="p-3 border-t bg-gray-50 flex justify-between items-center">
-        <div class="text-sm text-gray-500" v-if="selectedItem">
-            Selected: <span class="font-medium text-gray-900">{{ selectedItem.name }}</span>
+        <div class="text-sm text-gray-500">
+            <span v-if="props.multiSelect">
+                Selected: <span class="font-medium text-gray-900">{{ selectedItems.length }} {{ selectedItems.length === 1 ? 'image' : 'images' }}</span>
+            </span>
+            <span v-else-if="selectedItem">
+                Selected: <span class="font-medium text-gray-900">{{ selectedItem.name }}</span>
+            </span>
+            <span v-else>Select {{ props.multiSelect ? 'images' : 'an image' }}</span>
         </div>
-        <div v-else class="text-sm text-gray-500">Select an image</div>
         
         <div class="flex gap-2">
             <button @click="$emit('cancel')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button @click="$emit('select', selectedItem)" :disabled="!selectedItem" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            <button @click="emitSelection" 
+                    :disabled="props.multiSelect ? selectedItems.length === 0 : !selectedItem" 
+                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
                 Select
             </button>
         </div>
@@ -91,6 +117,8 @@ import { mediaApi, type FileItem } from '@/api/mediaApi';
 
 const props = defineProps<{
     mode?: 'manage' | 'select'; // Default: manage
+    multiSelect?: boolean; // Enable multi-select mode
+    excludedUrls?: string[]; // URLs to disable/exclude from selection
 }>();
 
 const emit = defineEmits(['select', 'cancel']);
@@ -103,6 +131,7 @@ const loading = ref(false);
 const uploading = ref(false);
 
 const selectedItem = ref<FileItem | null>(null);
+const selectedItems = ref<FileItem[]>([]); // For multi-select mode
 
 const showNewFolderInput = ref(false);
 const newFolderName = ref('');
@@ -141,10 +170,36 @@ const enterFolder = (item: FileItem) => {
 };
 
 const selectItem = (item: FileItem) => {
-    selectedItem.value = item;
-    // If in manage mode, maybe show details? For now just select.
-    if (isManageMode.value) {
-        // Could enable a visual selection state
+    if (props.multiSelect) {
+        // Multi-select mode: toggle item in array
+        const index = selectedItems.value.findIndex(i => i.path === item.path);
+        if (index > -1) {
+            selectedItems.value.splice(index, 1);
+        } else {
+            selectedItems.value.push(item);
+        }
+    } else {
+        // Single-select mode
+        selectedItem.value = item;
+    }
+};
+
+const isItemSelected = (item: FileItem): boolean => {
+    if (props.multiSelect) {
+        return selectedItems.value.some(i => i.path === item.path);
+    }
+    return selectedItem.value?.path === item.path;
+};
+
+const isItemExcluded = (item: FileItem): boolean => {
+    return props.excludedUrls?.includes(item.url) || false;
+};
+
+const emitSelection = () => {
+    if (props.multiSelect) {
+        emit('select', selectedItems.value);
+    } else {
+        emit('select', selectedItem.value);
     }
 };
 
