@@ -49,7 +49,7 @@
                                 leaveTo="opacity-0"
                                 @after-leave="query = ''"
                             >
-                                <ComboboxOptions class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                <ComboboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700">
                                         Nothing found.
                                     </div>
@@ -92,7 +92,7 @@
                                 </span>
                             </ListboxButton>
                             <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                <ListboxOptions class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                <ListboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     <ListboxOption :value="null" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
                                             <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">All Statuses</span>
@@ -170,85 +170,115 @@
             </div>
         </Transition>
 
-        <div class="flex-1 overflow-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+        <div class="flex-1 overflow-auto relative custom-scrollbar">
+                <table class="min-w-full divide-y divide-gray-100">
+                <thead class="bg-gray-50/80 backdrop-blur-md sticky top-0 z-20">
                 <tr>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Product</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">SKU</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Category</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Stock</th>
-                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">SKU</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">Actions</span>
                     </th>
                 </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="loading && products.length === 0" v-for="i in 5" :key="i">
-                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-10 w-48 bg-gray-100 rounded-lg animate-pulse"></div></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-20 bg-gray-100 rounded animate-pulse"></div></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-24 bg-gray-100 rounded animate-pulse"></div></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-16 bg-gray-100 rounded animate-pulse"></div></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-12 bg-gray-100 rounded animate-pulse"></div></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><div class="h-6 w-16 bg-gray-100 rounded-full animate-pulse"></div></td>
-                        <td class="px-6 py-4 whitespace-nowrap"></td>
+                <tbody class="bg-white divide-y divide-gray-50">
+                <!-- Skeleton Loader -->
+                <tr v-if="loading && products.length === 0" v-for="i in 5" :key="i" class="animate-pulse">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 bg-gray-100 rounded-xl"></div>
+                            <div class="ml-4 space-y-2">
+                                <div class="h-4 w-32 bg-gray-100 rounded"></div>
+                                <div class="h-3 w-20 bg-gray-100 rounded"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-20 bg-gray-100 rounded"></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-24 bg-gray-100 rounded"></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-16 bg-gray-100 rounded"></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-4 w-12 bg-gray-100 rounded"></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="h-6 w-20 bg-gray-100 rounded-full"></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap"></td>
                 </tr>
+                
+                <!-- Empty State -->
                 <tr v-else-if="products.length === 0">
-                    <td colspan="7" class="px-6 py-20 text-center text-gray-500">
+                    <td colspan="7" class="px-6 py-24 text-center">
                         <div class="flex flex-col items-center justify-center">
-                            <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                            <p class="text-lg font-medium text-gray-900">No products found</p>
-                            <p class="text-sm text-gray-500 mt-1">Try adjusting your filters or create a new product.</p>
+                            <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">No products found</h3>
+                            <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">We couldn't find any products matching your filters. Try adjusting your search query or create a new product.</p>
+                            <button @click="resetFilters" class="mt-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm">Clear all filters</button>
                         </div>
                     </td>
                 </tr>
+
+                <!-- Product Rows -->
                 <tr v-else v-for="(product, index) in products" :key="product.id" class="group hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                        <div class="h-12 w-12 flex-shrink-0">
-                        <img v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" class="h-12 w-12 rounded-lg object-cover shadow-sm border border-gray-100 bg-white" />
-                        <div v-else class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs border border-gray-200">
+                        <div class="h-14 w-14 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
+                        <img v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" class="h-full w-full rounded-xl object-cover shadow-sm border border-gray-100 bg-white" />
+                        <div v-else class="h-full w-full rounded-xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         </div>
                         </div>
                         <div class="ml-4">
-                        <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ product.name }}</div>
-                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-xs">{{ product.description }}</div>
+                        <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ product.name }}</div>
+                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-[200px] mt-0.5">{{ product.description || 'No description' }}</div>
                         </div>
                     </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">{{ product.sku || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 font-mono border border-gray-200">
+                            {{ product.sku || 'NOSKU' }}
+                        </span>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <span v-if="product.category" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <div v-if="product.category" class="flex items-center">
+                             <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
                             {{ product.category.name }}
-                        </span>
-                        <span v-else class="text-gray-400 italic">Uncategorized</span>
+                        </div>
+                        <span v-else class="text-gray-400 italic text-xs">Uncategorized</span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">${{ product.price.toFixed(2) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <span v-if="product.hasVariants" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold font-mono tracking-tight">${{ product.price.toFixed(2) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div v-if="product.hasVariants" class="flex items-center text-xs text-purple-600 font-medium bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100 w-fit">
+                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                             Variants
-                        </span>
-                        <span v-else :class="[product.stockQuantity > 0 ? 'text-gray-700' : 'text-red-500 font-medium', 'text-sm']">
-                            {{ product.stockQuantity }} units
-                        </span>
+                        </div>
+                        <div v-else class="flex items-center">
+                            <span class="block h-2 w-2 rounded-full mr-2" :class="[product.stockQuantity < 5 ? 'bg-red-500 animate-pulse' : (product.stockQuantity < 20 ? 'bg-yellow-500' : 'bg-green-500')]"></span>
+                            <span :class="[product.stockQuantity < 5 ? 'text-red-700 font-bold' : (product.stockQuantity < 20 ? 'text-yellow-700' : 'text-gray-900'), 'text-sm font-medium']">
+                                {{ product.stockQuantity }}
+                            </span>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border shadow-sm"
+                    <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border"
                             :class="{
-                            'bg-green-100 text-green-800 border-green-200': product.status === 'ACTIVE',
-                            'bg-yellow-100 text-yellow-800 border-yellow-200': product.status === 'DRAFT',
-                            'bg-gray-100 text-gray-800 border-gray-200': product.status === 'ARCHIVED'
+                            'bg-green-50 text-green-700 border-green-200': product.status === 'ACTIVE',
+                            'bg-yellow-50 text-yellow-700 border-yellow-200': product.status === 'DRAFT',
+                            'bg-gray-50 text-gray-600 border-gray-200': product.status === 'ARCHIVED'
                             }">
+                        <span class="h-1.5 w-1.5 rounded-full mr-1.5" :class="{
+                            'bg-green-500': product.status === 'ACTIVE',
+                            'bg-yellow-500': product.status === 'DRAFT',
+                            'bg-gray-400': product.status === 'ARCHIVED'
+                        }"></span>
                         {{ product.status }}
                     </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Menu as="div" class="relative inline-block text-left">
                         <div>
-                            <MenuButton class="flex items-center text-gray-400 hover:text-gray-600 focus:outline-none bg-white hover:bg-gray-100 rounded-full p-2 transition-colors border border-transparent hover:border-gray-200">
+                            <MenuButton class="flex items-center justify-center h-8 w-8 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 focus:outline-none transition-all">
                                 <span class="sr-only">Open options</span>
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
@@ -505,6 +535,14 @@ const resetFilters = () => {
 const handlePageSizeChange = () => {
     currentPage.value = 0;
     fetchProducts();
+};
+
+const changePage = (page: number) => {
+    if (page < 0 || page >= totalPages.value) return;
+    currentPage.value = page;
+    fetchProducts();
+    // Scroll to top of table or window
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const statusColor = (status: string | null) => {
