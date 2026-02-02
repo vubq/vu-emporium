@@ -111,14 +111,18 @@
                  <!-- Existing Images -->
                  <div v-for="(img, idx) in form.images.filter(i => i)" :key="idx" 
                       class="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 group hover:border-indigo-400 transition-colors cursor-pointer">
-                    <img :src="img" class="w-full h-full object-cover" @error="handleImageError" @click="openProductPreview(idx)" />
-                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <AppImage 
+                        :src="img" 
+                        class="w-full h-full cursor-pointer hover:opacity-90 transition-opacity" 
+                        @click="openProductPreview(idx)"
+                    />
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                         <button type="button" @click.stop="openProductPreview(idx)" 
-                                class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors" :disabled="submitting">
+                                class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors pointer-events-auto" :disabled="submitting">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                         </button>
                         <button type="button" @click.stop="removeProductImage(idx)" 
-                                class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors" :disabled="submitting">
+                                class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors pointer-events-auto" :disabled="submitting">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     </div>
@@ -206,11 +210,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <!-- Tiny Thumbnail -->
-                                            <div class="h-8 w-8 rounded-md bg-gray-100 flex-shrink-0 mr-3 border border-gray-200 overflow-hidden">
-                                                 <img v-if="variant.images && variant.images[0]" :src="variant.images[0]" class="h-full w-full object-cover" />
-                                                 <div v-else class="h-full w-full flex items-center justify-center text-gray-400">
-                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                 </div>
+                                            <div class="h-8 w-8 rounded-md bg-gray-100 flex-shrink-0 mr-3 border border-gray-200 overflow-hidden relative">
+                                                 <AppImage 
+                                                    :src="(variant.images && variant.images[0]) || ''" 
+                                                    class="h-full w-full"
+                                                 />
                                             </div>
                                             <span class="text-sm font-medium text-gray-900">{{ getVariantName(variant) }}</span>
                                         </div>
@@ -262,7 +266,7 @@
                                 </ListboxButton>
                             <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
                                 <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                <ListboxOption v-for="status in ['ACTIVE', 'DRAFT', 'ARCHIVED']" :key="status" :value="status" as="template" v-slot="{ active, selected }">
+                                <ListboxOption v-for="status in availableStatuses" :key="status" :value="status" as="template" v-slot="{ active, selected }">
                                     <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2.5 pl-10 pr-4']">
                                         <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ status }}</span>
                                         <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
@@ -598,10 +602,12 @@
                     
                     <!-- Image Display -->
                     <div class="relative bg-gray-100 aspect-video flex items-center justify-center">
-                      <img v-if="previewImageIndex !== null && form.images.filter(i => i)[previewImageIndex]" 
+                      <AppImage 
+                           v-if="previewImageIndex !== null && form.images.filter(i => i)[previewImageIndex]" 
                            :src="form.images.filter(i => i)[previewImageIndex]" 
-                           class="max-h-[60vh] max-w-full object-contain" 
-                           @error="handleImageError" />
+                           class="relative z-10 max-h-[60vh] max-w-full"
+                           object-fit="contain"
+                      />
                       
                       <!-- Navigation Buttons -->
                       <button v-if="form.images.filter(i => i).length > 1 && previewImageIndex > 0" 
@@ -689,19 +695,20 @@
                     </div>
                     
                     <!-- Image Grid -->
-                    <div class="p-6">
-                      <div class="grid grid-cols-3 gap-4">
-                        <!-- Existing Images -->
-                        <div v-for="(img, imgIdx) in (variants[currentVariantIndex].images || [])" :key="imgIdx"
-                             class="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 group hover:border-indigo-400 transition-colors cursor-pointer">
-                          <img :src="img" class="w-full h-full object-cover" @error="handleImageError" @click="openVariantPreview(currentVariantIndex, imgIdx)" />
-                          <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-6 max-h-[60vh] overflow-y-auto">
+                        <div v-for="(img, imgIdx) in variants[currentVariantIndex].images || []" :key="imgIdx" class="relative group aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                          <AppImage 
+                                :src="img" 
+                                class="w-full h-full cursor-pointer hover:opacity-90 transition-opacity" 
+                                @click="openVariantPreview(currentVariantIndex, imgIdx)"
+                          />
+                          <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                             <button type="button" @click.stop="openVariantPreview(currentVariantIndex, imgIdx)" 
-                                    class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
+                                    class="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors pointer-events-auto">
                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                             </button>
                             <button type="button" @click.stop="removeVariantImage(currentVariantIndex, imgIdx)" 
-                                    class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                                    class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors pointer-events-auto">
                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                           </div>
@@ -716,7 +723,7 @@
                       </div>
                       
                       <p class="text-xs text-gray-500 mt-4">Click on an image to preview. Hover to see delete option.</p>
-                    </div>
+
                     
                     <!-- Footer -->
                     <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
@@ -774,10 +781,12 @@
                     
                     <!-- Image Display -->
                     <div class="relative bg-gray-100 aspect-video flex items-center justify-center">
-                      <img v-if="previewVariantImageIndex !== null && (variants[previewVariantIndex].images || [])[previewVariantImageIndex]" 
+                      <AppImage 
+                           v-if="previewVariantImageIndex !== null && (variants[previewVariantIndex].images || [])[previewVariantImageIndex]" 
                            :src="(variants[previewVariantIndex].images || [])[previewVariantImageIndex]" 
-                           class="max-h-[60vh] max-w-full object-contain" 
-                           @error="handleImageError" />
+                           class="relative z-10 max-h-[60vh] max-w-full"
+                           object-fit="contain"
+                      />
                       
                       <!-- Navigation Buttons -->
                       <button v-if="(variants[previewVariantIndex].images || []).length > 1 && previewVariantImageIndex > 0" 
@@ -878,6 +887,7 @@ import {
     Dialog, DialogPanel, TransitionChild, DialogTitle
 } from '@headlessui/vue';
 import MediaManager from './MediaManager.vue';
+import AppImage from '@/components/common/AppImage.vue';
 
 const props = defineProps<{
   initialData?: any;
@@ -950,12 +960,32 @@ const form = reactive({
   metaKeywords: ''
 });
 
+// Status Options Logic
+const availableStatuses = computed(() => {
+    const allStatuses = ['ACTIVE', 'DRAFT', 'ARCHIVED', 'OUT_OF_STOCK', 'DISCONTINUED'];
+    
+    // If creating new product, all statuses allowed (or maybe default to DRAFT/ACTIVE)
+    if (!props.isEdit || !props.initialData) {
+        return allStatuses;
+    }
+
+    const currentStatus = props.initialData.status;
+
+    // Rule: Cannot transition from ACTIVE or ARCHIVED to DRAFT
+    if (currentStatus === 'ACTIVE' || currentStatus === 'ARCHIVED') {
+        return allStatuses.filter(s => s !== 'DRAFT');
+    }
+
+    return allStatuses;
+});
+
 // Update form when editing
 watch(() => props.initialData, (newVal) => {
     if (newVal) {
         Object.assign(form, {
             ...newVal,
             // Ensure zeros if null/undefined for numeric fields
+// ... (rest of watch)
             basePrice: newVal.basePrice || 0,
             salePrice: newVal.salePrice || 0,
             costPrice: newVal.costPrice || 0,
@@ -1027,9 +1057,6 @@ watch(selectedCategory, (newVal) => {
     form.categoryId = newVal ? newVal.id : null;
 });
 
-const handleImageError = (e: Event) => {
-    (e.target as HTMLImageElement).style.display = 'none';
-};
 
 // MediaManager Functions
 function openMediaModal(type: 'product' | 'variant', index?: number) {
@@ -1493,6 +1520,7 @@ function getVariantName(variant: any) {
     if (!variant.optionValues) return 'Variant';
     return variant.optionValues.map((v: any) => v.value).join(' / ');
 }
+
 
 function submitForm() {
     submitting.value = true;

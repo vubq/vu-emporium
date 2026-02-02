@@ -3,7 +3,6 @@ package com.ecommerce.controller.api.admin;
 import com.ecommerce.model.dto.request.ProductRequest;
 import com.ecommerce.model.dto.response.ApiResponse;
 import com.ecommerce.model.dto.response.ProductDTO;
-import com.ecommerce.model.entity.Product;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.interfaces.ProductService;
 import jakarta.validation.Valid;

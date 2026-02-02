@@ -231,10 +231,10 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                         <div class="h-14 w-14 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300">
-                        <img v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" class="h-full w-full rounded-xl object-cover shadow-sm border border-gray-100 bg-white" />
-                        <div v-else class="h-full w-full rounded-xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        </div>
+                             <AppImage 
+                                :src="(product.images && product.images.length > 0) ? product.images[0] : ''" 
+                                class="h-full w-full rounded-xl shadow-sm border border-gray-100 bg-white"
+                             />
                         </div>
                         <div class="ml-4">
                         <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ product.name }}</div>
@@ -319,7 +319,13 @@
                                 </div>
                                 <div class="py-1">
                                     <MenuItem v-slot="{ active }">
-                                        <button @click="deleteProduct(product.id)" :class="[active ? 'bg-red-50 text-red-700' : 'text-red-600', 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors']">
+                                        <button @click="deleteProduct(product)" 
+                                            :disabled="product.status === 'ACTIVE' || product.status === 'ARCHIVED'"
+                                            :class="[
+                                                active ? 'bg-red-50 text-red-700' : 'text-red-600',
+                                                (product.status === 'ACTIVE' || product.status === 'ARCHIVED') ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-50',
+                                                'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors'
+                                            ]">
                                                 <svg class="mr-3 h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                             Delete Product
                                         </button>
@@ -463,6 +469,7 @@ import { adminProductApi, categoryApi } from '@/api/productApi';
 import type { Product, Category } from '@/types/product';
 import ProductForm from '../components/ProductForm.vue';
 import ConfirmModal from '@/components/common/ConfirmModal.vue';
+import AppImage from '@/components/common/AppImage.vue';
 import { 
     Menu, MenuButton, MenuItems, MenuItem,
     Dialog, DialogPanel, TransitionRoot, TransitionChild,
@@ -606,8 +613,12 @@ const handleFormSubmit = async (payload: any) => {
     }
 };
 
-const deleteProduct = (id: number) => {
-    productToDelete.value = id;
+const deleteProduct = (product: Product) => {
+    if (product.status === 'ACTIVE' || product.status === 'ARCHIVED') {
+        alert("Cannot delete ACTIVE or ARCHIVED products. Only DRAFT products can be deleted.");
+        return;
+    }
+    productToDelete.value = product.id;
     showDeleteModal.value = true;
 };
 
@@ -639,7 +650,10 @@ onMounted(() => {
     fetchProducts();
 });
 
+// ... (existing code)
 watch(selectedCategory, () => {
     currentPage.value = 0; // Reset page when category changes
 });
+
+
 </script>

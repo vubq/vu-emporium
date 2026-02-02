@@ -23,15 +23,11 @@
               <!-- Product Image -->
               <div class="flex-shrink-0">
                 <div class="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
-                  <img 
-                    v-if="item.image" 
-                    :src="item.image" 
+                  <AppImage 
+                    :src="item.image || ''" 
                     :alt="item.name" 
                     class="w-full h-full object-cover"
                   />
-                  <div v-else class="w-full h-full flex items-center justify-center">
-                    <span class="text-gray-400 text-xs">No image</span>
-                  </div>
                 </div>
               </div>
               
@@ -155,8 +151,10 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cartStore';
+import AppImage from '@/components/common/AppImage.vue';
 
 const cartStore = useCartStore();
 </script>

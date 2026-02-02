@@ -17,6 +17,9 @@ public interface ProductService {
 
     ProductDTO getProductById(Long id);
 
+    // For Storefront (Filters by ACTIVE status)
+    ProductDTO getStorefrontProductById(Long id);
+
     ProductDTO getProductBySlug(String slug);
 
     List<ProductDTO> getFeaturedProducts();

@@ -35,31 +35,35 @@
               >
                 <span class="sr-only">Image {{ index + 1 }}</span>
                 <span class="absolute inset-0 overflow-hidden rounded-lg">
-                  <img :src="image" alt="" class="w-full h-full object-center object-cover" />
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Main Image -->
-          <div class="w-full aspect-w-1 aspect-h-1 bg-white rounded-2xl overflow-hidden shadow-card border border-gray-100">
-             <transition
-                enter-active-class="transition duration-300 ease-out"
-                enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100"
-                leave-active-class="transition duration-200 ease-in"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95"
-                mode="out-in"
-             >
-                <img 
-                    :key="currentDisplayImage"
-                    :src="currentDisplayImage" 
-                    :alt="product.name" 
-                    class="w-full h-full object-center object-cover hover:scale-105 transition-transform duration-500 cursor-zoom-in" 
+                <AppImage 
+                  :src="image || ''" 
+                  class="w-full h-full object-cover" 
                 />
-             </transition>
+              </span>
+            </button>
           </div>
+        </div>
+
+        <!-- Main Image -->
+        <div class="w-full aspect-w-1 aspect-h-1 bg-white rounded-2xl overflow-hidden shadow-card border border-gray-100">
+           <transition
+              enter-active-class="transition duration-300 ease-out"
+              enter-from-class="opacity-0 scale-95"
+              enter-to-class="opacity-100 scale-100"
+              leave-active-class="transition duration-200 ease-in"
+              leave-from-class="opacity-100 scale-100"
+              leave-to-class="opacity-0 scale-95"
+              mode="out-in"
+           >
+              <AppImage 
+                  :key="currentDisplayImage"
+                  :src="currentDisplayImage || ''" 
+                  :alt="product.name" 
+                  class="w-full h-full hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                  object-fit="cover"
+              />
+           </transition>
+        </div>
         </div>
 
         <!-- Product Info -->
@@ -248,13 +252,17 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import AppImage from "@/components/common/AppImage.vue";
 import { productApi } from '@/api/productApi';
 import type { Product } from '@/types/product';
 import { useCartStore } from '@/stores/cartStore';
 import { RadioGroup, RadioGroupLabel, RadioGroupOption, TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 
+
+
 const route = useRoute();
 const cartStore = useCartStore();
+
 
 const product = ref<Product | null>(null);
 const loading = ref(true);
@@ -377,5 +385,14 @@ async function addToCart() {
   
   loadingCart.value = false;
   // Could add a toast notification here
+// ... (existing code)
+  
+  loadingCart.value = false;
+  // Could add a toast notification here
 }
+
+const handleImageError = (e: Event) => {
+  const target = e.target as HTMLImageElement;
+  target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+};
 </script>

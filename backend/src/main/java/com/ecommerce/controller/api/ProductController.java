@@ -37,7 +37,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductDTO>> getProductById(@PathVariable Long id) {
-        ProductDTO product = productService.getProductById(id);
+        ProductDTO product = productService.getStorefrontProductById(id);
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 

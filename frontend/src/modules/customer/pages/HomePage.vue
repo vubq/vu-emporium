@@ -89,15 +89,11 @@
             <div class="bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden group-hover:-translate-y-2">
               <!-- Image Container -->
               <div class="relative overflow-hidden aspect-square bg-gray-100">
-                <img 
-                  v-if="product.images[0]" 
-                  :src="product.images[0]" 
+                <AppImage 
+                  :src="product.images[0] || ''" 
                   :alt="product.name" 
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center">
-                  <span class="text-gray-400">No image</span>
-                </div>
                 
                 <!-- Gradient Overlay on Hover -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -114,7 +110,10 @@
                   {{ product.name }}
                 </h3>
                 <p class="text-2xl font-bold gradient-text mb-4">
-                  ${{ product.price.toFixed(2) }}
+                  ${{ (product.salePrice && product.salePrice > 0 ? product.salePrice : (product.basePrice || 0)).toFixed(2) }}
+                  <span v-if="product.salePrice && product.salePrice > 0 && product.salePrice < (product.basePrice || 0)" class="text-sm text-gray-500 line-through ml-2">
+                    ${{ (product.basePrice || 0).toFixed(2) }}
+                  </span>
                 </p>
                 <button 
                   @click.stop="addToCart(product)" 
@@ -153,12 +152,14 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { productApi } from '@/api/productApi';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/types/product';
+import AppImage from "@/components/common/AppImage.vue";
 
 const router = useRouter();
 const cartStore = useCartStore();

@@ -51,9 +51,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDTO getStorefrontProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+        if (product.getStatus() != ProductStatus.ACTIVE) {
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+
+        return convertToDTO(product);
+    }
+
+    @Override
     public ProductDTO getProductBySlug(String slug) {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "slug", slug));
+
+        if (product.getStatus() != ProductStatus.ACTIVE) {
+            throw new ResourceNotFoundException("Product", "slug", slug);
+        }
+
         return convertToDTO(product);
     }
 
@@ -84,6 +101,14 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
+        // Validate Status Transition
+        if (request.getStatus() != null && request.getStatus() == ProductStatus.DRAFT) {
+            if (product.getStatus() == ProductStatus.ACTIVE || product.getStatus() == ProductStatus.ARCHIVED) {
+                throw new com.ecommerce.exception.BadRequestException(
+                        "Cannot change status from " + product.getStatus() + " to DRAFT");
+            }
+        }
+
         updateProductFromRequest(product, request);
 
         // Smart merge of Options and Variants logic
@@ -96,9 +121,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product", "id", id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+        // Only DRAFT (or INACTIVE) can be deleted
+        if (product.getStatus() == ProductStatus.ACTIVE || product.getStatus() == ProductStatus.ARCHIVED) {
+            throw new com.ecommerce.exception.BadRequestException(
+                    "Cannot delete product with status " + product.getStatus());
         }
+
         productRepository.deleteById(id);
     }
 
