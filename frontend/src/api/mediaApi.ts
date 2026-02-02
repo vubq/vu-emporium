@@ -34,5 +34,10 @@ export const mediaApi = {
     // Delete file/folder
     deleteItem(path: string) {
         return apiClient.delete<{ data: void }>('/admin/media', { params: { path } });
+    },
+
+    // Rename file/folder
+    renameItem(path: string, newName: string) {
+        return apiClient.patch<{ data: void }>('/admin/media/rename', { path, newName });
     }
 };

@@ -76,13 +76,34 @@
                     <img v-else :src="item.url" class="w-full h-full object-cover" />
                 </div>
                 
-                <!-- Info -->
-                <div class="text-xs truncate text-center font-medium text-gray-700 select-none">{{ item.name }}</div>
+                <!-- Info / Rename Input -->
+                <div v-if="editingItem?.path === item.path" class="flex items-center gap-1" @click.stop>
+                    <input 
+                        v-model="editingName" 
+                        ref="editInputRef"
+                        @keyup.enter="saveRename(item)" 
+                        @keyup.esc="cancelRename"
+                        type="text" 
+                        class="flex-1 text-xs px-1 py-0.5 border rounded focus:outline-none focus:border-indigo-500"
+                    />
+                    <button @click="saveRename(item)" class="p-0.5 text-green-600 hover:bg-green-50 rounded">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                    </button>
+                    <button @click="cancelRename" class="p-0.5 text-red-600 hover:bg-red-50 rounded">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <div v-else class="text-xs truncate text-center font-medium text-gray-700 select-none">{{ item.name }}</div>
 
-                <!-- Actions (Hover) - only for manage mode or folders -->
-                <button v-if="isManageMode || item.type === 'folder'" @click.stop="handleDelete(item)" class="absolute top-1 right-1 p-1 bg-white rounded-full text-red-500 opacity-0 group-hover:opacity-100 shadow-sm hover:bg-red-50 transition-opacity">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
+                <!-- Actions (Hover) -->
+                <div v-if="isManageMode || item.type === 'folder'" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <button @click.stop="startRename(item)" class="p-1 bg-white rounded-full text-blue-500 shadow-sm hover:bg-blue-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </button>
+                    <button @click.stop="confirmDelete(item)" class="p-1 bg-white rounded-full text-red-500 shadow-sm hover:bg-red-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -108,6 +129,27 @@
             </button>
         </div>
     </div>
+
+    <!-- Confirm Delete Modal -->
+    <ConfirmModal
+        :isOpen="deleteModal.show"
+        :title="$t('admin.media.confirm_delete_title')"
+        :message="deleteModal.message"
+        :confirmText="$t('common.delete')"
+        :type="'danger'"
+        :loading="deleteModal.loading"
+        @close="deleteModal.show = false"
+        @confirm="executeDelete"
+    />
+
+    <!-- Alert Modal -->
+    <AlertModal
+        v-model="alertModal.show"
+        :title="alertModal.title"
+        :message="alertModal.message"
+        :variant="alertModal.variant"
+        @close="alertModal.show = false"
+    />
   </div>
 </template>
 
@@ -115,13 +157,15 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { mediaApi, type FileItem } from '@/api/mediaApi';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
+import AlertModal from '@/components/common/AlertModal.vue';
 
 const { t } = useI18n();
 
 const props = defineProps<{
-    mode?: 'manage' | 'select'; // Default: manage
-    multiSelect?: boolean; // Enable multi-select mode
-    excludedUrls?: string[]; // URLs to disable/exclude from selection
+    mode?: 'manage' | 'select';
+    multiSelect?: boolean;
+    excludedUrls?: string[];
 }>();
 
 const emit = defineEmits(['select', 'cancel']);
@@ -134,11 +178,32 @@ const loading = ref(false);
 const uploading = ref(false);
 
 const selectedItem = ref<FileItem | null>(null);
-const selectedItems = ref<FileItem[]>([]); // For multi-select mode
+const selectedItems = ref<FileItem[]>([]);
 
 const showNewFolderInput = ref(false);
 const newFolderName = ref('');
 const newFolderRef = ref<HTMLInputElement | null>(null);
+
+// Rename state
+const editingItem = ref<FileItem | null>(null);
+const editingName = ref('');
+const editInputRef = ref<HTMLInputElement | null>(null);
+
+// Delete modal state
+const deleteModal = ref({
+    show: false,
+    item: null as FileItem | null,
+    message: '',
+    loading: false
+});
+
+// Alert modal state
+const alertModal = ref({
+    show: false,
+    title: '',
+    message: '',
+    variant: 'info' as 'success' | 'error' | 'warning' | 'info'
+});
 
 const pathParts = computed(() => {
     return currentPath.value ? currentPath.value.split('/').filter(p => p) : [];
@@ -151,8 +216,7 @@ const loadFiles = async () => {
         items.value = res.data.data;
         selectedItem.value = null;
     } catch (e) {
-        console.error(e);
-        alert(t('admin.manage.media.load_failed'));
+        showAlert(t('admin.media.error_title'), t('admin.media.load_failed'), 'error');
     } finally {
         loading.value = false;
     }
@@ -174,7 +238,6 @@ const enterFolder = (item: FileItem) => {
 
 const selectItem = (item: FileItem) => {
     if (props.multiSelect) {
-        // Multi-select mode: toggle item in array
         const index = selectedItems.value.findIndex(i => i.path === item.path);
         if (index > -1) {
             selectedItems.value.splice(index, 1);
@@ -182,7 +245,6 @@ const selectItem = (item: FileItem) => {
             selectedItems.value.push(item);
         }
     } else {
-        // Single-select mode
         selectedItem.value = item;
     }
 };
@@ -214,7 +276,7 @@ const createFolder = async () => {
         showNewFolderInput.value = false;
         loadFiles();
     } catch (e) {
-        alert(t('admin.manage.media.create_failed'));
+        showAlert(t('admin.media.error_title'), t('admin.media.create_failed'), 'error');
     }
 };
 
@@ -244,14 +306,8 @@ const uploadFiles = async (fileList: FileList) => {
             try {
                 await mediaApi.uploadFile(file, currentPath.value, false);
             } catch (error: any) {
-                if (error.response && error.response.status === 409) {
-                     if (confirm(t('admin.manage.media.file_exists', { name: file.name }))) {
-                         await mediaApi.uploadFile(file, currentPath.value, true);
-                     }
-                } else {
-                    console.error("Upload error", error);
-                    alert(t('admin.manage.media.upload_failed', { name: file.name }));
-                }
+                console.error("Upload error", error);
+                showAlert(t('admin.media.error_title'), t('admin.manage.media.upload_failed', { name: file.name }), 'error');
             }
         }
         loadFiles();
@@ -260,15 +316,83 @@ const uploadFiles = async (fileList: FileList) => {
     }
 };
 
-const handleDelete = async (item: FileItem) => {
-    const typeLabel = item.type === 'folder' ? t('admin.manage.media.folder') : t('admin.manage.media.image');
-    if (!confirm(t('admin.manage.media.delete_confirm', { type: typeLabel, name: item.name }))) return;
+// Rename functionality
+const startRename = (item: FileItem) => {
+    editingItem.value = item;
+    editingName.value = item.name;
+    nextTick(() => editInputRef.value?.focus());
+};
+
+const cancelRename = () => {
+    editingItem.value = null;
+    editingName.value = '';
+};
+
+const saveRename = async (item: FileItem) => {
+    if (!editingName.value || editingName.value === item.name) {
+        cancelRename();
+        return;
+    }
+
+    // Check if name already exists
+    const exists = items.value.some(i => i.name === editingName.value && i.path !== item.path);
+    if (exists) {
+        const typeLabel = item.type === 'folder' ? t('admin.media.folder') : t('admin.media.file');
+        showAlert(t('admin.media.error_title'), t('admin.media.name_exists', { type: typeLabel }), 'warning');
+        return;
+    }
+
     try {
-        await mediaApi.deleteItem(item.path);
+        await mediaApi.renameItem(item.path, editingName.value);
+        showAlert(t('admin.media.alert_title'), t('admin.media.rename_success'), 'success');
+        cancelRename();
         loadFiles();
     } catch (e: any) {
-        alert(e.response?.data?.message || t('admin.manage.media.delete_failed'));
+        showAlert(t('admin.media.error_title'), e.response?.data?.message || t('admin.media.rename_failed'), 'error');
     }
+};
+
+// Delete functionality
+const confirmDelete = (item: FileItem) => {
+    const typeLabel = item.type === 'folder' ? t('admin.media.folder') : t('admin.media.file');
+    let message = t('admin.media.confirm_delete_message', { type: typeLabel, name: item.name });
+    
+    if (item.type === 'folder') {
+        message += '\n\n' + t('admin.media.confirm_delete_folder_content');
+    }
+
+    deleteModal.value = {
+        show: true,
+        item: item,
+        message: message,
+        loading: false
+    };
+};
+
+const executeDelete = async () => {
+    if (!deleteModal.value.item) return;
+    
+    deleteModal.value.loading = true;
+    try {
+        await mediaApi.deleteItem(deleteModal.value.item.path);
+        showAlert(t('admin.media.alert_title'), t('admin.media.delete_success'), 'success');
+        deleteModal.value.show = false;
+        loadFiles();
+    } catch (e: any) {
+        showAlert(t('admin.media.error_title'), e.response?.data?.message || t('admin.media.delete_failed'), 'error');
+    } finally {
+        deleteModal.value.loading = false;
+    }
+};
+
+// Alert helper
+const showAlert = (title: string, message: string, variant: 'success' | 'error' | 'warning' | 'info') => {
+    alertModal.value = {
+        show: true,
+        title,
+        message,
+        variant
+    };
 };
 
 onMounted(() => {

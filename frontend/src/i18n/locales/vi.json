@@ -38,6 +38,7 @@
         "save": "Lưu",
         "cancel": "Hủy",
         "delete": "Xóa",
+        "select": "Chọn",
         "edit": "Chỉnh sửa",
         "actions": "Hành động",
         "status": "Trạng thái",
@@ -214,7 +215,27 @@
             "media": {
                 "new_folder": "Thư mục mới",
                 "upload": "Tải lên",
-                "upload_failed": "Tải lên thất bại: {name}"
+                "upload_failed": "Tải lên thất bại: {name}",
+                "folder_name_placeholder": "Tên...",
+                "empty": "Thư mục trống",
+                "selected_multi": "Đã chọn: {count} hình ảnh",
+                "selected_single": "Đã chọn: {name}",
+                "select_placeholder": "Chọn {type}",
+                "images": "các hình ảnh",
+                "an_image": "một hình ảnh",
+                "selected": "Đã chọn",
+                "rename": "Đổi tên",
+                "rename_item": "Đổi tên {type}",
+                "new_name": "Tên mới",
+                "rename_success": "Đổi tên thành công",
+                "rename_failed": "Đổi tên thất bại",
+                "name_exists": "Đã tồn tại {type} với tên này",
+                "confirm_delete_title": "Xác nhận xóa",
+                "confirm_delete_message": "Bạn có chắc chắn muốn xóa {type} \"{name}\"?",
+                "confirm_delete_folder_content": "Thư mục này chứa các tệp. Toàn bộ nội dung sẽ bị xóa.",
+                "delete_success": "Xóa thành công",
+                "alert_title": "Thông báo",
+                "error_title": "Lỗi"
             }
         },
         "forms": {
@@ -343,7 +364,20 @@
             "delete_failed": "Xóa thất bại",
             "selected": "Đã chọn",
             "an_image": "một hình ảnh",
-            "folder": "thư mục"
+            "folder": "thư mục",
+            "rename": "Đổi tên",
+            "rename_item": "Đổi tên {type}",
+            "new_name": "Tên mới",
+            "rename_success": "Đổi tên thành công",
+            "rename_failed": "Đổi tên thất bại",
+            "name_exists": "Đã tồn tại {type} với tên này",
+            "confirm_delete_title": "Xác nhận xóa",
+            "confirm_delete_message": "Bạn có chắc chắn muốn xóa {type} \"{name}\"?",
+            "confirm_delete_folder_content": "Thư mục này chứa các tệp. Toàn bộ nội dung sẽ bị xóa.",
+            "delete_success": "Xóa thành công",
+            "alert_title": "Thông báo",
+            "error_title": "Lỗi",
+            "file": "tệp"
         }
     }
 }

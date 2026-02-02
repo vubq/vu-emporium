@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,10 +66,12 @@ public class MediaController {
             if (name == null || name.isEmpty())
                 return ResponseEntity.badRequest().body(ApiResponse.error("Folder name required"));
 
-            Path dirPath = getSecurePath(path).resolve(name);
-            if (Files.exists(dirPath)) {
-                return ResponseEntity.badRequest().body(ApiResponse.error("Folder already exists"));
-            }
+            Path parentPath = getSecurePath(path);
+
+            // Auto-numbering: generate unique folder name if exists
+            String uniqueName = generateUniqueName(parentPath, name);
+            Path dirPath = parentPath.resolve(uniqueName);
+
             Files.createDirectories(dirPath);
             return ResponseEntity.ok(ApiResponse.success("Folder created", null));
         } catch (Exception e) {
@@ -89,18 +92,16 @@ public class MediaController {
             if (!Files.exists(dirPath))
                 Files.createDirectories(dirPath);
 
-            String filename = file.getOriginalFilename(); // Keep original name or sanitize?
+            String filename = file.getOriginalFilename();
             if (filename == null)
                 filename = "unnamed_file";
 
             // Basic sanitization
             filename = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
 
-            Path filePath = dirPath.resolve(filename);
-
-            if (Files.exists(filePath) && !overwrite) {
-                return ResponseEntity.status(409).body(ApiResponse.error("File already exists"));
-            }
+            // Auto-numbering: generate unique filename if exists
+            String uniqueFilename = generateUniqueName(dirPath, filename);
+            Path filePath = dirPath.resolve(uniqueFilename);
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -113,23 +114,104 @@ public class MediaController {
         }
     }
 
+    @PatchMapping("/rename")
+    public ResponseEntity<ApiResponse<Void>> rename(@RequestBody Map<String, String> payload) {
+        try {
+            String oldPath = payload.get("path");
+            String newName = payload.get("newName");
+
+            if (oldPath == null || oldPath.isEmpty())
+                return ResponseEntity.badRequest().body(ApiResponse.error("Path is required"));
+            if (newName == null || newName.isEmpty())
+                return ResponseEntity.badRequest().body(ApiResponse.error("New name is required"));
+
+            // Sanitize new name
+            newName = newName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+            Path sourcePath = getSecurePath(oldPath);
+            if (!Files.exists(sourcePath))
+                return ResponseEntity.badRequest().body(ApiResponse.error("File or folder not found"));
+
+            // Get parent directory
+            Path parentPath = sourcePath.getParent();
+            if (parentPath == null)
+                return ResponseEntity.badRequest().body(ApiResponse.error("Cannot rename root directory"));
+
+            Path targetPath = parentPath.resolve(newName);
+
+            // Check if target already exists
+            if (Files.exists(targetPath))
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("A file or folder with this name already exists"));
+
+            // Perform rename
+            Files.move(sourcePath, targetPath, StandardCopyOption.ATOMIC_MOVE);
+
+            return ResponseEntity.ok(ApiResponse.success("Renamed successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Rename failed: " + e.getMessage()));
+        }
+    }
+
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> delete(@RequestParam String path) {
         try {
             Path target = getSecurePath(path);
-            if (Files.isDirectory(target)) {
-                // Recursive delete ? Or just empty? Let's safeguard to only empty for now or
-                // use walkFileTree
-                try (Stream<Path> entries = Files.list(target)) {
-                    if (entries.findAny().isPresent()) {
-                        return ResponseEntity.badRequest().body(ApiResponse.error("Folder not empty"));
-                    }
-                }
-            }
-            Files.deleteIfExists(target);
+            if (!Files.exists(target))
+                return ResponseEntity.badRequest().body(ApiResponse.error("File or folder not found"));
+
+            // Recursive delete for directories
+            deleteRecursively(target);
+
             return ResponseEntity.ok(ApiResponse.success("Deleted", null));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.error("Delete failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Generate unique name by appending (1), (2), etc. if name already exists
+     */
+    private String generateUniqueName(Path directory, String baseName) {
+        String name = baseName;
+        String extension = "";
+
+        // Extract extension for files
+        int dotIndex = baseName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < baseName.length() - 1) {
+            name = baseName.substring(0, dotIndex);
+            extension = baseName.substring(dotIndex);
+        }
+
+        Path targetPath = directory.resolve(baseName);
+        int counter = 1;
+
+        while (Files.exists(targetPath)) {
+            String newName = name + " (" + counter + ")" + extension;
+            targetPath = directory.resolve(newName);
+            counter++;
+        }
+
+        return targetPath.getFileName().toString();
+    }
+
+    /**
+     * Recursively delete a file or directory
+     */
+    private void deleteRecursively(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            try (Stream<Path> entries = Files.walk(path)) {
+                entries.sorted(Comparator.reverseOrder())
+                        .forEach(p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
+            }
+        } else {
+            Files.delete(path);
         }
     }
 

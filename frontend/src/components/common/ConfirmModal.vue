@@ -41,7 +41,7 @@
                   @click="closeModal"
                   :disabled="loading"
                 >
-                  Cancel
+                  {{ $t('common.cancel') }}
                 </button>
                 <button
                   type="button"
@@ -72,6 +72,9 @@
 
 <script setup lang="ts">
 import { TransitionRoot, TransitionChild, Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
   isOpen: boolean;

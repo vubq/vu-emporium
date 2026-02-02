@@ -38,6 +38,7 @@
         "save": "Save",
         "cancel": "Cancel",
         "delete": "Delete",
+        "select": "Select",
         "edit": "Edit",
         "actions": "Actions",
         "status": "Status",
@@ -214,7 +215,27 @@
             "media": {
                 "new_folder": "New Folder",
                 "upload": "Upload",
-                "upload_failed": "Upload failed: {name}"
+                "upload_failed": "Upload failed: {name}",
+                "folder_name_placeholder": "Name...",
+                "empty": "Folder is empty",
+                "selected_multi": "Selected: {count} images",
+                "selected_single": "Selected: {name}",
+                "select_placeholder": "Select {type}",
+                "images": "images",
+                "an_image": "an image",
+                "selected": "Selected",
+                "rename": "Rename",
+                "rename_item": "Rename {type}",
+                "new_name": "New name",
+                "rename_success": "Renamed successfully",
+                "rename_failed": "Failed to rename",
+                "name_exists": "A {type} with this name already exists",
+                "confirm_delete_title": "Confirm Delete",
+                "confirm_delete_message": "Are you sure you want to delete {type} \"{name}\"?",
+                "confirm_delete_folder_content": "This folder contains files. All contents will be deleted.",
+                "delete_success": "Deleted successfully",
+                "alert_title": "Notice",
+                "error_title": "Error"
             }
         },
         "forms": {
@@ -343,7 +364,20 @@
             "delete_failed": "Delete failed",
             "selected": "Selected",
             "an_image": "an image",
-            "folder": "folder"
+            "folder": "folder",
+            "rename": "Rename",
+            "rename_item": "Rename {type}",
+            "new_name": "New name",
+            "rename_success": "Renamed successfully",
+            "rename_failed": "Failed to rename",
+            "name_exists": "A {type} with this name already exists",
+            "confirm_delete_title": "Confirm Delete",
+            "confirm_delete_message": "Are you sure you want to delete {type} \"{name}\"?",
+            "confirm_delete_folder_content": "This folder contains files. All contents will be deleted.",
+            "delete_success": "Deleted successfully",
+            "alert_title": "Notice",
+            "error_title": "Error",
+            "file": "file"
         }
     }
 }
