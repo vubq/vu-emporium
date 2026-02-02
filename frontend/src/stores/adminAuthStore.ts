@@ -17,7 +17,8 @@ interface AuthResponse {
 }
 
 export const useAdminAuthStore = defineStore('adminAuth', () => {
-    const admin = ref<Admin | null>(null);
+    const storedAdmin = localStorage.getItem('admin');
+    const admin = ref<Admin | null>(storedAdmin ? JSON.parse(storedAdmin) : null);
     const token = ref<string | null>(localStorage.getItem('adminToken'));
     const isAuthenticated = ref<boolean>(!!token.value);
 
@@ -54,6 +55,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
                 },
             });
             admin.value = response.data.data;
+            localStorage.setItem('admin', JSON.stringify(admin.value));
         } catch (error) {
             console.error('Failed to fetch admin info:', error);
             logout();
@@ -68,6 +70,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
         // Only clear admin tokens
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminRefreshToken');
+        localStorage.removeItem('admin');
     }
 
     return {

@@ -4,37 +4,37 @@ import { authApi } from '@/api/authApi';
 import type { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/auth';
 
 export const useAuthStore = defineStore('auth', () => {
-    const user = ref<User | null>(null);
-    const accessToken = ref<string | null>(localStorage.getItem('accessToken'));
-    const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'));
+    const customer = ref<User | null>(null);
+    const customerToken = ref<string | null>(localStorage.getItem('customerToken'));
+    const customerRefreshToken = ref<string | null>(localStorage.getItem('customerRefreshToken'));
 
-    const isAuthenticated = computed(() => !!accessToken.value);
-    const isAdmin = computed(() => user.value?.roles.includes('ROLE_ADMIN') ?? false);
+    const isAuthenticated = computed(() => !!customerToken.value);
+    const isAdmin = computed(() => customer.value?.roles.includes('ROLE_ADMIN') ?? false);
 
     function setAuthData(data: AuthResponse) {
         // Set customer data (keep admin tokens if they exist)
-        user.value = {
+        customer.value = {
             id: data.user.id,
             email: data.user.email,
             fullName: data.user.fullName,
             roles: data.user.roles,
         };
-        accessToken.value = data.accessToken;
-        refreshToken.value = data.refreshToken;
+        customerToken.value = data.accessToken;
+        customerRefreshToken.value = data.refreshToken;
 
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(user.value));
+        localStorage.setItem('customerToken', data.accessToken);
+        localStorage.setItem('customerRefreshToken', data.refreshToken);
+        localStorage.setItem('customer', JSON.stringify(customer.value));
     }
 
     function clearAuthData() {
-        user.value = null;
-        accessToken.value = null;
-        refreshToken.value = null;
+        customer.value = null;
+        customerToken.value = null;
+        customerRefreshToken.value = null;
 
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('customerRefreshToken');
+        localStorage.removeItem('customer');
     }
 
     async function register(data: RegisterRequest) {
@@ -59,8 +59,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function logout() {
         try {
-            if (refreshToken.value) {
-                await authApi.logout(refreshToken.value);
+            if (customerRefreshToken.value) {
+                await authApi.logout(customerRefreshToken.value);
             }
         } finally {
             clearAuthData();
@@ -68,10 +68,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function initializeAuth() {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
+        const storedCustomer = localStorage.getItem('customer');
+        if (storedCustomer) {
             try {
-                user.value = JSON.parse(storedUser);
+                customer.value = JSON.parse(storedCustomer);
             } catch (e) {
                 clearAuthData();
             }
@@ -79,9 +79,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-        user,
-        accessToken,
-        refreshToken,
+        customer,
+        customerToken,
+        customerRefreshToken,
         isAuthenticated,
         isAdmin,
         register,

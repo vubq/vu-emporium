@@ -19,8 +19,8 @@ apiClient.interceptors.request.use(
             // For admin routes, only use adminToken
             token = localStorage.getItem('adminToken');
         } else {
-            // For customer routes, only use accessToken
-            token = localStorage.getItem('accessToken');
+            // For customer routes, only use customerToken
+            token = localStorage.getItem('customerToken');
         }
 
         if (token && config.headers) {
@@ -68,22 +68,30 @@ apiClient.interceptors.response.use(
                         // Refresh failed, clear admin tokens and redirect to admin login
                         localStorage.removeItem('adminToken');
                         localStorage.removeItem('adminRefreshToken');
+                        localStorage.removeItem('admin');
                         window.location.href = '/admin/login';
                         return Promise.reject(refreshError);
                     }
+                } else {
+                    // No refresh token available, clear admin tokens and redirect to admin login
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminRefreshToken');
+                    localStorage.removeItem('admin');
+                    window.location.href = '/admin/login';
+                    return Promise.reject(error);
                 }
             } else {
                 // Handle customer token refresh
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (refreshToken) {
+                const customerRefreshToken = localStorage.getItem('customerRefreshToken');
+                if (customerRefreshToken) {
                     try {
                         const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/refresh`, {
-                            refreshToken,
+                            refreshToken: customerRefreshToken,
                         });
 
                         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-                        localStorage.setItem('accessToken', accessToken);
-                        localStorage.setItem('refreshToken', newRefreshToken);
+                        localStorage.setItem('customerToken', accessToken);
+                        localStorage.setItem('customerRefreshToken', newRefreshToken);
 
                         if (originalRequest.headers) {
                             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -92,11 +100,20 @@ apiClient.interceptors.response.use(
                         return apiClient(originalRequest);
                     } catch (refreshError) {
                         // Refresh failed, clear tokens and redirect to login
-                        localStorage.removeItem('accessToken');
-                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('customerToken');
+                        localStorage.removeItem('customerRefreshToken');
+                        // Also remove user data
+                        localStorage.removeItem('customer');
                         window.location.href = '/login';
                         return Promise.reject(refreshError);
                     }
+                } else {
+                    // No refresh token available, clear tokens and redirect to login
+                    localStorage.removeItem('customerToken');
+                    localStorage.removeItem('customerRefreshToken');
+                    localStorage.removeItem('customer');
+                    window.location.href = '/login';
+                    return Promise.reject(error);
                 }
             }
         }
