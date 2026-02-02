@@ -28,8 +28,14 @@ public class ProductVariant {
     @Column(unique = true, length = 100)
     private String sku;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal basePrice;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal salePrice;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal costPrice;
 
     @Column(nullable = false)
     @Builder.Default

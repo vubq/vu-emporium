@@ -13,7 +13,7 @@ public interface ProductService {
     Page<ProductDTO> getAllProducts(Long categoryId, String search, Pageable pageable);
 
     Page<ProductDTO> getAllProducts(Long categoryId, String search, BigDecimal minPrice, BigDecimal maxPrice,
-            ProductStatus status, Pageable pageable);
+            String brand, ProductStatus status, Pageable pageable);
 
     ProductDTO getProductById(Long id);
 

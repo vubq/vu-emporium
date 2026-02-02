@@ -19,8 +19,6 @@ public class ProductDTO {
     private String name;
     private String slug;
     private String description;
-    private BigDecimal price;
-    private BigDecimal compareAtPrice;
     private Integer stockQuantity;
     private String sku;
     private CategoryDTO category;
@@ -29,6 +27,23 @@ public class ProductDTO {
     private Boolean featured;
     private Integer viewCount;
     private Integer soldCount;
+
+    // New Fields
+    private BigDecimal basePrice;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
+    private String brand;
+    private Double weight;
+    private Double length;
+    private Double width;
+    private Double height;
+    private String metaTitle;
+    private String metaDescription;
+    private String metaKeywords;
+    private Double averageRating;
+    private Integer reviewCount;
+    private Integer totalSales;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

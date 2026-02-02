@@ -66,15 +66,15 @@
         <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
           <div class="flex justify-between">
               <h1 class="text-3xl font-display font-extrabold tracking-tight text-gray-900 sm:text-4xl">{{ product.name }}</h1>
-              <span v-if="product.compareAtPrice" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 self-start mt-2">
-                 Save {{ calculateDiscount(product.price, product.compareAtPrice) }}%
+              <span v-if="currentStrikethroughPrice" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 self-start mt-2">
+                 Save {{ calculateDiscount(currentDisplayPrice, currentStrikethroughPrice) }}%
               </span>
           </div>
           
           <div class="mt-3 flex items-end space-x-4">
             <h2 class="sr-only">Product information</h2>
             <p class="text-3xl text-gray-900 font-bold gradient-text from-primary-600 to-accent-600">${{ currentDisplayPrice.toFixed(2) }}</p>
-            <p v-if="product.compareAtPrice && product.compareAtPrice > currentDisplayPrice" class="text-lg text-gray-500 line-through mb-1">${{ product.compareAtPrice.toFixed(2) }}</p>
+            <p v-if="currentStrikethroughPrice" class="text-lg text-gray-500 line-through mb-1">${{ currentStrikethroughPrice.toFixed(2) }}</p>
           </div>
 
           <!-- Ratings (Static for now) -->
@@ -309,8 +309,17 @@ watch(currentVariant, () => {
 });
 
 const currentDisplayPrice = computed(() => {
-    if (currentVariant.value) return currentVariant.value.price;
-    return product.value?.price || 0;
+    const p = currentVariant.value || product.value;
+    if (!p) return 0;
+    return (p.salePrice && p.salePrice > 0) ? p.salePrice : (p.basePrice || 0);
+});
+
+const currentStrikethroughPrice = computed(() => {
+    const p = currentVariant.value || product.value;
+    if (!p || !p.salePrice || p.salePrice <= 0 || !p.basePrice || p.salePrice >= p.basePrice) {
+        return null;
+    }
+    return p.basePrice;
 });
 
 const currentDisplayImage = computed(() => {

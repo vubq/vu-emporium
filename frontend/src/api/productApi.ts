@@ -52,6 +52,7 @@ export const adminProductApi = {
         search?: string;
         minPrice?: number | null;
         maxPrice?: number | null;
+        brand?: string;
         status?: string | null;
         sortBy?: string;
         sortDir?: string;

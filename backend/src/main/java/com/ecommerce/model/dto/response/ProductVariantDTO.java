@@ -15,7 +15,9 @@ import java.util.List;
 public class ProductVariantDTO {
     private Long id;
     private String sku;
-    private BigDecimal price;
+    private BigDecimal basePrice;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
     private Integer stockQuantity;
     private List<String> images;
     private List<ProductOptionValueDTO> optionValues;

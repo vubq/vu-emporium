@@ -34,6 +34,7 @@ public class AdminProductController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String brand,
             @RequestParam(required = false) ProductStatus status,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
@@ -41,7 +42,7 @@ public class AdminProductController {
         Sort sort = sortDir.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<ProductDTO> products = productService.getAllProducts(categoryId, search, minPrice, maxPrice, status,
+        Page<ProductDTO> products = productService.getAllProducts(categoryId, search, minPrice, maxPrice, brand, status,
                 pageable);
         return ResponseEntity.ok(ApiResponse.success(products));
     }

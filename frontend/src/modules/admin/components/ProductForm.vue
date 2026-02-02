@@ -61,10 +61,40 @@
                   <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Premium Cotton T-Shirt" :disabled="submitting" />
                 </div>
                 <div>
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
+                   <input v-model="form.brand" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Acme Corp" :disabled="submitting" />
+                </div>
+                <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
                   <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="Describe your product..." :disabled="submitting"></textarea>
                 </div>
             </div>
+            
+            <!-- SEO Card -->
+           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 transition-shadow hover:shadow-md mt-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                <span class="bg-green-100 text-green-600 p-2 rounded-lg mr-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </span>
+                SEO
+            </h3>
+            
+            <div class="space-y-6">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Title</label>
+                  <input v-model="form.metaTitle" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="SEO Title" :disabled="submitting" />
+                </div>
+                <div>
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Description</label>
+                   <textarea v-model="form.metaDescription" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="SEO Description" :disabled="submitting"></textarea>
+                </div>
+                 <div>
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Keywords</label>
+                   <input v-model="form.metaKeywords" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="comma, separated, keywords" :disabled="submitting" />
+                </div>
+            </div>
+          </div>
+
           </div>
 
           <!-- Media Card -->
@@ -158,70 +188,49 @@
                      </button>
                 </div>
 
+                <!-- Variant Table (Collapsed View) -->
                 <div v-if="variants.length > 0" class="border rounded-xl overflow-hidden border-gray-200 shadow-sm bg-white">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">SKU (Auto)</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Price</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">Images</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(variant, index) in variants" :key="index" class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ getVariantName(variant) }}
-                                    </td>
+                                <tr v-for="(variant, index) in variants" :key="index" class="hover:bg-gray-50 transition-colors cursor-pointer" @click="openEditVariantModal(index)">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model="variant.sku" type="text" readonly class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none transition-all" />
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model.number="variant.price" type="number" step="0.01" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <input v-model.number="variant.stockQuantity" type="number" class="block w-full text-sm rounded-xl border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <!-- Image Thumbnails -->
-                                            <div class="flex items-center gap-2">
-                                                <div v-if="!variant.images || variant.images.length === 0"
-                                                     class="w-16 h-16 rounded-lg bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                </div>
-                                                
-                                                <div v-else class="flex items-center gap-2">
-                                                    <!-- First thumbnail only -->
-                                                    <div class="relative w-16 h-16 rounded-lg border-2 border-gray-200 overflow-hidden group hover:border-indigo-400 transition-all cursor-pointer"
-                                                         @click="openVariantImageModal(index)">
-                                                        <img :src="variant.images[0]" 
-                                                             class="w-full h-full object-cover" 
-                                                             @error="handleImageError" />
-                                                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <!-- More indicator -->
-                                                    <div v-if="(variant.images || []).length > 1" 
-                                                         class="w-16 h-16 rounded-lg bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center text-sm font-bold text-indigo-600 cursor-pointer hover:bg-indigo-100 transition-colors"
-                                                         @click="openVariantImageModal(index)">
-                                                        +{{ variant.images.length - 1 }}
-                                                    </div>
-                                                </div>
+                                        <div class="flex items-center">
+                                            <!-- Tiny Thumbnail -->
+                                            <div class="h-8 w-8 rounded-md bg-gray-100 flex-shrink-0 mr-3 border border-gray-200 overflow-hidden">
+                                                 <img v-if="variant.images && variant.images[0]" :src="variant.images[0]" class="h-full w-full object-cover" />
+                                                 <div v-else class="h-full w-full flex items-center justify-center text-gray-400">
+                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                 </div>
                                             </div>
-                                            
-                                            <!-- Manage Button - only show if no counter -->
-                                            <button v-if="!variant.images || variant.images.length <= 1" 
-                                                    type="button" @click="openVariantImageModal(index)" 
-                                                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-indigo-200 hover:border-indigo-300" :disabled="submitting"
-                                                    :title="'Manage images for ' + getVariantName(variant)">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                            </button>
+                                            <span class="text-sm font-medium text-gray-900">{{ getVariantName(variant) }}</span>
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-sm text-gray-500 font-mono">{{ variant.sku }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-gray-900">${{ variant.basePrice?.toFixed(2) }}</span>
+                                            <span v-if="variant.salePrice && variant.salePrice > 0" class="text-xs text-green-600 font-medium">Sale: ${{ variant.salePrice.toFixed(2) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span :class="[variant.stockQuantity > 0 ? 'text-gray-900' : 'text-red-500', 'text-sm font-medium']">{{ variant.stockQuantity }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button type="button" class="text-indigo-600 hover:text-indigo-900 font-medium bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100">
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -266,6 +275,17 @@
                             </div>
                          </Listbox>
                     </div>
+                         
+                     <!-- Featured Toggle -->
+                     <div class="flex items-center justify-between">
+                         <span class="flex-grow flex flex-col">
+                             <span class="text-sm font-semibold text-gray-700">Featured Product</span>
+                             <span class="text-xs text-gray-500">Show this product on home page</span>
+                         </span>
+                         <Switch v-model="form.featured" :class="[form.featured ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500']" :disabled="submitting">
+                             <span aria-hidden="true" :class="[form.featured ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
+                         </Switch>
+                     </div>
 
                     <!-- Category -->
                     <div>
@@ -317,30 +337,42 @@
                 </div>
             </div>
 
-            <!-- Pricing Card -->
+             <!-- Pricing Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-md font-bold text-gray-900 mb-4">Pricing</h3>
                  <div class="space-y-4">
-                     <div>
-                      <label class="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                      <div class="relative rounded-xl shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span class="text-gray-500 sm:text-sm">$</span>
-                        </div>
-                        <input v-model.number="form.price" type="number" step="0.01" min="0" required class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
-                      </div>
-                    </div>
-                    <div>
-                       <label class="block text-sm font-semibold text-gray-700 mb-1">Compare at Price</label>
-                        <div class="relative rounded-xl shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span class="text-gray-500 sm:text-sm">$</span>
-                        </div>
-                        <input v-model.number="form.compareAtPrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
-                      </div>
-                    </div>
+                     <div class="grid grid-cols-3 gap-4">
+                         <div>
+                           <label class="block text-sm font-semibold text-gray-700 mb-1">Base Price</label>
+                           <div class="relative rounded-xl shadow-sm">
+                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                               <span class="text-gray-500 sm:text-sm">$</span>
+                             </div>
+                             <input v-model.number="form.basePrice" type="number" step="0.01" min="0" required class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
+                           </div>
+                         </div>
+                         <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Sale Price</label>
+                             <div class="relative rounded-xl shadow-sm">
+                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                               <span class="text-gray-500 sm:text-sm">$</span>
+                             </div>
+                             <input v-model.number="form.salePrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
+                           </div>
+                         </div>
+                         <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Cost Price</label>
+                             <div class="relative rounded-xl shadow-sm">
+                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                               <span class="text-gray-500 sm:text-sm">$</span>
+                             </div>
+                             <input v-model.number="form.costPrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="0.00" :disabled="submitting" />
+                           </div>
+                         </div>
+                     </div>
                  </div>
             </div>
+
 
             <!-- Inventory Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -357,51 +389,178 @@
                 </div>
             </div>
 
+            <!-- Stats Card (Edit Only) -->
+            <div v-if="isEdit" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                 <h3 class="text-md font-bold text-gray-900 mb-4">Statistics</h3>
+                 <div class="grid grid-cols-2 gap-4">
+                     <div class="bg-gray-50 rounded-xl p-3 text-center">
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Rating</span>
+                         <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.averageRating ? form.averageRating.toFixed(1) : '0.0' }}</span>
+                     </div>
+                      <div class="bg-gray-50 rounded-xl p-3 text-center">
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Reviews</span>
+                         <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.reviewCount || 0 }}</span>
+                     </div>
+                      <div class="bg-gray-50 rounded-xl p-3 text-center">
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Sales</span>
+                         <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.totalSales || 0 }}</span>
+                     </div>
+                      <div class="bg-gray-50 rounded-xl p-3 text-center">
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Views</span>
+                         <span class="block text-xl font-bold text-gray-900 mt-1">{{ initialData?.viewCount || 0 }}</span>
+                     </div>
+                 </div>
+            </div>
+
+
+            <!-- Shipping Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-md font-bold text-gray-900 mb-4">Shipping</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Weight (kg)</label>
+                    <input v-model.number="form.weight" type="number" step="0.01" min="0" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
+                  </div>
+                  <div class="grid grid-cols-3 gap-2">
+                       <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Length (cm)</label>
+                        <input v-model.number="form.length" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Width (cm)</label>
+                        <input v-model.number="form.width" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Height (cm)</label>
+                        <input v-model.number="form.height" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
+                      </div>
+                  </div>
+                </div>
+            </div>
+
+
         </div>
       </form>
       
-      <!-- MediaManager Modal -->
-      <TransitionRoot appear :show="showMediaModal" as="template">
-        <Dialog as="div" @close="closeMediaModal" class="relative z-50">
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-          >
-            <div class="fixed inset-0 bg-black/25 backdrop-blur-sm" />
-          </TransitionChild>
 
-          <div class="fixed inset-0 overflow-y-auto">
-            <div class="flex min-h-full items-center justify-center p-4">
-              <TransitionChild
-                as="template"
-                enter="duration-300 ease-out"
-                enter-from="opacity-0 scale-95"
-                enter-to="opacity-100 scale-100"
-                leave="duration-200 ease-in"
-                leave-from="opacity-100 scale-100"
-                leave-to="opacity-0 scale-95"
-              >
-                <DialogPanel class="w-full max-w-5xl h-[80vh] transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
-                  <MediaManager 
-                    mode="select"
-                    :multi-select="true"
-                    :excluded-urls="getExcludedUrls()"
-                    @select="handleMediaSelect" 
-                    @cancel="closeMediaModal" 
-                  />
-                </DialogPanel>
-              </TransitionChild>
+      <!-- Variant Edit Modal -->
+    <TransitionRoot appear :show="showEditVariantModal" as="template">
+        <Dialog as="div" @close="closeEditVariantModal" class="relative z-50">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center">
+                    <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
+                        <DialogPanel v-if="editingVariant" class="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all border border-gray-100">
+                            <DialogTitle as="h3" class="text-xl font-bold leading-6 text-gray-900 mb-8 flex justify-between items-center">
+                                <div class="flex items-center">
+                                     <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    </span>
+                                    <span>Edit Variant: <span class="text-indigo-600">{{ getVariantName(editingVariant) }}</span></span>
+                                </div>
+                                <button @click="closeEditVariantModal" class="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </DialogTitle>
+                            
+                            <div class="space-y-8">
+                                <!-- SKU & Stock -->
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">SKU</label>
+                                        <input v-model="editingVariant.sku" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Stock Quantity</label>
+                                        <input v-model.number="editingVariant.stockQuantity" type="number" min="0" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
+                                    </div>
+                                </div>
+
+                                <!-- Pricing -->
+                                <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Pricing Configuration
+                                    </h4>
+                                    <div class="grid grid-cols-3 gap-5">
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">Base Price</label>
+                                            <div class="relative rounded-xl shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                                </div>
+                                                <input v-model.number="editingVariant.basePrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white" placeholder="0.00" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">Sale Price</label>
+                                            <div class="relative rounded-xl shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                                </div>
+                                                 <input v-model.number="editingVariant.salePrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white" placeholder="0.00" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">Cost Price</label>
+                                            <div class="relative rounded-xl shadow-sm">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                                </div>
+                                                 <input v-model.number="editingVariant.costPrice" type="number" step="0.01" min="0" class="w-full pl-7 pr-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none bg-white" placeholder="0.00" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Images -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-sm font-bold text-gray-900 flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                            Variant Images
+                                        </h4>
+                                        <button type="button" @click="openMediaModalForEditingVariant" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100">+ Add Images</button>
+                                    </div>
+                                    
+                                    <div class="flex flex-wrap gap-4">
+                                        <div v-for="(img, idx) in editingVariant.images" :key="idx" class="relative group w-24 h-24 rounded-xl overflow-hidden border-2 border-gray-200 shadow-sm hover:border-indigo-400 transition-all">
+                                            <img :src="img" class="w-full h-full object-cover" />
+                                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button @click="removeEditingVariantImage(idx)" class="p-1.5 bg-white text-red-500 rounded-full hover:bg-red-50 transition-colors shadow-sm">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button v-if="!editingVariant.images || editingVariant.images.length === 0" 
+                                            @click="openMediaModalForEditingVariant"
+                                            class="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all">
+                                            <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                            <span class="text-xs font-semibold">Add</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end space-x-3 pt-6 border-t border-gray-100">
+                                <button type="button" class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all" @click="closeEditVariantModal">
+                                    Cancel
+                                </button>
+                                <button type="button" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-medium hover:bg-black shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transform hover:-translate-y-0.5 transition-all" @click="saveVariantChanges">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
             </div>
-          </div>
         </Dialog>
-      </TransitionRoot>
-      
-      <!-- Product Image Preview Modal -->
+    </TransitionRoot>
+
+    <!-- Product Image Preview Modal -->
       <TransitionRoot appear :show="showProductPreview" as="template">
         <Dialog as="div" @close="closeProductPreview" class="relative z-50">
           <TransitionChild
@@ -666,6 +825,46 @@
       </TransitionRoot>
     </div>
   </div>
+      <!-- MediaManager Modal -->
+      <TransitionRoot appear :show="showMediaModal" as="template">
+        <Dialog as="div" @close="closeMediaModal" class="relative z-[60]">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+              <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel class="w-full max-w-5xl h-[80vh] transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+                  <MediaManager 
+                    mode="select"
+                    :multi-select="true"
+                    :excluded-urls="getExcludedUrls()"
+                    @select="handleMediaSelect" 
+                    @cancel="closeMediaModal" 
+                  />
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
 </template>
 
 <script setup lang="ts">
@@ -676,7 +875,7 @@ import {
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
     Switch, SwitchGroup, SwitchLabel,
     Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot,
-    Dialog, DialogPanel, TransitionChild
+    Dialog, DialogPanel, TransitionChild, DialogTitle
 } from '@headlessui/vue';
 import MediaManager from './MediaManager.vue';
 
@@ -718,6 +917,12 @@ const showVariantPreview = ref(false);
 const previewVariantIndex = ref<number | null>(null);
 const previewVariantImageIndex = ref<number | null>(null);
 
+// Variant Edit Modal State
+const showEditVariantModal = ref(false);
+const editingVariantIndex = ref<number | null>(null);
+const editingVariant = ref<any>(null); // Temporary copy for editing
+
+
 // Loading States
 const isLoadingData = ref(true);
 const submitting = ref(false);
@@ -725,14 +930,87 @@ const submitting = ref(false);
 const form = reactive({
   name: '',
   description: '',
-  price: 0,
-  compareAtPrice: 0,
   stockQuantity: 0,
   sku: '',
   categoryId: null as number | null,
   status: 'ACTIVE',
-  images: ['']
+  featured: false,
+  images: [''],
+  // New Fields
+  basePrice: 0,
+  salePrice: 0,
+  costPrice: 0,
+  brand: '',
+  weight: 0,
+  length: 0,
+  width: 0,
+  height: 0,
+  metaTitle: '',
+  metaDescription: '',
+  metaKeywords: ''
 });
+
+// Update form when editing
+watch(() => props.initialData, (newVal) => {
+    if (newVal) {
+        Object.assign(form, {
+            ...newVal,
+            // Ensure zeros if null/undefined for numeric fields
+            basePrice: newVal.basePrice || 0,
+            salePrice: newVal.salePrice || 0,
+            costPrice: newVal.costPrice || 0,
+            weight: newVal.weight || 0,
+            length: newVal.length || 0,
+            width: newVal.width || 0,
+            height: newVal.height || 0,
+            images: newVal.images && newVal.images.length > 0 ? newVal.images : ['']
+        });
+        hasVariants.value = newVal.hasVariants;
+        if (newVal.options) {
+             options.value = newVal.options.map((opt: any) => ({
+                 name: opt.name,
+                 valuesInput: opt.values.map((v: any) => v.value).join(', '),
+                 values: opt.values
+             }));
+        }
+        if (newVal.variants) {
+            variants.value = JSON.parse(JSON.stringify(newVal.variants));
+        }
+        if (newVal.category) {
+            selectedCategory.value = newVal.category;
+            query.value = newVal.category.name;
+        }
+    } else {
+        // Reset form
+        Object.assign(form, {
+             name: '',
+             description: '',
+             stockQuantity: 0,
+             sku: '',
+             categoryId: null,
+             status: 'ACTIVE',
+             featured: false,
+             images: [''],
+             basePrice: 0,
+             salePrice: 0,
+             costPrice: 0,
+             brand: '',
+             weight: 0,
+             length: 0,
+             width: 0,
+             height: 0,
+             metaTitle: '',
+             metaDescription: '',
+             metaKeywords: ''
+        });
+        hasVariants.value = false;
+        options.value = [];
+        variants.value = [];
+        selectedCategory.value = null;
+        query.value = '';
+    }
+}, { immediate: true });
+
 
 const filteredCategories = computed(() =>
   query.value === ''
@@ -764,31 +1042,6 @@ function closeMediaModal() {
     mediaTarget.value = null;
 }
 
-function handleMediaSelect(items: any) {
-    // Handle both single item (legacy) and array (multi-select)
-    const itemsArray = Array.isArray(items) ? items : [items];
-    
-    if (!itemsArray || itemsArray.length === 0 || !mediaTarget.value) return;
-    
-    const { type, index } = mediaTarget.value;
-    
-    if (type === 'product') {
-        // Add to product images (filter out empty strings first)
-        const cleanImages = form.images.filter(img => img);
-        const newUrls = itemsArray.map(item => item.url).filter(url => !cleanImages.includes(url));
-        form.images = [...cleanImages, ...newUrls];
-    } else if (type === 'variant' && index !== undefined) {
-        // Add to variant images
-        if (!variants.value[index].images) {
-            variants.value[index].images = [];
-        }
-        const existingUrls = variants.value[index].images;
-        const newUrls = itemsArray.map(item => item.url).filter(url => !existingUrls.includes(url));
-        variants.value[index].images.push(...newUrls);
-    }
-    
-    closeMediaModal();
-}
 
 function removeProductImage(index: number) {
     form.images.splice(index, 1);
@@ -804,16 +1057,6 @@ function removeVariantImage(variantIndex: number, imageIndex: number) {
     }
 }
 
-function getExcludedUrls(): string[] {
-    if (!mediaTarget.value) return [];
-    
-    if (mediaTarget.value.type === 'product') {
-        return form.images.filter(i => i);
-    } else if (mediaTarget.value.type === 'variant' && mediaTarget.value.index !== undefined) {
-        return variants.value[mediaTarget.value.index].images || [];
-    }
-    return [];
-}
 
 // Product Preview Functions
 function openProductPreview(index: number) {
@@ -885,6 +1128,92 @@ function prevVariantImage() {
     }
 }
 
+// Variant Edit Functions
+function openEditVariantModal(index: number) {
+    editingVariantIndex.value = index;
+    // Create a deep copy to avoid direct mutation until saved
+    editingVariant.value = JSON.parse(JSON.stringify(variants.value[index]));
+    showEditVariantModal.value = true;
+}
+
+function closeEditVariantModal() {
+    // Guard: Do not close if Media Modal is open (prevents accidental closing due to event bubbling)
+    if (showMediaModal.value) return;
+    
+    showEditVariantModal.value = false;
+    editingVariantIndex.value = null;
+    editingVariant.value = null;
+}
+
+function saveVariantChanges() {
+    if (editingVariantIndex.value !== null && editingVariant.value) {
+        variants.value[editingVariantIndex.value] = { ...editingVariant.value };
+        closeEditVariantModal();
+    }
+}
+
+// Media Manager Helper for Edit Modal
+function openMediaModalForEditingVariant() {
+    // We used to open via index, but now we are editing a temporary object 'editingVariant'
+    // The MediaManager needs to know where to put the results.
+    // Solution: We can temporarily hijack the mediaTarget to point to a special 'editing' state
+    // OR easier: modify handleMediaSelect to handle 'editing-variant'
+    
+    mediaTarget.value = { type: 'editing-variant' };
+    showMediaModal.value = true;
+}
+
+function removeEditingVariantImage(imageIndex: number) {
+    if (editingVariant.value && editingVariant.value.images) {
+        editingVariant.value.images.splice(imageIndex, 1);
+    }
+}
+
+
+function handleMediaSelect(items: any) {
+    // Handle both single item (legacy) and array (multi-select)
+    const itemsArray = Array.isArray(items) ? items : [items];
+    
+    if (!itemsArray || itemsArray.length === 0 || !mediaTarget.value) return;
+    
+    const { type, index } = mediaTarget.value;
+    
+    if (type === 'product') {
+        const cleanImages = form.images.filter(img => img);
+        const newUrls = itemsArray.map(item => item.url).filter(url => !cleanImages.includes(url));
+        form.images = [...cleanImages, ...newUrls];
+    } else if (type === 'variant' && index !== undefined) {
+        if (!variants.value[index].images) {
+            variants.value[index].images = [];
+        }
+        const existingUrls = variants.value[index].images;
+        const newUrls = itemsArray.map(item => item.url).filter(url => !existingUrls.includes(url));
+        variants.value[index].images.push(...newUrls);
+    } else if (type === 'editing-variant') {
+         if (!editingVariant.value.images) {
+            editingVariant.value.images = [];
+        }
+        const existingUrls = editingVariant.value.images;
+        const newUrls = itemsArray.map(item => item.url).filter(url => !existingUrls.includes(url));
+        editingVariant.value.images.push(...newUrls);
+    }
+    
+    closeMediaModal();
+}
+
+function getExcludedUrls(): string[] {
+    if (!mediaTarget.value) return [];
+    
+    if (mediaTarget.value.type === 'product') {
+        return form.images.filter(i => i);
+    } else if (mediaTarget.value.type === 'variant' && mediaTarget.value.index !== undefined) {
+        return variants.value[mediaTarget.value.index].images || [];
+    } else if (mediaTarget.value.type === 'editing-variant' && editingVariant.value) {
+        return editingVariant.value.images || [];
+    }
+    return [];
+}
+
 onMounted(async () => {
     isLoadingData.value = true;
     try {
@@ -896,8 +1225,6 @@ onMounted(async () => {
         if (props.initialData) {
             Object.assign(form, props.initialData);
             // Fix for numbers that might come as strings or undefined
-            if(form.price === undefined) form.price = 0;
-            if(form.compareAtPrice === undefined) form.compareAtPrice = 0;
             
             if (props.initialData.category) {
                 form.categoryId = props.initialData.category.id;
@@ -1132,9 +1459,11 @@ function updateVariantsMatrix() {
 
         } else {
             // New Variant
-             newVariants.push({
+              newVariants.push({
                 sku: `${form.sku || 'SKU'}-${combo.map((c: any) => c.value).join('-')}`,
-                price: form.price,
+                basePrice: form.basePrice,
+                salePrice: form.salePrice,
+                costPrice: form.costPrice,
                 stockQuantity: form.stockQuantity, 
                 images: [],
                 optionValues: combo.map((c: any) => ({ value: c.value }))

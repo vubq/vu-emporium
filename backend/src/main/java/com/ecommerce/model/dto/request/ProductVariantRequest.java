@@ -1,5 +1,6 @@
 package com.ecommerce.model.dto.request;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,15 @@ public class ProductVariantRequest {
 
     private String sku;
 
-    @NotNull(message = "Price is required")
-    private BigDecimal price;
+    @NotNull(message = "Base price is required")
+    @DecimalMin(value = "0.0", message = "Base price must be positive")
+    private BigDecimal basePrice;
+
+    @DecimalMin(value = "0.0", message = "Sale price must be positive")
+    private BigDecimal salePrice;
+
+    @DecimalMin(value = "0.0", message = "Cost price must be positive")
+    private BigDecimal costPrice;
 
     @Min(value = 0, message = "Stock quantity must be non-negative")
     private Integer stockQuantity;

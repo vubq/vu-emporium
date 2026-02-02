@@ -12,7 +12,9 @@ export interface ProductOption {
 export interface ProductVariant {
     id: number;
     sku: string;
-    price: number;
+    basePrice: number;
+    salePrice?: number;
+    costPrice?: number;
     stockQuantity: number;
     images: string[]; // Changed from single image to array
     optionValues: ProductOptionValue[];
@@ -23,8 +25,6 @@ export interface Product {
     name: string;
     slug: string;
     description?: string;
-    price: number;
-    compareAtPrice?: number;
     stockQuantity: number;
     sku?: string;
     category?: Category;
@@ -39,6 +39,23 @@ export interface Product {
     hasVariants: boolean;
     options: ProductOption[];
     variants: ProductVariant[];
+
+    // New Fields
+    basePrice?: number;
+    salePrice?: number;
+    costPrice?: number;
+    brand?: string;
+    weight?: number;
+    length?: number;
+    width?: number;
+    height?: number;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    averageRating?: number;
+    reviewCount?: number;
+    totalSales?: number;
+
 }
 
 export interface Category {

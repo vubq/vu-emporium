@@ -27,6 +27,12 @@
                     </div>
                 </div>
 
+                <!-- Brand -->
+                <div class="lg:col-span-1">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Brand</label>
+                    <input v-model="filters.brand" type="text" placeholder="Filter by brand..." class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                </div>
+
                 <!-- Category -->
                 <div class="lg:col-span-1">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
@@ -176,6 +182,7 @@
                 <tr>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">SKU</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Brand</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
@@ -240,6 +247,9 @@
                             {{ product.sku || 'NOSKU' }}
                         </span>
                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm text-gray-600">{{ product.brand || '-' }}</span>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         <div v-if="product.category" class="flex items-center">
                              <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
@@ -247,7 +257,13 @@
                         </div>
                         <span v-else class="text-gray-400 italic text-xs">Uncategorized</span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold font-mono tracking-tight">${{ product.price.toFixed(2) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold font-mono tracking-tight">
+                        <div v-if="product.salePrice && product.salePrice > 0" class="flex flex-col">
+                            <span class="text-indigo-600">${{ product.salePrice.toFixed(2) }}</span>
+                            <span class="text-gray-400 text-xs line-through">${{ product.basePrice?.toFixed(2) }}</span>
+                        </div>
+                        <span v-else>${{ product.basePrice?.toFixed(2) || '0.00' }}</span>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div v-if="product.hasVariants" class="flex items-center text-xs text-purple-600 font-medium bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100 w-fit">
                             <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
@@ -465,7 +481,8 @@ const filters = reactive({
     search: '',
     minPrice: null as number | null,
     maxPrice: null as number | null,
-    status: null as string | null
+    status: null as string | null,
+    brand: ''
 });
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<Category | null>(null);
@@ -509,6 +526,7 @@ const fetchProducts = async () => {
             minPrice: filters.minPrice,
             maxPrice: filters.maxPrice,
             status: filters.status,
+            brand: filters.brand,
             categoryId: selectedCategory.value?.id,
             sortBy: 'id',
             sortDir: 'DESC'
@@ -527,6 +545,7 @@ const resetFilters = () => {
     filters.minPrice = null;
     filters.maxPrice = null;
     filters.status = null;
+    filters.brand = '';
     selectedCategory.value = null;
     currentPage.value = 0;
     fetchProducts();

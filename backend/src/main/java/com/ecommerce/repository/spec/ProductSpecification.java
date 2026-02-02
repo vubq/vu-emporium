@@ -13,8 +13,9 @@ import java.util.List;
 public class ProductSpecification {
 
     public static Specification<Product> getSpecifications(Long categoryId, String search, BigDecimal minPrice,
-            BigDecimal maxPrice, ProductStatus status) {
+            BigDecimal maxPrice, String brand, ProductStatus status) {
         return (root, query, criteriaBuilder) -> {
+
             List<Predicate> predicates = new ArrayList<>();
 
             // Status Filter
@@ -29,10 +30,15 @@ public class ProductSpecification {
 
             // Price Range Filter
             if (minPrice != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("basePrice"), minPrice));
             }
             if (maxPrice != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("basePrice"), maxPrice));
+            }
+
+            // Brand Filter
+            if (StringUtils.hasText(brand)) {
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("brand")), brand.toLowerCase()));
             }
 
             // Search (Name or Description)

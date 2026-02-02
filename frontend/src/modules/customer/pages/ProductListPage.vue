@@ -63,9 +63,16 @@
                 {{ product.name }}
               </h3>
               <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
-              <p class="text-2xl font-bold gradient-text mb-4">
-                ${{ product.price.toFixed(2) }}
-              </p>
+              <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2 mb-4">
+                  <p class="text-2xl font-bold gradient-text">
+                    ${{ (product.salePrice && product.salePrice > 0 ? product.salePrice : product.basePrice || 0).toFixed(2) }}
+                  </p>
+                  <p v-if="product.salePrice && product.salePrice > 0 && product.salePrice < product.basePrice" class="text-sm text-gray-500 line-through">
+                    ${{ product.basePrice?.toFixed(2) }}
+                  </p>
+                </div>
+              </div>
               <button 
                 @click.stop="addToCart(product)" 
                 :disabled="product.stockQuantity === 0"

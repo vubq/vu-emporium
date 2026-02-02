@@ -31,14 +31,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDTO> getAllProducts(Long categoryId, String search, Pageable pageable) {
         // Delegate to the more specific method with default behavior (Active status)
-        return getAllProducts(categoryId, search, null, null, ProductStatus.ACTIVE, pageable);
+        return getAllProducts(categoryId, search, null, null, null, ProductStatus.ACTIVE, pageable);
     }
 
     @Override
     public Page<ProductDTO> getAllProducts(Long categoryId, String search, BigDecimal minPrice, BigDecimal maxPrice,
-            ProductStatus status, Pageable pageable) {
+            String brand, ProductStatus status, Pageable pageable) {
         Specification<Product> spec = ProductSpecification.getSpecifications(categoryId, search, minPrice, maxPrice,
-                status);
+                brand, status);
         Page<Product> products = productRepository.findAll(spec, pageable);
         return products.map(this::convertToDTO);
     }
@@ -105,8 +105,6 @@ public class ProductServiceImpl implements ProductService {
     private void updateProductFromRequest(Product product, com.ecommerce.model.dto.request.ProductRequest request) {
         product.setName(request.getName());
         product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setCompareAtPrice(request.getCompareAtPrice());
         product.setStockQuantity(request.getStockQuantity());
         product.setSku(request.getSku());
 
@@ -125,6 +123,20 @@ public class ProductServiceImpl implements ProductService {
         if (request.getFeatured() != null) {
             product.setFeatured(request.getFeatured());
         }
+
+        // --- New Fields Mapping ---
+        product.setBasePrice(request.getBasePrice());
+        product.setSalePrice(request.getSalePrice());
+        product.setCostPrice(request.getCostPrice());
+        product.setBrand(request.getBrand());
+        product.setWeight(request.getWeight());
+        product.setLength(request.getLength());
+        product.setWidth(request.getWidth());
+        product.setHeight(request.getHeight());
+        product.setMetaTitle(request.getMetaTitle());
+        product.setMetaDescription(request.getMetaDescription());
+        product.setMetaKeywords(request.getMetaKeywords());
+        // ------------------------
 
         // Slug generation (simplistic)
         if (product.getSlug() == null || !product.getName().equals(request.getName())) {
@@ -216,7 +228,9 @@ public class ProductServiceImpl implements ProductService {
 
                 // Update fields
                 variant.setSku(variantReq.getSku());
-                variant.setPrice(variantReq.getPrice());
+                variant.setBasePrice(variantReq.getBasePrice());
+                variant.setSalePrice(variantReq.getSalePrice());
+                variant.setCostPrice(variantReq.getCostPrice());
                 variant.setStockQuantity(variantReq.getStockQuantity());
                 if (variantReq.getImages() != null) {
                     variant.setImages(new java.util.ArrayList<>(variantReq.getImages()));
@@ -253,8 +267,7 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .slug(product.getSlug())
                 .description(product.getDescription())
-                .price(product.getPrice())
-                .compareAtPrice(product.getCompareAtPrice())
+                .description(product.getDescription())
                 .stockQuantity(product.getStockQuantity())
                 .sku(product.getSku())
                 .category(convertCategoryToDTO(product.getCategory()))
@@ -264,6 +277,22 @@ public class ProductServiceImpl implements ProductService {
                 .featured(product.getFeatured())
                 .viewCount(product.getViewCount())
                 .soldCount(product.getSoldCount())
+                // --- New Fields ---
+                .basePrice(product.getBasePrice())
+                .salePrice(product.getSalePrice())
+                .costPrice(product.getCostPrice())
+                .brand(product.getBrand())
+                .weight(product.getWeight())
+                .length(product.getLength())
+                .width(product.getWidth())
+                .height(product.getHeight())
+                .metaTitle(product.getMetaTitle())
+                .metaDescription(product.getMetaDescription())
+                .metaKeywords(product.getMetaKeywords())
+                .averageRating(product.getAverageRating())
+                .reviewCount(product.getReviewCount())
+                .totalSales(product.getTotalSales())
+                // ----------------
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .hasVariants(product.getHasVariants());
@@ -304,7 +333,9 @@ public class ProductServiceImpl implements ProductService {
         return com.ecommerce.model.dto.response.ProductVariantDTO.builder()
                 .id(variant.getId())
                 .sku(variant.getSku())
-                .price(variant.getPrice())
+                .basePrice(variant.getBasePrice())
+                .salePrice(variant.getSalePrice())
+                .costPrice(variant.getCostPrice())
                 .stockQuantity(variant.getStockQuantity())
                 .images(variant.getImages() != null ? new java.util.ArrayList<>(variant.getImages())
                         : new java.util.ArrayList<>())

@@ -37,12 +37,6 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal compareAtPrice;
-
     @Column(nullable = false)
     @Builder.Default
     private Integer stockQuantity = 0;
@@ -80,6 +74,44 @@ public class Product {
     @Column(nullable = false)
     @Builder.Default
     private Boolean hasVariants = false;
+
+    // Pricing
+    @Column(precision = 10, scale = 2)
+    private BigDecimal basePrice;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal salePrice;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal costPrice;
+
+    // Attributes
+    @Column(length = 100)
+    private String brand;
+
+    private Double weight;
+    private Double length;
+    private Double width;
+    private Double height;
+
+    // SEO
+    @Column(length = 200)
+    private String metaTitle;
+
+    @Column(columnDefinition = "TEXT")
+    private String metaDescription;
+
+    private String metaKeywords;
+
+    // Stats
+    @Builder.Default
+    private Double averageRating = 0.0;
+
+    @Builder.Default
+    private Integer reviewCount = 0;
+
+    @Builder.Default
+    private Integer totalSales = 0;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

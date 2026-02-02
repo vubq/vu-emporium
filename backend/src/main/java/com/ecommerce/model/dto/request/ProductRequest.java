@@ -22,13 +22,6 @@ public class ProductRequest {
 
     private String description;
 
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    private BigDecimal price;
-
-    @DecimalMin(value = "0.0", message = "Compare at price must be non-negative")
-    private BigDecimal compareAtPrice;
-
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock quantity must be non-negative")
     private Integer stockQuantity;
@@ -43,6 +36,21 @@ public class ProductRequest {
     private ProductStatus status;
 
     private Boolean featured;
+
+    // New Fields
+    @NotNull(message = "Base price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Base price must be greater than 0")
+    private BigDecimal basePrice;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
+    private String brand;
+    private Double weight;
+    private Double length;
+    private Double width;
+    private Double height;
+    private String metaTitle;
+    private String metaDescription;
+    private String metaKeywords;
 
     private List<ProductOptionRequest> options;
 
