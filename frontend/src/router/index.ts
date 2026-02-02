@@ -84,31 +84,53 @@ const router = createRouter({
                     path: '',
                     name: 'admin-dashboard',
                     component: () => import('@/pages/admin/AdminDashboardPage.vue'),
-                    meta: { title: 'Dashboard' },
+                    meta: {
+                        title: 'Dashboard',
+                        icon: 'HomeIcon',
+                        showInSidebar: true
+                    },
                 },
                 {
                     path: 'products',
                     name: 'admin-products',
                     component: () => import('@/modules/admin/pages/ProductManagementPage.vue'),
-                    meta: { title: 'Product Management' },
+                    meta: {
+                        title: 'Product Management',
+                        model: 'Products', // Group name
+                        icon: 'CubeIcon',
+                        showInSidebar: true
+                    },
                 },
                 {
                     path: 'orders',
                     name: 'admin-orders',
                     component: () => import('@/pages/admin/AdminOrdersPage.vue'),
-                    meta: { title: 'Order Management' },
+                    meta: {
+                        title: 'Order Management',
+                        icon: 'ShoppingBagIcon',
+                        showInSidebar: true
+                    },
                 },
                 {
                     path: 'users',
                     name: 'admin-users',
                     component: () => import('@/pages/admin/AdminUsersPage.vue'),
-                    meta: { title: 'User Management' },
+                    meta: {
+                        title: 'User Management',
+                        label: 'Customers',
+                        icon: 'UsersIcon',
+                        showInSidebar: true
+                    },
                 },
                 {
                     path: 'media',
                     name: 'admin-media',
                     component: () => import('@/modules/admin/pages/MediaPage.vue'),
-                    meta: { title: 'Media Manager' },
+                    meta: {
+                        title: 'Media Manager',
+                        icon: 'PhotoIcon',
+                        showInSidebar: true
+                    },
                 },
             ],
         },
