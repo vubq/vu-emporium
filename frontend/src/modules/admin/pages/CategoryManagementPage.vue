@@ -4,12 +4,12 @@
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Category Management</h2>
-          <p class="text-sm text-gray-500 mt-1">Organize your products into categories.</p>
+          <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $t('admin.manage.categories.title') }}</h2>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('admin.manage.categories.subtitle') }}</p>
         </div>
         <button @click="openCreateModal" class="px-5 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center text-sm">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-            Add New Category
+            {{ $t('admin.manage.categories.add_new') }}
         </button>
       </div>
 
@@ -18,9 +18,9 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <!-- Search -->
                 <div class="md:col-span-1">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Search</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('common.search') }}</label>
                     <div class="relative">
-                        <input v-model="searchQuery" type="text" placeholder="Category name..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                        <input v-model="searchQuery" type="text" :placeholder="$t('admin.manage.categories.search_placeholder')" class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         </div>
@@ -30,11 +30,11 @@
                 <!-- Status Filter (Simple Select) -->
                  <!-- Status -->
                 <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Status</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('common.status') }}</label>
                         <Listbox v-model="statusFilter">
                         <div class="relative">
                             <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-2 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                <span class="block truncate font-medium" :class="statusColor(statusFilter)">{{ statusFilter ? (statusFilter === 'active' ? 'Active' : 'Inactive') : 'All Statuses' }}</span>
+                                <span class="block truncate font-medium" :class="statusColor(statusFilter)">{{ statusFilter ? (statusFilter === 'active' ? $t('common.active') : $t('common.inactive')) : $t('admin.manage.products.all_statuses') }}</span>
                                 <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                     <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </span>
@@ -43,19 +43,19 @@
                                 <ListboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     <ListboxOption :value="null" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
-                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">All Statuses</span>
+                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('admin.manage.products.all_statuses') }}</span>
                                         </li>
                                     </ListboxOption>
                                     <ListboxOption value="active" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
-                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">Active</span>
+                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('common.active') }}</span>
                                         </li>
                                     </ListboxOption>
                                      <ListboxOption value="inactive" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
-                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">Inactive</span>
+                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('common.inactive') }}</span>
                                         </li>
-                                    </ListboxOption>
+                                     </ListboxOption>
                                 </ListboxOptions>
                             </transition>
                         </div>
@@ -66,7 +66,7 @@
                 <!-- Reset -->
                 <div class="md:col-span-1 flex justify-end">
                      <button @click="resetFilters" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium transition-all text-sm">
-                        Reset Filters
+                        {{ $t('admin.manage.products.reset') }}
                     </button>
                 </div>
           </div>
@@ -89,7 +89,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span class="text-sm font-medium text-indigo-600">Loading categories...</span>
+                    <span class="text-sm font-medium text-indigo-600">{{ $t('admin.manage.categories.loading') }}</span>
                 </div>
             </div>
         </Transition>
@@ -98,13 +98,13 @@
             <table class="min-w-full divide-y divide-gray-100">
                 <thead class="bg-gray-50/80 backdrop-blur-md sticky top-0 z-20">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Image</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Order</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.forms.category.image') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.name') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.description') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.forms.category.display_order') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.status') }}</th>
                          <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">Actions</span>
+                            <span class="sr-only">{{ $t('common.actions') }}</span>
                         </th>
                     </tr>
                 </thead>
@@ -123,9 +123,9 @@
                                 <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                                 </div>
-                                <h3 class="text-lg font-bold text-gray-900">No categories found</h3>
-                                <p class="text-sm text-gray-500 mt-1">Try adjusting your search query.</p>
-                                <button @click="resetFilters" class="mt-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm">Reset filters</button>
+                                <h3 class="text-lg font-bold text-gray-900">{{ $t('admin.manage.categories.no_results') }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">{{ $t('admin.manage.categories.no_results_desc') }}</p>
+                                <button @click="resetFilters" class="mt-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm">{{ $t('admin.manage.products.reset') }}</button>
                             </div>
                         </td>
                     </tr>
@@ -164,7 +164,7 @@
                                     'bg-green-500': category.active,
                                     'bg-gray-400': !category.active
                                 }"></span>
-                                {{ category.active ? 'Active' : 'Inactive' }}
+                                {{ category.active ? $t('common.active') : $t('common.inactive') }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -179,18 +179,16 @@
                                     <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                                         <MenuItems class="absolute right-0 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100 z-50 mt-2 origin-top-right">
                                             <div class="py-1">
-                                                <MenuItem v-slot="{ active }">
                                                     <button @click="openEditModal(category)" :class="[active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors']">
                                                         <svg class="mr-3 h-4 w-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                                        Edit Category
+                                                        {{ $t('admin.forms.category.edit_title') }}
                                                     </button>
-                                                </MenuItem>
                                             </div>
                                             <div class="py-1">
                                                 <MenuItem v-slot="{ active }">
                                                     <button @click="confirmDelete(category)" :class="[active ? 'bg-red-50 text-red-700' : 'text-red-600', 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors']">
                                                         <svg class="mr-3 h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                        Delete Category
+                                                        {{ $t('common.delete') }} {{ $t('product.category') }}
                                                     </button>
                                                 </MenuItem>
                                             </div>
@@ -251,6 +249,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { adminCategoryApi } from '@/api/adminCategoryApi';
 import type { Category } from '@/types/product';
 import CategoryForm from '@/modules/admin/components/CategoryForm.vue';
@@ -262,6 +261,7 @@ import {
 } from '@headlessui/vue';
 
 // State
+const { t } = useI18n();
 const categories = ref<Category[]>([]);
 const loading = ref(true);
 const submitting = ref(false);
@@ -351,20 +351,20 @@ const handleSubmit = async (formData: any) => {
         closeModal();
     } catch (error) {
         console.error('Failed to save category', error);
-        alert('Failed to save category. Please try again.');
+        alert(t('common.error'));
     } finally {
         submitting.value = false;
     }
 };
 
 const confirmDelete = async (category: Category) => {
-    if (confirm(`Are you sure you want to delete category "${category.name}"?`)) {
+    if (confirm(t('media.delete_confirm', { type: t('product.category'), name: category.name }))) {
         try {
             await adminCategoryApi.deleteCategory(category.id);
             await fetchCategories();
         } catch (error) {
             console.error('Failed to delete category', error);
-            alert('Failed to delete category. It might contain products.');
+            alert(t('common.error'));
         }
     }
 };

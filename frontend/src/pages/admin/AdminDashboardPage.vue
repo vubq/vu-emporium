@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <!-- Welcome Header -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-white">
-      <h2 class="text-2xl font-bold mb-2">Welcome back, {{ admin?.fullName || 'Admin' }}!</h2>
-      <p class="text-blue-100">Here's what's happening with your store today.</p>
+      <h2 class="text-2xl font-bold mb-2">{{ $t('admin.welcome', { name: admin?.fullName || 'Admin' }) }}</h2>
+      <p class="text-blue-100">{{ $t('admin.subtitle') }}</p>
     </div>
 
     <!-- Stats Grid -->
@@ -17,7 +17,7 @@
             </svg>
           </div>
         </div>
-        <h3 class="text-gray-600 text-sm font-medium mb-1">Total Revenue</h3>
+        <h3 class="text-gray-600 text-sm font-medium mb-1">{{ $t('admin.stats.total_revenue') }}</h3>
         <p class="text-2xl font-bold text-gray-900">${{ formatNumber(stats?.totalRevenue || 0) }}</p>
       </div>
 
@@ -30,9 +30,9 @@
             </svg>
           </div>
         </div>
-        <h3 class="text-gray-600 text-sm font-medium mb-1">Total Orders</h3>
+        <h3 class="text-gray-600 text-sm font-medium mb-1">{{ $t('admin.stats.total_orders') }}</h3>
         <p class="text-2xl font-bold text-gray-900">{{ stats?.totalOrders || 0 }}</p>
-        <p class="text-sm text-gray-500 mt-1">{{ stats?.pendingOrders || 0 }} pending</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('admin.stats.pending_orders', { count: stats?.pendingOrders || 0 }) }}</p>
       </div>
 
       <!-- Total Products -->
@@ -44,9 +44,9 @@
             </svg>
           </div>
         </div>
-        <h3 class="text-gray-600 text-sm font-medium mb-1">Total Products</h3>
+        <h3 class="text-gray-600 text-sm font-medium mb-1">{{ $t('admin.stats.total_products') }}</h3>
         <p class="text-2xl font-bold text-gray-900">{{ stats?.totalProducts || 0 }}</p>
-        <p class="text-sm text-gray-500 mt-1">{{ stats?.activeProducts || 0 }} active</p>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('admin.stats.active_products', { count: stats?.activeProducts || 0 }) }}</p>
       </div>
 
       <!-- Total Customers -->
@@ -58,18 +58,18 @@
             </svg>
           </div>
         </div>
-        <h3 class="text-gray-600 text-sm font-medium mb-1">Total Customers</h3>
+        <h3 class="text-gray-600 text-sm font-medium mb-1">{{ $t('admin.stats.total_customers') }}</h3>
         <p class="text-2xl font-bold text-gray-900">{{ stats?.totalCustomers || 0 }}</p>
       </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <router-link to="/admin/products" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group">
+       <router-link to="/admin/products" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">Manage Products</h3>
-            <p class="text-sm text-gray-500">Add, edit, or remove products</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $t('admin.actions.manage_products') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('admin.actions.manage_products_desc') }}</p>
           </div>
           <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -80,8 +80,8 @@
       <router-link to="/admin/orders" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">View Orders</h3>
-            <p class="text-sm text-gray-500">Process and track orders</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $t('admin.actions.view_orders') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('admin.actions.view_orders_desc') }}</p>
           </div>
           <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -92,8 +92,8 @@
       <router-link to="/admin/users" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">Manage Users</h3>
-            <p class="text-sm text-gray-500">View and manage customers</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $t('admin.actions.manage_users') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('admin.actions.manage_users_desc') }}</p>
           </div>
           <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>

@@ -30,4 +30,13 @@ public class AdminAuthController {
         AdminDTO admin = adminAuthService.getCurrentAdmin(email);
         return ResponseEntity.ok(ApiResponse.success(admin));
     }
+
+    @PatchMapping("/language")
+    public ResponseEntity<ApiResponse<Void>> updateLanguage(
+            @Valid @RequestBody com.ecommerce.model.dto.request.UpdateLanguageRequest request,
+            Authentication authentication) {
+        String email = authentication.getName();
+        adminAuthService.updateLanguage(email, request.getLanguage());
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

@@ -3,8 +3,8 @@
     <!-- Page Header -->
     <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-4xl md:text-5xl font-display font-bold mb-4 animate-fade-in">Our Products</h1>
-        <p class="text-xl text-white/90 animate-slide-up">Discover our curated collection of quality items</p>
+        <h1 class="text-4xl md:text-5xl font-display font-bold mb-4 animate-fade-in">{{ $t('product.listing.title') }}</h1>
+        <p class="text-xl text-white/90 animate-slide-up">{{ $t('product.listing.subtitle') }}</p>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
             <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center">
               <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-              Categories
+              {{ $t('common.categories') }}
             </h2>
             
             <div class="space-y-1">
@@ -23,7 +23,7 @@
                 @click="filterByCategory(null)"
                 :class="[!selectedCategoryId ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50', 'w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between group']"
               >
-                All Products
+                {{ $t('nav.all_products') }}
                 <span v-if="!selectedCategoryId" class="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
               </button>
 
@@ -83,10 +83,10 @@
               
               <!-- Stock Badge -->
               <div v-if="product.stockQuantity > 0" class="absolute top-4 right-4">
-                <span class="badge badge-success shadow-lg">In Stock</span>
+                <span class="badge badge-success shadow-lg">{{ $t('product.in_stock') }}</span>
               </div>
               <div v-else class="absolute top-4 right-4">
-                <span class="badge bg-red-100 text-red-700 shadow-lg">Out of Stock</span>
+                <span class="badge bg-red-100 text-red-700 shadow-lg">{{ $t('product.out_of_stock') }}</span>
               </div>
             </div>
             
@@ -114,7 +114,7 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                {{ product.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                {{ product.stockQuantity > 0 ? $t('product.add_to_cart') : $t('product.out_of_stock') }}
               </button>
             </div>
           </div>
@@ -126,8 +126,8 @@
             <svg class="w-20 h-20 mx-auto text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <p class="text-gray-500 text-lg font-medium">No products found in this category</p>
-            <button @click="filterByCategory(null)" class="mt-4 text-primary-600 hover:text-primary-700 font-bold">View all products</button>
+            <p class="text-gray-500 text-lg font-medium">{{ $t('product.listing.no_results') }}</p>
+            <button @click="filterByCategory(null)" class="mt-4 text-primary-600 hover:text-primary-700 font-bold">{{ $t('product.listing.view_all') }}</button>
           </div>
       </div>
     </div>

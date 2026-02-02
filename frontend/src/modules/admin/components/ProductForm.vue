@@ -8,7 +8,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="text-sm font-medium text-gray-500">Preparing product data...</span>
+            <span class="text-sm font-medium text-gray-500">{{ $t('common.loading') }}...</span>
         </div>
     </div>
 
@@ -21,22 +21,22 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="text-sm font-bold text-gray-700">Saving...</span>
+                <span class="text-sm font-bold text-gray-700">{{ $t('common.saving') }}...</span>
             </div>
        </div>
 
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
-           <h2 class="text-3xl font-bold text-gray-900 tracking-tight">{{ isEdit ? 'Edit Product' : 'Create New Product' }}</h2>
-           <p class="text-sm text-gray-500 mt-2">Fill in the details to configure your product.</p>
+           <h2 class="text-3xl font-bold text-gray-900 tracking-tight">{{ isEdit ? $t('admin.forms.product.edit_title') : $t('admin.forms.product.create_title') }}</h2>
+           <p class="text-sm text-gray-500 mt-2">{{ $t('admin.forms.product.subtitle') }}</p>
         </div>
         <div class="flex space-x-4">
              <button type="button" @click="$emit('cancel')" class="px-6 py-2.5 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm" :disabled="submitting">
-                Cancel
+                {{ $t('common.cancel') }}
              </button>
              <button type="submit" @click="submitForm" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" :disabled="submitting">
-                {{ isEdit ? 'Save Changes' : 'Publish Product' }}
+                {{ isEdit ? $t('common.save_changes') : $t('admin.forms.product.publish') }}
              </button>
         </div>
       </div>
@@ -52,21 +52,21 @@
                 <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </span>
-                General Information
+                {{ $t('admin.forms.product.general_info') }}
             </h3>
             
             <div class="space-y-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
-                  <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Premium Cotton T-Shirt" :disabled="submitting" />
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.name') }}</label>
+                  <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.name_placeholder')" :disabled="submitting" />
                 </div>
                 <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
-                   <input v-model="form.brand" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Acme Corp" :disabled="submitting" />
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.brand') }}</label>
+                   <input v-model="form.brand" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.brand_placeholder')" :disabled="submitting" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                  <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="Describe your product..." :disabled="submitting"></textarea>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.description') }}</label>
+                  <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="submitting"></textarea>
                 </div>
             </div>
             
@@ -76,21 +76,21 @@
                 <span class="bg-green-100 text-green-600 p-2 rounded-lg mr-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </span>
-                SEO
+                {{ $t('admin.forms.product.seo') }}
             </h3>
             
             <div class="space-y-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Title</label>
-                  <input v-model="form.metaTitle" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="SEO Title" :disabled="submitting" />
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_title') }}</label>
+                  <input v-model="form.metaTitle" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_title')" :disabled="submitting" />
                 </div>
                 <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Description</label>
-                   <textarea v-model="form.metaDescription" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="SEO Description" :disabled="submitting"></textarea>
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_description') }}</label>
+                   <textarea v-model="form.metaDescription" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_description')" :disabled="submitting"></textarea>
                 </div>
                  <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-2">Meta Keywords</label>
-                   <input v-model="form.metaKeywords" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" placeholder="comma, separated, keywords" :disabled="submitting" />
+                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_keywords') }}</label>
+                   <input v-model="form.metaKeywords" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_keywords_placeholder')" :disabled="submitting" />
                 </div>
             </div>
           </div>
@@ -103,7 +103,7 @@
                 <span class="bg-pink-100 text-pink-600 p-2 rounded-lg mr-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </span>
-                Product Images
+                {{ $t('admin.forms.product.product_images') }}
             </h3>
              
              <!-- Image Gallery -->
@@ -128,7 +128,7 @@
                     </div>
                     <!-- Primary Badge -->
                     <div v-if="idx === 0" class="absolute top-2 left-2 px-2 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full">
-                        Primary
+                        {{ $t('admin.forms.product.primary') }}
                     </div>
                  </div>
                  
@@ -140,7 +140,7 @@
                  </button>
              </div>
              
-             <p class="text-xs text-gray-500 mt-4">Click "Add Image" to select from media library. First image will be the primary image.</p>
+             <p class="text-xs text-gray-500 mt-4">{{ $t('admin.forms.product.media_help') }}</p>
           </div>
 
           <!-- Variants Card -->
@@ -150,10 +150,10 @@
                     <span class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                     </span>
-                    Variants & Options
+                    {{ $t('admin.forms.product.variants') }}
                 </h3>
                 <SwitchGroup as="div" class="flex items-center">
-                    <SwitchLabel as="span" class="mr-3 text-sm font-medium text-gray-700">Enable Variants</SwitchLabel>
+                    <SwitchLabel as="span" class="mr-3 text-sm font-medium text-gray-700">{{ $t('admin.forms.product.enable_variants') }}</SwitchLabel>
                     <Switch v-model="hasVariants" :class="[hasVariants ? 'bg-blue-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500']" :disabled="submitting">
                         <span aria-hidden="true" :class="[hasVariants ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
                     </Switch>
@@ -169,12 +169,12 @@
                         </button>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Option Name</label>
-                                <input v-model="option.name" type="text" placeholder="e.g. Size" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ $t('admin.forms.product.option_name') }}</label>
+                                <input v-model="option.name" type="text" :placeholder="$t('admin.forms.product.option_name_placeholder')" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Values (comma separated)</label>
-                                <input v-model="option.valuesInput" type="text" placeholder="e.g. Small, Medium, Large" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" @change="processOptionValues(index)" :disabled="submitting" />
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ $t('admin.forms.product.option_values') }}</label>
+                                <input v-model="option.valuesInput" type="text" :placeholder="$t('admin.forms.product.option_values_placeholder')" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" @change="processOptionValues(index)" :disabled="submitting" />
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     <span v-for="(val, vIdx) in option.values" :key="vIdx" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
                                         {{ val.value }}
@@ -188,7 +188,7 @@
                 <div class="flex justify-between items-center pt-2">
                      <button type="button" @click="addOption" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center" :disabled="submitting">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Add Another Option
+                        {{ $t('admin.forms.product.add_option') }}
                      </button>
                 </div>
 
@@ -196,13 +196,13 @@
                 <div v-if="variants.length > 0" class="border rounded-xl overflow-hidden border-gray-200 shadow-sm bg-white">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead>
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">SKU</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Price</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Actions</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('common.variant') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">{{ $t('admin.forms.product.sku') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">{{ $t('admin.forms.product.base_price') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">{{ $t('admin.forms.product.stock') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">{{ $t('common.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -233,7 +233,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button type="button" class="text-indigo-600 hover:text-indigo-900 font-medium bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100">
-                                            Edit
+                                            {{ $t('common.edit') }}
                                         </button>
                                     </td>
                                 </tr>
@@ -250,16 +250,16 @@
             
             <!-- Organization Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 class="text-md font-bold text-gray-900 mb-4">Organization</h3>
+                <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.product.organization') }}</h3>
                 
                 <div class="space-y-5">
                     <!-- Status -->
                     <div>
-                             <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                             <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.status') }}</label>
                              <Listbox v-model="form.status" :disabled="submitting">
                                 <div class="relative mt-1">
                                 <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <span class="block truncate font-medium" :class="{'text-green-600': form.status === 'ACTIVE', 'text-yellow-600': form.status === 'DRAFT', 'text-gray-500': form.status === 'ARCHIVED'}">{{ form.status }}</span>
+                                    <span class="block truncate font-medium" :class="{'text-green-600': form.status === 'ACTIVE', 'text-yellow-600': form.status === 'DRAFT', 'text-gray-500': form.status === 'ARCHIVED'}">{{ getStatusLabel(form.status || 'ACTIVE') }}</span>
                                     <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                     </span>
@@ -268,7 +268,7 @@
                                 <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                 <ListboxOption v-for="status in availableStatuses" :key="status" :value="status" as="template" v-slot="{ active, selected }">
                                     <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2.5 pl-10 pr-4']">
-                                        <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ status }}</span>
+                                        <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ getStatusLabel(status) }}</span>
                                         <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
                                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                                         </span>
@@ -283,8 +283,8 @@
                      <!-- Featured Toggle -->
                      <div class="flex items-center justify-between">
                          <span class="flex-grow flex flex-col">
-                             <span class="text-sm font-semibold text-gray-700">Featured Product</span>
-                             <span class="text-xs text-gray-500">Show this product on home page</span>
+                             <span class="text-sm font-semibold text-gray-700">{{ $t('admin.forms.product.featured') }}</span>
+                             <span class="text-xs text-gray-500">{{ $t('admin.forms.product.featured_desc') }}</span>
                          </span>
                          <Switch v-model="form.featured" :class="[form.featured ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500']" :disabled="submitting">
                              <span aria-hidden="true" :class="[form.featured ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
@@ -293,7 +293,7 @@
 
                     <!-- Category -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('product.category') }}</label>
                         <Combobox v-model="selectedCategory" nullable by="id" :disabled="submitting">
                             <div class="relative mt-1">
                                 <div class="relative w-full text-left">
@@ -301,7 +301,7 @@
                                         class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                         :displayValue="(category: any) => category?.fullName || category?.name"
                                         @change="query = $event.target.value"
-                                        placeholder="Search category..."
+                                        :placeholder="$t('admin.forms.product.search_category')"
                                     />
                                     <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
@@ -315,7 +315,7 @@
                                 >
                                     <ComboboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700">
-                                            Nothing found.
+                                            {{ $t('common.no_results') }}
                                         </div>
                                         <ComboboxOption
                                             v-for="category in filteredCategories"
@@ -343,11 +343,11 @@
 
              <!-- Pricing Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 class="text-md font-bold text-gray-900 mb-4">Pricing</h3>
+                <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.product.pricing') }}</h3>
                  <div class="space-y-4">
                      <div class="grid grid-cols-3 gap-4">
                          <div>
-                           <label class="block text-sm font-semibold text-gray-700 mb-1">Base Price</label>
+                           <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.base_price') }}</label>
                            <div class="relative rounded-xl shadow-sm">
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                <span class="text-gray-500 sm:text-sm">$</span>
@@ -356,7 +356,7 @@
                            </div>
                          </div>
                          <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Sale Price</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.sale_price') }}</label>
                              <div class="relative rounded-xl shadow-sm">
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                <span class="text-gray-500 sm:text-sm">$</span>
@@ -365,7 +365,7 @@
                            </div>
                          </div>
                          <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Cost Price</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.cost_price') }}</label>
                              <div class="relative rounded-xl shadow-sm">
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                <span class="text-gray-500 sm:text-sm">$</span>
@@ -380,14 +380,14 @@
 
             <!-- Inventory Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 class="text-md font-bold text-gray-900 mb-4">Inventory</h3>
+                <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.product.inventory') }}</h3>
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">SKU</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.sku') }}</label>
                     <input v-model="form.sku" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                   </div>
                    <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Quantity</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('common.quantity') }}</label>
                     <input v-model.number="form.stockQuantity" type="number" min="0" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                   </div>
                 </div>
@@ -395,22 +395,22 @@
 
             <!-- Stats Card (Edit Only) -->
             <div v-if="isEdit" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                 <h3 class="text-md font-bold text-gray-900 mb-4">Statistics</h3>
+                 <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.product.statistics') }}</h3>
                  <div class="grid grid-cols-2 gap-4">
                      <div class="bg-gray-50 rounded-xl p-3 text-center">
-                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Rating</span>
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">{{ $t('admin.forms.product.rating') }}</span>
                          <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.averageRating ? form.averageRating.toFixed(1) : '0.0' }}</span>
                      </div>
                       <div class="bg-gray-50 rounded-xl p-3 text-center">
-                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Reviews</span>
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">{{ $t('admin.forms.product.reviews_label') }}</span>
                          <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.reviewCount || 0 }}</span>
                      </div>
                       <div class="bg-gray-50 rounded-xl p-3 text-center">
-                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Sales</span>
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">{{ $t('admin.forms.product.sales') }}</span>
                          <span class="block text-xl font-bold text-gray-900 mt-1">{{ form.totalSales || 0 }}</span>
                      </div>
                       <div class="bg-gray-50 rounded-xl p-3 text-center">
-                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">Views</span>
+                         <span class="block text-xs text-gray-500 font-bold uppercase tracking-wider">{{ $t('admin.forms.product.views') }}</span>
                          <span class="block text-xl font-bold text-gray-900 mt-1">{{ initialData?.viewCount || 0 }}</span>
                      </div>
                  </div>
@@ -419,23 +419,23 @@
 
             <!-- Shipping Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 class="text-md font-bold text-gray-900 mb-4">Shipping</h3>
+                <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.product.shipping') }}</h3>
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Weight (kg)</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.weight') }} (kg)</label>
                     <input v-model.number="form.weight" type="number" step="0.01" min="0" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                   </div>
                   <div class="grid grid-cols-3 gap-2">
                        <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Length (cm)</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.length') }} (cm)</label>
                         <input v-model.number="form.length" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Width (cm)</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.width') }} (cm)</label>
                         <input v-model.number="form.width" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Height (cm)</label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">{{ $t('admin.forms.product.height') }} (cm)</label>
                         <input v-model.number="form.height" type="number" step="0.1" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="submitting" />
                       </div>
                   </div>
@@ -463,7 +463,7 @@
                                      <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                     </span>
-                                    <span>Edit Variant: <span class="text-indigo-600">{{ getVariantName(editingVariant) }}</span></span>
+                                    <span>{{ $t('admin.forms.product.edit_variant') }}: <span class="text-indigo-600">{{ getVariantName(editingVariant) }}</span></span>
                                 </div>
                                 <button @click="closeEditVariantModal" class="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 transition-colors">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -474,11 +474,11 @@
                                 <!-- SKU & Stock -->
                                 <div class="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-2">SKU</label>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.sku') }}</label>
                                         <input v-model="editingVariant.sku" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Stock Quantity</label>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.stock_quantity') }}</label>
                                         <input v-model.number="editingVariant.stockQuantity" type="number" min="0" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" />
                                     </div>
                                 </div>
@@ -487,11 +487,11 @@
                                 <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        Pricing Configuration
+                                        {{ $t('admin.forms.product.pricing_configuration') }}
                                     </h4>
                                     <div class="grid grid-cols-3 gap-5">
                                         <div>
-                                            <label class="block text-xs font-bold text-gray-700 mb-2">Base Price</label>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">{{ $t('admin.forms.product.base_price') }}</label>
                                             <div class="relative rounded-xl shadow-sm">
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">$</span>
@@ -500,7 +500,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-bold text-gray-700 mb-2">Sale Price</label>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">{{ $t('admin.forms.product.sale_price') }}</label>
                                             <div class="relative rounded-xl shadow-sm">
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">$</span>
@@ -509,7 +509,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-bold text-gray-700 mb-2">Cost Price</label>
+                                            <label class="block text-xs font-bold text-gray-700 mb-2">{{ $t('admin.forms.product.cost_price') }}</label>
                                             <div class="relative rounded-xl shadow-sm">
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">$</span>
@@ -525,9 +525,9 @@
                                     <div class="flex justify-between items-center mb-4">
                                         <h4 class="text-sm font-bold text-gray-900 flex items-center">
                                             <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                            Variant Images
+                                            {{ $t('admin.forms.product.variant_images') }}
                                         </h4>
-                                        <button type="button" @click="openMediaModalForEditingVariant" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100">+ Add Images</button>
+                                        <button type="button" @click="openMediaModalForEditingVariant" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-indigo-100">+ {{ $t('admin.forms.product.add_images') }}</button>
                                     </div>
                                     
                                     <div class="flex flex-wrap gap-4">
@@ -543,7 +543,7 @@
                                             @click="openMediaModalForEditingVariant"
                                             class="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all">
                                             <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                            <span class="text-xs font-semibold">Add</span>
+                                            <span class="text-xs font-semibold">{{ $t('common.add') }}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -551,10 +551,10 @@
 
                             <div class="mt-8 flex justify-end space-x-3 pt-6 border-t border-gray-100">
                                 <button type="button" class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all" @click="closeEditVariantModal">
-                                    Cancel
+                                    {{ $t('common.cancel') }}
                                 </button>
                                 <button type="button" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-medium hover:bg-black shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transform hover:-translate-y-0.5 transition-all" @click="saveVariantChanges">
-                                    Save Changes
+                                    {{ $t('common.save_changes') }}
                                 </button>
                             </div>
                         </DialogPanel>
@@ -594,7 +594,7 @@
                   <div class="relative">
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b">
-                      <h3 class="text-lg font-bold text-gray-900">Product Images</h3>
+                      <h3 class="text-lg font-bold text-gray-900">{{ $t('admin.forms.product.product_images') }}</h3>
                       <button @click="closeProductPreview" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
@@ -626,7 +626,7 @@
                     <!-- Footer with Thumbnails and Actions -->
                     <div class="p-4 border-t bg-gray-50">
                       <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-gray-600">Image {{ (previewImageIndex || 0) + 1 }} of {{ form.images.filter(i => i).length }}</span>
+                        <span class="text-sm text-gray-600">{{ $t('common.image') }} {{ (previewImageIndex || 0) + 1 }} {{ $t('common.of') }} {{ form.images.filter(i => i).length }}</span>
                         <button @click="removeProductImage(previewImageIndex || 0); closeProductPreview();" 
                                 class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -642,7 +642,7 @@
                              :class="previewImageIndex === idx ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-300 hover:border-indigo-300'">
                           <img :src="img" class="w-full h-full object-cover" @error="handleImageError" />
                           <div v-if="idx === 0" class="absolute top-1 left-1 px-1.5 py-0.5 bg-indigo-600 text-white text-xs font-bold rounded">
-                            Primary
+                            {{ $t('admin.forms.product.primary') }}
                           </div>
                         </div>
                       </div>
@@ -686,7 +686,7 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between p-6 border-b">
                       <div>
-                        <h3 class="text-lg font-bold text-gray-900">Manage Variant Images</h3>
+                        <h3 class="text-lg font-bold text-gray-900">{{ $t('admin.forms.product.manage_variant_images') }}</h3>
                         <p class="text-sm text-gray-500 mt-1">{{ getVariantName(variants[currentVariantIndex]) }}</p>
                       </div>
                       <button @click="closeVariantImageModal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -718,18 +718,18 @@
                         <button type="button" @click="openMediaModalForVariant" 
                                 class="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-indigo-500 hover:bg-indigo-50 transition-all group">
                           <svg class="w-10 h-10 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                          <span class="text-sm text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">Add Image</span>
+                          <span class="text-sm text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">{{ $t('media.add_image') }}</span>
                         </button>
                       </div>
                       
-                      <p class="text-xs text-gray-500 mt-4">Click on an image to preview. Hover to see delete option.</p>
+                      <p class="text-xs text-gray-500 mt-4">{{ $t('admin.forms.product.image_management_help') }}</p>
 
                     
                     <!-- Footer -->
                     <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
                       <button @click="closeVariantImageModal" 
                               class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
-                        Done
+                        {{ $t('common.done') }}
                       </button>
                     </div>
                   </div>
@@ -771,7 +771,7 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b">
                       <div>
-                        <h3 class="text-lg font-bold text-gray-900">Variant Images</h3>
+                        <h3 class="text-lg font-bold text-gray-900">{{ $t('admin.forms.product.variant_images') }}</h3>
                         <p class="text-sm text-gray-500 mt-1">{{ getVariantName(variants[previewVariantIndex]) }}</p>
                       </div>
                       <button @click="closeVariantPreview" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -805,7 +805,7 @@
                     <!-- Footer with Thumbnails and Actions -->
                     <div class="p-4 border-t bg-gray-50">
                       <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-gray-600">Image {{ (previewVariantImageIndex || 0) + 1 }} of {{ (variants[previewVariantIndex].images || []).length }}</span>
+                        <span class="text-sm text-gray-600">{{ $t('common.image') }} {{ (previewVariantImageIndex || 0) + 1 }} {{ $t('common.of') }} {{ (variants[previewVariantIndex].images || []).length }}</span>
                         <div class="flex gap-2">
                           <button @click="openVariantImageModal(previewVariantIndex); closeVariantPreview();" 
                                   class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
@@ -878,6 +878,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { categoryApi } from '@/api/productApi';
 import type { Category } from '@/types/product';
 import { 
@@ -895,6 +896,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['submit', 'cancel']);
+
+const { t } = useI18n();
 
 const categories = ref<Category[]>([]);
 const hasVariants = ref(false);
@@ -1489,7 +1492,7 @@ function updateVariantsMatrix() {
                 // IMPORTANT: Overwrite optionValues with the NEW correct structure
                 optionValues: combo.map((c: any) => ({ value: c.value })),
                 // ALWAYS regenerate SKU to ensure it matches current options (remove stale segments like deleted colors)
-                sku: `${form.sku || 'SKU'}-${combo.map((c: any) => c.value).join('-')}`
+                sku: `${form.sku || t('admin.manage.products.columns.sku')}-${combo.map((c: any) => c.value).join('-')}`
             };
 
             // Handle ID uniqeness
@@ -1514,7 +1517,7 @@ function updateVariantsMatrix() {
         } else {
             // New Variant
               newVariants.push({
-                sku: `${form.sku || 'SKU'}-${combo.map((c: any) => c.value).join('-')}`,
+                sku: `${form.sku || t('admin.manage.products.columns.sku')}-${combo.map((c: any) => c.value).join('-')}`,
                 basePrice: form.basePrice,
                 salePrice: form.salePrice,
                 costPrice: form.costPrice,
@@ -1544,8 +1547,16 @@ function cartesian(args: any[]): any[] {
 }
 
 function getVariantName(variant: any) {
-    if (!variant.optionValues) return 'Variant';
+    if (!variant.optionValues) return t('admin.forms.product.variant_table.variant');
     return variant.optionValues.map((v: any) => v.value).join(' / ');
+}
+
+function getStatusLabel(status: string) {
+    if (!status) return '';
+    const key = `common.${status.toLowerCase()}`;
+    // Fallback to title case if key not found (though we should have most)
+    const label = t(key);
+    return label === key ? status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ') : label;
 }
 
 

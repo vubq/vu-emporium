@@ -2,17 +2,17 @@
   <div class="min-h-screen bg-gray-50 font-sans text-gray-900">
     <ProductDetailSkeleton v-if="loading" />
     <div v-else-if="!product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <h2 class="text-2xl font-bold text-gray-900">Product not found</h2>
-        <router-link to="/products" class="mt-4 inline-block text-primary-600 hover:text-primary-800">Return to shop</router-link>
+        <h2 class="text-2xl font-bold text-gray-900">{{ $t('product.not_found') }}</h2>
+        <router-link to="/products" class="mt-4 inline-block text-primary-600 hover:text-primary-800">{{ $t('product.return_to_shop') }}</router-link>
     </div>
 
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Breadcrumb -->
       <nav class="flex mb-8 animate-fade-in" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
-          <li><router-link to="/" class="text-gray-500 hover:text-primary-600 transition-colors">Home</router-link></li>
+          <li><router-link to="/" class="text-gray-500 hover:text-primary-600 transition-colors">{{ $t('common.home') }}</router-link></li>
           <li><span class="text-gray-400">/</span></li>
-          <li><router-link to="/products" class="text-gray-500 hover:text-primary-600 transition-colors">Products</router-link></li>
+          <li><router-link to="/products" class="text-gray-500 hover:text-primary-600 transition-colors">{{ $t('common.products') }}</router-link></li>
           <li><span class="text-gray-400">/</span></li>
           <li class="text-gray-900 font-medium truncate max-w-xs">{{ product.name }}</li>
         </ol>
@@ -69,7 +69,7 @@
           <div class="flex justify-between">
               <h1 class="text-3xl font-display font-extrabold tracking-tight text-gray-900 sm:text-4xl">{{ product.name }}</h1>
               <span v-if="currentStrikethroughPrice" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 self-start mt-2">
-                 Save {{ calculateDiscount(currentDisplayPrice, currentStrikethroughPrice) }}%
+                 {{ $t('product.save') }} {{ calculateDiscount(currentDisplayPrice, currentStrikethroughPrice) }}%
               </span>
           </div>
           
@@ -150,12 +150,12 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <svg v-else class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                    {{ isOutOfStock ? 'Out of Stock' : (loadingCart ? 'Adding...' : 'Add to Cart') }}
+                    {{ isOutOfStock ? $t('product.out_of_stock') : (loadingCart ? $t('product.adding') : $t('product.add_to_cart')) }}
                 </button>
             </div>
             
             <p v-if="currentVariant && currentVariant.stockQuantity < 5 && currentVariant.stockQuantity > 0" class="mt-2 text-sm text-red-600 font-medium">
-                Only {{ currentVariant.stockQuantity }} items left in stock!
+                {{ $t('product.only_left', { count: currentVariant.stockQuantity }) }}
             </p>
           </div>
           
@@ -165,19 +165,19 @@
                     <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-2 group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <span class="text-xs font-medium text-gray-500">Quality<br>Guaranteed</span>
+                    <span class="text-xs font-medium text-gray-500">{{ $t('home.benefits.quality_title').split(' ')[0] }}<br>{{ $t('home.benefits.quality_title').split(' ')[1] }}</span>
                 </div>
                 <div class="flex flex-col items-center text-center group">
                     <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center text-green-600 mb-2 group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <span class="text-xs font-medium text-gray-500">Fast<br>Shipping</span>
+                    <span class="text-xs font-medium text-gray-500">{{ $t('home.benefits.delivery_title').split(' ')[0] }}<br>{{ $t('home.benefits.delivery_title').split(' ')[1] }}</span>
                 </div>
                 <div class="flex flex-col items-center text-center group">
                     <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-2 group-hover:scale-110 transition-transform">
                          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </div>
-                    <span class="text-xs font-medium text-gray-500">Easy<br>Returns</span>
+                    <span class="text-xs font-medium text-gray-500">{{ $t('product.benefits.return_title').split(' ')[0] }}<br>{{ $t('product.benefits.return_title').split(' ')[1] }}</span>
                 </div>
             </div>
         </div>
@@ -188,9 +188,9 @@
             <TabGroup>
                 <TabList class="flex space-x-1 rounded-xl bg-gray-100 p-1 max-w-md mx-auto">
                     <Tab 
-                        v-for="category in ['Description', 'Specifications', 'Reviews']" 
+                        v-for="tab in ['description', 'specifications', 'reviews']" 
                         as="template" 
-                        :key="category" 
+                        :key="tab" 
                         v-slot="{ selected }"
                     >
                         <button
@@ -202,7 +202,7 @@
                                     : 'text-gray-600 hover:bg-white/[0.12] hover:text-primary-600',
                             ]"
                         >
-                            {{ category }}
+                            {{ $t(`product.tabs.${tab}`) }}
                         </button>
                     </Tab>
                 </TabList>
@@ -210,32 +210,32 @@
                 <TabPanels class="mt-8">
                     <TabPanel class="rounded-xl bg-white p-6 shadow-sm ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none animate-fade-in text-gray-500">
                          <div v-html="product.description" class="prose max-w-none text-gray-500"></div>
-                         <p v-if="!product.description" class="text-center italic">No description available.</p>
+                         <p v-if="!product.description" class="text-center italic">{{ $t('product.no_description') }}</p>
                     </TabPanel>
                      <TabPanel class="rounded-xl bg-white p-6 shadow-sm ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none animate-fade-in">
                         <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                             <div class="sm:col-span-1 border-b border-gray-100 pb-4">
-                                <dt class="text-sm font-medium text-gray-500">Material</dt>
+                                <dt class="text-sm font-medium text-gray-500">{{ $t('product.material') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900">Premium blend</dd>
                             </div>
                              <div class="sm:col-span-1 border-b border-gray-100 pb-4">
-                                <dt class="text-sm font-medium text-gray-500">Care</dt>
+                                <dt class="text-sm font-medium text-gray-500">{{ $t('product.care') }}</dt>
                                 <dd class="mt-1 text-sm text-gray-900">Machine wash cold</dd>
                             </div>
                             <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium text-gray-500">Variant</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ currentVariant ? getVariantName(currentVariant) : 'Standard' }}</dd>
+                                <dt class="text-sm font-medium text-gray-500">{{ $t('product.category') }}</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ currentVariant ? getVariantName(currentVariant) : $t('common.all') }}</dd>
                             </div>
                         </dl>
                     </TabPanel>
                     <TabPanel class="rounded-xl bg-white p-6 shadow-sm ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none animate-fade-in text-center">
                         <div class="py-12">
                              <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.013 8.013 0 01-5.45-2.125L3 19l1.45-4.55A8 8 0 0112 4c4.418 0 8 3.582 8 8z" /></svg>
-                             <h3 class="mt-2 text-sm font-medium text-gray-900">No reviews yet</h3>
-                             <p class="mt-1 text-sm text-gray-500">Be the first to review this product.</p>
+                             <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('product.no_reviews') }}</h3>
+                             <p class="mt-1 text-sm text-gray-500">{{ $t('product.be_first_review') }}</p>
                              <div class="mt-6">
                                 <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                                Write a review
+                                {{ $t('product.write_review') }}
                                 </button>
                              </div>
                         </div>

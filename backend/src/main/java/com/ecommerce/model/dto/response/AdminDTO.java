@@ -14,4 +14,5 @@ public class AdminDTO {
     private String email;
     private String fullName;
     private Boolean enabled;
+    private String preferredLanguage;
 }

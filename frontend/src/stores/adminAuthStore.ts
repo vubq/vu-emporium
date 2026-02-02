@@ -7,6 +7,7 @@ interface Admin {
     email: string;
     fullName: string;
     enabled: boolean;
+    preferredLanguage?: string;
 }
 
 interface AuthResponse {
@@ -56,6 +57,12 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
             });
             admin.value = response.data.data;
             localStorage.setItem('admin', JSON.stringify(admin.value));
+
+            // Save admin's preferred language to localStorage with admin-specific key
+            // The i18n plugin will automatically load it on next page load
+            if (admin.value.preferredLanguage) {
+                localStorage.setItem('adminLocale', admin.value.preferredLanguage);
+            }
         } catch (error) {
             console.error('Failed to fetch admin info:', error);
             logout();

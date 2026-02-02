@@ -7,22 +7,22 @@
                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                  </svg>
-                 <span class="text-sm font-bold text-gray-700">Saving...</span>
+                 <span class="text-sm font-bold text-gray-700">{{ $t('admin.forms.category.saving') }}</span>
              </div>
         </div>
  
         <!-- Header -->
        <div class="flex items-center justify-between mb-6">
          <div>
-            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ isEdit ? 'Edit Category' : 'Create New Category' }}</h2>
-            <p class="text-sm text-gray-500 mt-1">Configure category details and settings.</p>
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ isEdit ? $t('admin.forms.category.edit_title') : $t('admin.forms.category.create_title') }}</h2>
+            <p class="text-sm text-gray-500 mt-1">{{ $t('admin.forms.category.subtitle') }}</p>
          </div>
          <div class="flex space-x-3">
               <button type="button" @click="$emit('cancel')" class="px-4 py-2 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm text-sm" :disabled="loading">
-                 Cancel
+                 {{ $t('common.cancel') }}
               </button>
               <button type="button" @click="submitForm" class="px-4 py-2 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm" :disabled="loading">
-                 {{ isEdit ? 'Save Changes' : 'Create Category' }}
+                 {{ isEdit ? $t('common.save_changes') : $t('admin.forms.category.create_title') }}
               </button>
          </div>
        </div>
@@ -36,16 +36,16 @@
                  <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                  </span>
-                 General Information
+                 {{ $t('admin.forms.category.general_info') }}
              </h3>
              <div class="space-y-4">
                  <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-1">Category Name</label>
-                   <input v-model="formData.name" type="text" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="e.g. Electronics" :disabled="loading" />
+                   <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.category_name') }}</label>
+                   <input v-model="formData.name" type="text" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.manage.categories.search_placeholder')" :disabled="loading" />
                  </div>
                  <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                   <textarea v-model="formData.description" rows="4" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" placeholder="Description of the category..." :disabled="loading"></textarea>
+                   <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.description') }}</label>
+                   <textarea v-model="formData.description" rows="4" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="loading"></textarea>
                  </div>
              </div>
            </div>
@@ -56,7 +56,7 @@
                  <span class="bg-pink-100 text-pink-600 p-2 rounded-lg mr-3">
                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                  </span>
-                 Category Image
+                 {{ $t('admin.forms.category.image') }}
              </h3>
              <div class="flex items-start gap-6">
                  <div v-if="formData.imageUrl" class="relative group w-32 h-32 rounded-xl overflow-hidden border-2 border-gray-200">
@@ -69,12 +69,12 @@
                  </div>
                  <button v-else type="button" @click="openMediaManager" class="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-indigo-500 hover:bg-indigo-50 transition-all group" :disabled="loading">
                      <svg class="w-8 h-8 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                     <span class="text-xs text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">Add Image</span>
+                     <span class="text-xs text-gray-500 group-hover:text-indigo-600 mt-2 font-medium">{{ $t('common.add_image') }}</span>
                  </button>
                  <div class="flex-1 text-sm text-gray-500">
-                     <p>Upload a representative image for this category.</p>
-                     <p class="mt-1">Recommended size: 500x500px.</p>
-                     <button v-if="formData.imageUrl" type="button" @click="openMediaManager" class="text-indigo-600 font-medium hover:text-indigo-800 mt-2">Change Image</button>
+                     <p>{{ $t('admin.forms.category.image_desc') }}</p>
+                     <p class="mt-1">{{ $t('admin.forms.category.image_size') }}</p>
+                     <button v-if="formData.imageUrl" type="button" @click="openMediaManager" class="text-indigo-600 font-medium hover:text-indigo-800 mt-2">{{ $t('admin.forms.product.change_image') }}</button>
                  </div>
              </div>
            </div>
@@ -84,22 +84,22 @@
          <div class="space-y-6">
              <!-- Organization Card -->
              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                 <h3 class="text-md font-bold text-gray-900 mb-4">Organization</h3>
+                 <h3 class="text-md font-bold text-gray-900 mb-4">{{ $t('admin.forms.category.organization') }}</h3>
                  <div class="space-y-5">
                       <!-- Active Status -->
                       <div class="flex items-center justify-between">
                           <span class="flex-grow flex flex-col">
-                              <span class="text-sm font-semibold text-gray-700">Active Status</span>
-                              <span class="text-xs text-gray-500">Enable or disable category</span>
+                              <span class="text-sm font-semibold text-gray-700">{{ $t('admin.forms.category.status') }}</span>
+                              <span class="text-xs text-gray-500">{{ $t('admin.forms.category.status_desc') }}</span>
                           </span>
                            <Switch v-model="formData.active" :class="[formData.active ? 'bg-green-500' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500']" :disabled="loading">
-                              <span aria-hidden="true" :class="[formData.active ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
-                          </Switch>
+                               <span aria-hidden="true" :class="[formData.active ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
+                           </Switch>
                       </div>
  
                       <!-- Parent Category -->
                      <div>
-                         <label class="block text-sm font-semibold text-gray-700 mb-1">Parent Category</label>
+                         <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.parent_category') }}</label>
                          <Listbox v-model="formData.parentId" :disabled="loading">
                              <div class="relative mt-1">
                                  <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-2.5 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -112,7 +112,7 @@
                                      <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                          <ListboxOption :value="null" as="template" v-slot="{ active, selected }">
                                              <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-4 pr-4']">
-                                                 <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">None (Root)</span>
+                                                 <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('admin.forms.category.root') }}</span>
                                              </li>
                                          </ListboxOption>
                                          <ListboxOption v-for="cat in parentCategories" :key="cat.id" :value="cat.id" as="template" v-slot="{ active, selected }">
@@ -128,7 +128,7 @@
  
                      <!-- Display Order -->
                      <div>
-                         <label class="block text-sm font-semibold text-gray-700 mb-1">Display Order</label>
+                         <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.display_order') }}</label>
                          <input v-model.number="formData.displayOrder" type="number" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" :disabled="loading" />
                      </div>
                  </div>
@@ -147,6 +147,7 @@
  
  <script setup lang="ts">
  import { ref, watch, computed } from 'vue';
+ import { useI18n } from 'vue-i18n';
  import type { Category } from '@/types/product';
  import MediaManager from './MediaManager.vue'; 
  import AppImage from '@/components/common/AppImage.vue';
@@ -154,6 +155,8 @@
      Switch, SwitchGroup, SwitchLabel,
      Listbox, ListboxButton, ListboxOptions, ListboxOption
  } from '@headlessui/vue';
+ 
+ const { t } = useI18n();
  
  const props = defineProps<{
      initialData?: Category | null;
@@ -184,9 +187,9 @@
  });
  
  const getParentName = (id: number | null) => {
-     if (!id) return 'None (Root)';
+     if (!id) return t('admin.forms.category.root');
      const parent = props.categories.find(c => c.id === id);
-     return parent ? parent.name : 'Unknown';
+     return parent ? parent.name : t('common.unknown');
  };
  
  watch(() => props.initialData, (newVal) => {

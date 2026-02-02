@@ -13,4 +13,6 @@ public interface AuthService {
     AuthResponse refreshToken(String refreshToken);
 
     void logout(String refreshToken);
+
+    void updateLanguage(String email, String language);
 }

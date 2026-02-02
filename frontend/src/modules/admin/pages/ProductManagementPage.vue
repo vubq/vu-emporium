@@ -4,12 +4,12 @@
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Product Management</h2>
-          <p class="text-sm text-gray-500 mt-1">Manage your catalog, inventory, and pricing.</p>
+          <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $t('admin.manage.products.title') }}</h2>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('admin.manage.products.subtitle') }}</p>
         </div>
         <button @click="openCreateModal" class="px-5 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center text-sm">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-            Add New Product
+            {{ $t('admin.manage.products.add_new') }}
         </button>
       </div>
 
@@ -18,9 +18,9 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 <!-- Search -->
                 <div class="lg:col-span-1">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Search</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('common.search') }}</label>
                     <div class="relative">
-                        <input v-model="filters.search" @keyup.enter="fetchProducts" type="text" placeholder="Product name, SKU..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                        <input v-model="filters.search" @keyup.enter="fetchProducts" type="text" :placeholder="$t('admin.manage.products.search_placeholder')" class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         </div>
@@ -29,13 +29,13 @@
 
                 <!-- Brand -->
                 <div class="lg:col-span-1">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Brand</label>
-                    <input v-model="filters.brand" type="text" placeholder="Filter by brand..." class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('admin.forms.product.brand') }}</label>
+                    <input v-model="filters.brand" type="text" :placeholder="$t('admin.manage.products.brand_placeholder')" class="w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
                 </div>
 
                 <!-- Category -->
                 <div class="lg:col-span-1">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('product.category') }}</label>
                     <Combobox v-model="selectedCategory" nullable by="id">
                         <div class="relative">
                             <div class="relative w-full text-left">
@@ -43,7 +43,7 @@
                                     class="w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                                     :displayValue="(category: any) => category?.name"
                                     @change="query = $event.target.value"
-                                    placeholder="All Categories"
+                                    :placeholder="$t('admin.manage.products.all_categories')"
                                 />
                                 <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
                                     <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
@@ -57,11 +57,11 @@
                             >
                                 <ComboboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700">
-                                        Nothing found.
+                                        {{ $t('media.empty') }}
                                     </div>
                                     <ComboboxOption :value="null" as="template" v-slot="{ selected, active }">
                                         <li class="relative cursor-pointer select-none py-2 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
-                                            <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">All Categories</span>
+                                            <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">{{ $t('admin.manage.products.all_categories') }}</span>
                                         </li>
                                     </ComboboxOption>
                                     <ComboboxOption
@@ -88,11 +88,11 @@
 
                 <!-- Status -->
                 <div class="lg:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Status</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('common.status') }}</label>
                         <Listbox v-model="filters.status">
                         <div class="relative">
                             <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-2 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                <span class="block truncate font-medium" :class="statusColor(filters.status)">{{ filters.status || 'All Statuses' }}</span>
+                                <span class="block truncate font-medium" :class="statusColor(filters.status)">{{ filters.status || $t('admin.manage.products.all_statuses') }}</span>
                                 <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                     <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                 </span>
@@ -101,12 +101,12 @@
                                 <ListboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                     <ListboxOption :value="null" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
-                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">All Statuses</span>
+                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('admin.manage.products.all_statuses') }}</span>
                                         </li>
                                     </ListboxOption>
                                     <ListboxOption v-for="status in ['ACTIVE', 'DRAFT', 'ARCHIVED']" :key="status" :value="status" as="template" v-slot="{ active, selected }">
                                         <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
-                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ status }}</span>
+                                            <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('common.' + status.toLowerCase()) }}</span>
                                             <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
                                                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                                             </span>
@@ -120,20 +120,20 @@
 
                 <!-- Price Range -->
                 <div class="lg:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Price Range</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('product.price_range') }}</label>
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                                     <span class="text-gray-500 text-xs">$</span>
                                 </div>
-                                <input v-model.number="filters.minPrice" type="number" placeholder="Min" class="w-full pl-5 pr-2 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                                <input v-model.number="filters.minPrice" type="number" :placeholder="$t('admin.manage.products.min_price')" class="w-full pl-5 pr-2 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
                             </div>
                             <span class="text-gray-400">-</span>
                             <div class="relative flex-1">
                                 <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                                     <span class="text-gray-500 text-xs">$</span>
                                 </div>
-                                <input v-model.number="filters.maxPrice" type="number" placeholder="Max" class="w-full pl-5 pr-2 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
+                                <input v-model.number="filters.maxPrice" type="number" :placeholder="$t('admin.manage.products.max_price')" class="w-full pl-5 pr-2 py-2 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all text-sm" />
                             </div>
                         </div>
                 </div>
@@ -145,10 +145,10 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Filter
+                        {{ $t('admin.manage.products.filter') }}
                     </button>
                      <button @click="resetFilters" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium transition-all text-sm" :disabled="loading">
-                        Reset
+                        {{ $t('admin.manage.products.reset') }}
                     </button>
                 </div>
           </div>
@@ -171,7 +171,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span class="text-sm font-medium text-indigo-600">Loading products...</span>
+                    <span class="text-sm font-medium text-indigo-600">{{ $t('admin.manage.products.loading') }}</span>
                 </div>
             </div>
         </Transition>
@@ -180,15 +180,15 @@
                 <table class="min-w-full divide-y divide-gray-100">
                 <thead class="bg-gray-50/80 backdrop-blur-md sticky top-0 z-20">
                 <tr>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">SKU</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Brand</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.product') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.sku') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.brand') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.category') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.price') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.stock') }}</th>
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ $t('admin.manage.products.columns.status') }}</th>
                     <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Actions</span>
+                    <span class="sr-only">{{ $t('common.actions') }}</span>
                     </th>
                 </tr>
                 </thead>
@@ -219,9 +219,9 @@
                             <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                 <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900">No products found</h3>
-                            <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">We couldn't find any products matching your filters. Try adjusting your search query or create a new product.</p>
-                            <button @click="resetFilters" class="mt-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm">Clear all filters</button>
+                            <h3 class="text-lg font-bold text-gray-900">{{ $t('admin.manage.products.no_results') }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">{{ $t('admin.manage.products.no_results_desc') }}</p>
+                            <button @click="resetFilters" class="mt-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm">{{ $t('admin.manage.products.clear_filters') }}</button>
                         </div>
                     </td>
                 </tr>
@@ -238,13 +238,13 @@
                         </div>
                         <div class="ml-4">
                         <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ product.name }}</div>
-                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-[200px] mt-0.5">{{ product.description || 'No description' }}</div>
+                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-[200px] mt-0.5">{{ product.description || $t('product.no_description') }}</div>
                         </div>
                     </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 font-mono border border-gray-200">
-                            {{ product.sku || 'NOSKU' }}
+                            {{ product.sku || $t('common.unknown') }}
                         </span>
                     </td>
                      <td class="px-6 py-4 whitespace-nowrap">
@@ -255,7 +255,7 @@
                              <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
                             {{ product.category.name }}
                         </div>
-                        <span v-else class="text-gray-400 italic text-xs">Uncategorized</span>
+                        <span v-else class="text-gray-400 italic text-xs">{{ $t('common.uncategorized') }}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold font-mono tracking-tight">
                         <div v-if="product.salePrice && product.salePrice > 0" class="flex flex-col">
@@ -267,7 +267,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div v-if="product.hasVariants" class="flex items-center text-xs text-purple-600 font-medium bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100 w-fit">
                             <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                            Variants
+                            {{ $t('admin.forms.product.variants') }}
                         </div>
                         <div v-else class="flex items-center">
                             <span class="block h-2 w-2 rounded-full mr-2" :class="[product.stockQuantity < 5 ? 'bg-red-500 animate-pulse' : (product.stockQuantity < 20 ? 'bg-yellow-500' : 'bg-green-500')]"></span>
@@ -288,7 +288,7 @@
                             'bg-yellow-500': product.status === 'DRAFT',
                             'bg-gray-400': product.status === 'ARCHIVED'
                         }"></span>
-                        {{ product.status }}
+                        {{ $t('common.' + product.status.toLowerCase()) }}
                     </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -313,7 +313,7 @@
                                     <MenuItem v-slot="{ active }">
                                         <button @click="openEditModal(product)" :class="[active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors']">
                                             <svg class="mr-3 h-4 w-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            Edit Product
+                                            {{ $t('admin.forms.product.edit_title') }}
                                         </button>
                                     </MenuItem>
                                 </div>
@@ -327,7 +327,7 @@
                                                 'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors'
                                             ]">
                                                 <svg class="mr-3 h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            Delete Product
+                                            {{ $t('common.delete') }} {{ $t('admin.products') }}
                                         </button>
                                     </MenuItem>
                                 </div>
@@ -345,14 +345,14 @@
             <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <!-- Mobile Pagination -->
                 <div class="flex-1 flex justify-between sm:hidden">
-                    <button @click="changePage(currentPage - 1)" :disabled="currentPage === 0" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Previous</button>
-                    <button @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages - 1" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Next</button>
+                    <button @click="changePage(currentPage - 1)" :disabled="currentPage === 0" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">{{ $t('common.previous') }}</button>
+                    <button @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages - 1" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">{{ $t('common.next') }}</button>
                 </div>
                 <!-- Desktop Pagination -->
                 <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                     <div>
                         <p class="text-sm text-gray-700">
-                            Showing page <span class="font-bold">{{ currentPage + 1 }}</span> of <span class="font-medium">{{ totalPages }}</span>
+                             {{ $t('common.pagination_info', { current: currentPage + 1, total: totalPages }) }}
                         </p>
                     </div>
 
@@ -451,9 +451,9 @@
       <!-- Confirmation Modal -->
       <ConfirmModal 
         :isOpen="showDeleteModal" 
-        title="Delete Product" 
-        message="Are you sure you want to delete this product? This action cannot be undone."
-        confirmText="Delete"
+        :title="$t('common.delete') + ' ' + $t('admin.products')" 
+        :message="$t('media.delete_confirm', { type: $t('admin.products'), name: '' })"
+        :confirmText="$t('common.delete')"
         type="danger"
         :loading="deleteLoading"
         @close="closeDeleteModal"

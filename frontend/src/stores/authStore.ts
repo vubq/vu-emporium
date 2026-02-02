@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
             email: data.user.email,
             fullName: data.user.fullName,
             roles: data.user.roles,
+            preferredLanguage: data.user.preferredLanguage,
         };
         customerToken.value = data.accessToken;
         customerRefreshToken.value = data.refreshToken;
@@ -25,6 +26,12 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('customerToken', data.accessToken);
         localStorage.setItem('customerRefreshToken', data.refreshToken);
         localStorage.setItem('customer', JSON.stringify(customer.value));
+
+        // Save user's preferred language to localStorage with customer-specific key
+        // The i18n plugin will automatically load it on next page load
+        if (data.user.preferredLanguage) {
+            localStorage.setItem('customerLocale', data.user.preferredLanguage);
+        }
     }
 
     function clearAuthData() {

@@ -37,6 +37,10 @@ public class Admin {
     @Builder.Default
     private Boolean enabled = true;
 
+    @Column(length = 5)
+    @Builder.Default
+    private String preferredLanguage = "vi";
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -13,7 +13,7 @@
             <div class="absolute inset-0 rounded-xl ring-1 ring-white/20"></div>
           </div>
           <div class="flex flex-col">
-            <h2 class="text-lg font-bold text-white tracking-wide leading-none">Admin Panel</h2>
+            <h2 class="text-lg font-bold text-white tracking-wide leading-none">{{ $t('admin.admin_panel') }}</h2>
             <p class="text-xs text-blue-400 font-medium mt-1 group-hover:text-blue-300 transition-colors">Vu Emporium</p>
           </div>
         </div>
@@ -22,7 +22,7 @@
       <!-- Navigation -->
       <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
         <div class="mb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Menu
+            {{ $t('admin.menu') }}
         </div>
         <template v-for="(item, index) in menuItems" :key="index">
           <!-- Single Link -->
@@ -110,7 +110,7 @@
             <button
                 @click="handleLogout"
                 class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
-                title="Logout"
+                :title="$t('common.logout')"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -127,9 +127,12 @@
         <div class="px-8 py-4 flex justify-between items-center">
           <h1 class="text-2xl font-bold text-gray-900">{{ pageTitle }}</h1>
           <!-- Add notification bell or other header items here -->
-           <button class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+           <div class="flex items-center space-x-2">
+             <LanguageSelector />
+             <button class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-           </button>
+             </button>
+           </div>
         </div>
       </header>
       
@@ -164,6 +167,10 @@ import {
     TagIcon
 } from '@heroicons/vue/24/outline';
 import LoadingBar from '@/components/common/LoadingBar.vue';
+import LanguageSelector from '@/components/common/LanguageSelector.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -205,23 +212,27 @@ const menuItems = computed(() => {
         const groupName = child.meta.model as string;
 
         if (groupName) {
+            const groupKey = groupName.toLowerCase().replace(/\s+/g, '_');
+            const translatedGroupName = t(`admin.${groupKey}`);
             if (!groups[groupName]) {
                 groups[groupName] = {
-                    label: groupName,
-                    path: '', // path for group is strictly for key purposes, actual navigation is handled by children
+                    label: translatedGroupName || groupName,
+                    path: '',
                     icon: icon,
                     children: [],
                     model: groupName
                 };
                 items.push(groups[groupName]);
             }
+            const childKey = label.toLowerCase().replace(/\s+/g, '_');
             groups[groupName].children?.push({
-                label: label,
+                label: t(`admin.${childKey}`) || label,
                 path: path
             });
         } else {
+            const labelKey = label.toLowerCase().replace(/\s+/g, '_');
             items.push({
-                label: label,
+                label: label === 'Dashboard' ? t('admin.dashboard') : (t(`admin.${labelKey}`) || label),
                 path: path,
                 icon: icon
             });
@@ -232,7 +243,12 @@ const menuItems = computed(() => {
 });
 
 const pageTitle = computed(() => {
-    return route.meta.title as string || 'Admin Panel';
+    const title = route.meta.title as string;
+    if (!title) return t('admin.admin_panel');
+    const key = title.toLowerCase().replace(/\s+/g, '_');
+    // Special case for Dashboard
+    if (title === 'Dashboard') return t('admin.dashboard');
+    return t(`admin.${key}`) || title;
 });
 
 function isActive(path: string): boolean {

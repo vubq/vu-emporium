@@ -21,14 +21,14 @@
               to="/" 
               class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 relative group py-2"
             >
-              Home
+              {{ $t('common.home') }}
               <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-300"></span>
             </router-link>
             <router-link 
               to="/products" 
               class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 relative group py-2"
             >
-              All Products
+              {{ $t('nav.all_products') }}
               <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-300"></span>
             </router-link>
 
@@ -36,7 +36,7 @@
             <Menu as="div" class="relative inline-block text-left">
               <div>
                 <MenuButton class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 relative group py-2 flex items-center">
-                  Categories
+                  {{ $t('common.categories') }}
                   <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </MenuButton>
               </div>
@@ -72,7 +72,9 @@
           </nav>
           
           <!-- Right Actions -->
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            <LanguageSelector />
+            
             <!-- Cart Icon with Badge -->
             <router-link to="/cart" class="relative group">
               <div class="p-2 hover:bg-primary-50 rounded-full transition-colors duration-200">
@@ -108,33 +110,33 @@
                     leave-to-class="transform opacity-0 scale-95"
                 >
                     <MenuItems class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100 z-50">
-                        <div class="px-4 py-3">
-                            <p class="text-sm">Signed in as</p>
-                            <p class="text-sm font-medium text-gray-900 truncate">{{ authStore.customer?.fullName || 'User' }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ authStore.customer?.email }}</p>
-                        </div>
-                        <div class="py-1">
-                            <MenuItem v-slot="{ active }">
-                                <router-link to="/orders" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
-                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                                    My Orders
-                                </router-link>
-                            </MenuItem>
-                            <MenuItem v-slot="{ active }">
-                                <router-link to="/profile" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
-                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                    Profile
-                                </router-link>
-                            </MenuItem>
-                        </div>
-                        <div class="py-1">
+                         <div class="px-4 py-3">
+                             <p class="text-sm">{{ $t('nav.sign_in_as') || 'Signed in as' }}</p>
+                             <p class="text-sm font-medium text-gray-900 truncate">{{ authStore.customer?.fullName || 'User' }}</p>
+                             <p class="text-xs text-gray-500 truncate">{{ authStore.customer?.email }}</p>
+                         </div>
+                         <div class="py-1">
                              <MenuItem v-slot="{ active }">
-                                <button @click="handleLogout" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex w-full items-center px-4 py-2 text-sm text-left']">
-                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                                    Sign out
-                                </button>
-                            </MenuItem>
-                        </div>
+                                 <router-link to="/orders" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
+                                     <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                     {{ $t('nav.orders') }}
+                                 </router-link>
+                             </MenuItem>
+                             <MenuItem v-slot="{ active }">
+                                 <router-link to="/profile" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
+                                     <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                     {{ $t('nav.profile') }}
+                                 </router-link>
+                             </MenuItem>
+                         </div>
+                         <div class="py-1">
+                              <MenuItem v-slot="{ active }">
+                                 <button @click="handleLogout" :class="[active ? 'bg-gray-50 text-gray-900' : 'text-gray-700', 'group flex w-full items-center px-4 py-2 text-sm text-left']">
+                                     <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                     {{ $t('nav.sign_out') }}
+                                 </button>
+                             </MenuItem>
+                         </div>
                     </MenuItems>
                 </transition>
             </Menu>
@@ -142,10 +144,10 @@
             <template v-else>
                <div class="hidden md:flex space-x-2">
                   <router-link to="/login" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">
-                    Log in
+                    {{ $t('nav.login') }}
                   </router-link>
                   <router-link to="/register" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-full shadow-sm hover:shadow transition-all">
-                    Sign up
+                    {{ $t('nav.signup') }}
                   </router-link>
                </div>
             </template>
@@ -181,7 +183,7 @@
               <span class="text-2xl font-display font-bold">Vu Emporium</span>
             </div>
             <p class="text-gray-400 mb-4 max-w-md text-sm leading-relaxed">
-              Your premier destination for quality products at amazing prices. Shop with confidence, style, and peace of mind.
+              {{ $t('common.brand_desc') }}
             </p>
             <div class="flex space-x-4">
                <!-- Social Icons (Placeholder) -->
@@ -200,28 +202,28 @@
           
           <!-- Quick Links -->
           <div>
-            <h3 class="font-display font-bold mb-4 text-gray-200">Quick Links</h3>
+            <h3 class="font-display font-bold mb-4 text-gray-200">{{ $t('admin.menu') }}</h3>
             <ul class="space-y-2 text-sm">
-              <li><router-link to="/" class="text-gray-400 hover:text-white transition-colors">Home</router-link></li>
-              <li><router-link to="/products" class="text-gray-400 hover:text-white transition-colors">Shop All</router-link></li>
-              <li><router-link to="/cart" class="text-gray-400 hover:text-white transition-colors">My Cart</router-link></li>
+              <li><router-link to="/" class="text-gray-400 hover:text-white transition-colors">{{ $t('common.home') }}</router-link></li>
+              <li><router-link to="/products" class="text-gray-400 hover:text-white transition-colors">{{ $t('nav.all_products') }}</router-link></li>
+              <li><router-link to="/cart" class="text-gray-400 hover:text-white transition-colors">{{ $t('common.cart') }}</router-link></li>
             </ul>
           </div>
           
           <!-- Customer Service -->
           <div>
-            <h3 class="font-display font-bold mb-4 text-gray-200">Help</h3>
+            <h3 class="font-display font-bold mb-4 text-gray-200">{{ $t('common.help') }}</h3>
             <ul class="space-y-2 text-sm">
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Shipping & Returns</a></li>
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Support</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('common.shipping_returns') }}</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('common.faq') }}</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('common.contact_support') }}</a></li>
             </ul>
           </div>
         </div>
         
         <!-- Bottom Bar -->
         <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-          <p>&copy; 2024 Vu Emporium. All rights reserved.</p>
+          <p>&copy; 2024 Vu Emporium. {{ $t('common.all_rights_reserved') }}</p>
           <div class="flex space-x-6 mt-4 md:mt-0">
             <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
@@ -241,6 +243,7 @@ import { categoryApi } from '@/api/productApi';
 import type { Category } from '@/types/product';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import LoadingBar from '@/components/common/LoadingBar.vue';
+import LanguageSelector from '@/components/common/LanguageSelector.vue';
 
 const authStore = useAuthStore();
 const cartStore = useCartStore();

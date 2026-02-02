@@ -144,6 +144,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .roles(roles)
+                .preferredLanguage(user.getPreferredLanguage())
                 .build();
 
         return AuthResponse.builder()
@@ -153,5 +154,15 @@ public class AuthServiceImpl implements AuthService {
                 .expiresIn(jwtService.getExpirationTime())
                 .user(userInfo)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateLanguage(String email, String language) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+        user.setPreferredLanguage(language);
+        userRepository.save(user);
     }
 }

@@ -26,5 +26,6 @@ public class AuthResponse {
         private String email;
         private String fullName;
         private String[] roles;
+        private String preferredLanguage;
     }
 }

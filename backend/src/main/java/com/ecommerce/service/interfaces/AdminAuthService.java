@@ -8,4 +8,6 @@ public interface AdminAuthService {
     AuthResponse login(AdminLoginRequest request);
 
     AdminDTO getCurrentAdmin(String email);
+
+    void updateLanguage(String email, String language);
 }

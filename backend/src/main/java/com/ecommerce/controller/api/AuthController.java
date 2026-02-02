@@ -41,6 +41,15 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Logout successful", null));
     }
 
+    @PatchMapping("/language")
+    public ResponseEntity<ApiResponse<Void>> updateLanguage(
+            @Valid @RequestBody com.ecommerce.model.dto.request.UpdateLanguageRequest request,
+            org.springframework.security.core.Authentication authentication) {
+        String email = authentication.getName();
+        authService.updateLanguage(email, request.getLanguage());
+        return ResponseEntity.ok(ApiResponse.success("Language updated", null));
+    }
+
     // Inner class for refresh token request
     public static class RefreshTokenRequest {
         private String refreshToken;

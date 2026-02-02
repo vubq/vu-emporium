@@ -60,6 +60,16 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                                 .email(admin.getEmail())
                                 .fullName(admin.getFullName())
                                 .enabled(admin.getEnabled())
+                                .preferredLanguage(admin.getPreferredLanguage())
                                 .build();
+        }
+
+        @Override
+        public void updateLanguage(String email, String language) {
+                Admin admin = adminRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException("Admin", "email", email));
+
+                admin.setPreferredLanguage(language);
+                adminRepository.save(admin);
         }
 }

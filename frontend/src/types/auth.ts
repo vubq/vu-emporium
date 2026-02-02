@@ -5,6 +5,7 @@ export interface User {
     phone?: string;
     address?: string;
     roles: string[];
+    preferredLanguage?: string;
 }
 
 export interface AuthResponse {
@@ -17,6 +18,7 @@ export interface AuthResponse {
         email: string;
         fullName: string;
         roles: string[];
+        preferredLanguage?: string;
     };
 }
 

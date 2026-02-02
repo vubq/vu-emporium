@@ -17,4 +17,8 @@ export const authApi = {
     logout(refreshToken: string) {
         return apiClient.post('/auth/logout', { refreshToken });
     },
+
+    updateLanguage(language: string) {
+        return apiClient.patch('/auth/language', { language });
+    },
 };
