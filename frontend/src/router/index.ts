@@ -102,6 +102,20 @@ const router = createRouter({
                     },
                 },
                 {
+                    path: 'categories',
+                    name: 'admin-categories',
+                    component: () => import('@/modules/admin/pages/CategoryManagementPage.vue'),
+                    meta: {
+                        title: 'Category Management',
+                        model: 'Products', // Group with Products? Or standalone? Let's group if Sidebar supports it.
+                        // Actually Products route has `model: 'Products'`. 
+                        // If I give this `model: 'Products'`, they might be grouped.
+                        // Let's try grouping them.
+                        icon: 'TagIcon',
+                        showInSidebar: true
+                    },
+                },
+                {
                     path: 'orders',
                     name: 'admin-orders',
                     component: () => import('@/pages/admin/AdminOrdersPage.vue'),

@@ -159,7 +159,8 @@ import {
     CubeIcon, 
     ShoppingBagIcon, 
     UsersIcon, 
-    PhotoIcon 
+    PhotoIcon,
+    TagIcon
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
@@ -173,7 +174,8 @@ const iconMap: Record<string, any> = {
     'CubeIcon': CubeIcon,
     'ShoppingBagIcon': ShoppingBagIcon,
     'UsersIcon': UsersIcon,
-    'PhotoIcon': PhotoIcon
+    'PhotoIcon': PhotoIcon,
+    'TagIcon': TagIcon
 };
 
 interface MenuItem {
