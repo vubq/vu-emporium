@@ -142,14 +142,7 @@
         @confirm="executeDelete"
     />
 
-    <!-- Alert Modal -->
-    <AlertModal
-        v-model="alertModal.show"
-        :title="alertModal.title"
-        :message="alertModal.message"
-        :variant="alertModal.variant"
-        @close="alertModal.show = false"
-    />
+
   </div>
 </template>
 
@@ -158,7 +151,7 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { mediaApi, type FileItem } from '@/api/mediaApi';
 import ConfirmModal from '@/components/common/ConfirmModal.vue';
-import AlertModal from '@/components/common/AlertModal.vue';
+
 
 const { t } = useI18n();
 
@@ -197,13 +190,7 @@ const deleteModal = ref({
     loading: false
 });
 
-// Alert modal state
-const alertModal = ref({
-    show: false,
-    title: '',
-    message: '',
-    variant: 'info' as 'success' | 'error' | 'warning' | 'info'
-});
+
 
 const pathParts = computed(() => {
     return currentPath.value ? currentPath.value.split('/').filter(p => p) : [];
@@ -387,12 +374,7 @@ const executeDelete = async () => {
 
 // Alert helper
 const showAlert = (title: string, message: string, variant: 'success' | 'error' | 'warning' | 'info') => {
-    alertModal.value = {
-        show: true,
-        title,
-        message,
-        variant
-    };
+    alert(`${title}\n\n${message}`);
 };
 
 onMounted(() => {
