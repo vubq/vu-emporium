@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <LoadingBar />
     <!-- Modern Header with Gradient -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,9 +28,47 @@
               to="/products" 
               class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 relative group py-2"
             >
-              Products
+              All Products
               <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-300"></span>
             </router-link>
+
+            <!-- Categories Dropdown -->
+            <Menu as="div" class="relative inline-block text-left">
+              <div>
+                <MenuButton class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 relative group py-2 flex items-center">
+                  Categories
+                  <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </MenuButton>
+              </div>
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <MenuItems class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 py-2">
+                  <div v-for="category in categories" :key="category.id" class="px-1">
+                    <MenuItem v-slot="{ active }">
+                      <router-link 
+                        :to="`/products?categoryId=${category.id}`"
+                        :class="[active ? 'bg-primary-50 text-primary-700' : 'text-gray-700', 'group flex flex-col px-4 py-2 text-sm rounded-lg transition-colors']"
+                      >
+                        <span class="font-bold">{{ category.name }}</span>
+                        <!-- Subcategories hint -->
+                        <div v-if="category.children && category.children.length > 0" class="flex flex-wrap gap-1 mt-1">
+                          <span v-for="child in category.children.slice(0, 3)" :key="child.id" class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">
+                            {{ child.name }}
+                          </span>
+                          <span v-if="category.children.length > 3" class="text-[10px] text-gray-400">...</span>
+                        </div>
+                      </router-link>
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </transition>
+            </Menu>
           </nav>
           
           <!-- Right Actions -->
@@ -194,14 +233,28 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useRouter } from 'vue-router';
+import { categoryApi } from '@/api/productApi';
+import type { Category } from '@/types/product';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
+import LoadingBar from '@/components/common/LoadingBar.vue';
 
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const router = useRouter();
+const categories = ref<Category[]>([]);
+
+onMounted(async () => {
+    try {
+        const response = await categoryApi.getRootCategories();
+        categories.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to load categories:', error);
+    }
+});
 
 async function handleLogout() {
   await authStore.logout();

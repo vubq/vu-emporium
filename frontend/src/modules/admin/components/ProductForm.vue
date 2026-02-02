@@ -299,7 +299,7 @@
                                 <div class="relative w-full text-left">
                                     <ComboboxInput
                                         class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                                        :displayValue="(category: any) => category?.name"
+                                        :displayValue="(category: any) => category?.fullName || category?.name"
                                         @change="query = $event.target.value"
                                         placeholder="Search category..."
                                     />
@@ -326,7 +326,7 @@
                                         >
                                             <li class="relative cursor-pointer select-none py-2.5 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
                                                 <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                    {{ category.name }}
+                                                    {{ category.fullName }}
                                                 </span>
                                                 <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3" :class="{ 'text-white': active, 'text-indigo-600': !active }">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
@@ -1042,11 +1042,38 @@ watch(() => props.initialData, (newVal) => {
 }, { immediate: true });
 
 
+// Helper to get full path
+const getCategoryPath = (categoryId: number | null): string => {
+  if (!categoryId) return '';
+  const path: string[] = [];
+  let currentId: number | null = categoryId;
+  const visited = new Set<number>();
+
+  while (currentId && !visited.has(currentId)) {
+    visited.add(currentId);
+    const category = categories.value.find(c => c.id === currentId);
+    if (category) {
+      path.unshift(category.name);
+      currentId = category.parentId;
+    } else {
+      break;
+    }
+  }
+  return path.join(' > ');
+};
+
+const displayCategories = computed(() => {
+  return categories.value.map(c => ({
+    ...c,
+    fullName: getCategoryPath(c.id)
+  }));
+});
+
 const filteredCategories = computed(() =>
   query.value === ''
-    ? categories.value
-    : categories.value.filter((category) =>
-        category.name
+    ? displayCategories.value
+    : displayCategories.value.filter((category) =>
+        category.fullName
           .toLowerCase()
           .replace(/\s+/g, '')
           .includes(query.value.toLowerCase().replace(/\s+/g, ''))

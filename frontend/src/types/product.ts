@@ -67,4 +67,5 @@ export interface Category {
     parentId?: number;
     active: boolean;
     displayOrder: number;
+    children?: Category[];
 }

@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex">
+    <LoadingBar />
     <!-- Sidebar -->
     <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 shadow-2xl z-20 transition-all duration-300">
       <!-- Logo -->
@@ -162,6 +163,7 @@ import {
     PhotoIcon,
     TagIcon
 } from '@heroicons/vue/24/outline';
+import LoadingBar from '@/components/common/LoadingBar.vue';
 
 const route = useRoute();
 const router = useRouter();

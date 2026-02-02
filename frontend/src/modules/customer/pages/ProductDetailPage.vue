@@ -1,8 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 font-sans text-gray-900">
-    <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center items-center min-h-[50vh]">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-    </div>
+    <ProductDetailSkeleton v-if="loading" />
     <div v-else-if="!product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <h2 class="text-2xl font-bold text-gray-900">Product not found</h2>
         <router-link to="/products" class="mt-4 inline-block text-primary-600 hover:text-primary-800">Return to shop</router-link>
@@ -257,6 +255,7 @@ import { productApi } from '@/api/productApi';
 import type { Product } from '@/types/product';
 import { useCartStore } from '@/stores/cartStore';
 import { RadioGroup, RadioGroupLabel, RadioGroupOption, TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+import ProductDetailSkeleton from '@/components/skeleton/ProductDetailSkeleton.vue';
 
 
 

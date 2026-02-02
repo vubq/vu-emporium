@@ -37,10 +37,26 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDTO> getAllProducts(Long categoryId, String search, BigDecimal minPrice, BigDecimal maxPrice,
             String brand, ProductStatus status, Pageable pageable) {
-        Specification<Product> spec = ProductSpecification.getSpecifications(categoryId, search, minPrice, maxPrice,
+
+        List<Long> categoryIds = null;
+        if (categoryId != null) {
+            categoryIds = getAllCategoryIdsRecursive(categoryId);
+        }
+
+        Specification<Product> spec = ProductSpecification.getSpecifications(categoryIds, search, minPrice, maxPrice,
                 brand, status);
         Page<Product> products = productRepository.findAll(spec, pageable);
         return products.map(this::convertToDTO);
+    }
+
+    private List<Long> getAllCategoryIdsRecursive(Long categoryId) {
+        List<Long> ids = new java.util.ArrayList<>();
+        ids.add(categoryId);
+        List<Category> children = categoryRepository.findByParentIdAndActiveTrue(categoryId);
+        for (Category child : children) {
+            ids.addAll(getAllCategoryIdsRecursive(child.getId()));
+        }
+        return ids;
     }
 
     @Override
@@ -392,6 +408,7 @@ public class ProductServiceImpl implements ProductService {
                 .imageUrl(category.getImageUrl())
                 .active(category.getActive())
                 .displayOrder(category.getDisplayOrder())
+                .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
     }
 }

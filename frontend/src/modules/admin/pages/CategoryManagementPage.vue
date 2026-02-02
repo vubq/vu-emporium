@@ -140,7 +140,12 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ category.name }}</div>
+                            <div class="flex items-center gap-2">
+                                <span v-if="category.parentId" class="text-xs text-gray-400 font-medium">
+                                    {{ getCategoryPath(category.parentId) }} >
+                                </span>
+                                <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ category.name }}</div>
+                            </div>
                             <div class="text-xs text-gray-500">{{ category.slug }}</div>
                         </td>
                         <td class="px-6 py-4">
@@ -286,6 +291,27 @@ const filteredCategories = computed(() => {
 });
 
 // Methods
+const getCategoryPath = (categoryId: number | null): string => {
+  if (!categoryId) return '';
+  const path: string[] = [];
+  let currentId: number | null = categoryId;
+  const visited = new Set<number>();
+
+  while (currentId && !visited.has(currentId)) {
+    visited.add(currentId);
+    const category = categories.value.find(c => c.id === currentId);
+    if (category) {
+      if (category.id !== categoryId) {
+          path.unshift(category.name);
+      }
+      currentId = category.parentId;
+    } else {
+      break;
+    }
+  }
+  return path.join(' > ');
+};
+
 const fetchCategories = async () => {
     loading.value = true;
     try {

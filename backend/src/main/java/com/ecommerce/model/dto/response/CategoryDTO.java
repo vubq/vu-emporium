@@ -17,4 +17,6 @@ public class CategoryDTO {
     private String imageUrl;
     private Boolean active;
     private Integer displayOrder;
+    private Long parentId;
+    private java.util.List<CategoryDTO> children;
 }

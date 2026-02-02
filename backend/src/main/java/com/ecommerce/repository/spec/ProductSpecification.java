@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ProductSpecification {
 
-    public static Specification<Product> getSpecifications(Long categoryId, String search, BigDecimal minPrice,
+    public static Specification<Product> getSpecifications(List<Long> categoryIds, String search, BigDecimal minPrice,
             BigDecimal maxPrice, String brand, ProductStatus status) {
         return (root, query, criteriaBuilder) -> {
 
@@ -24,8 +24,8 @@ public class ProductSpecification {
             }
 
             // Category Filter
-            if (categoryId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category").get("id"), categoryId));
+            if (categoryIds != null && !categoryIds.isEmpty()) {
+                predicates.add(root.get("category").get("id").in(categoryIds));
             }
 
             // Price Range Filter

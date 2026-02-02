@@ -9,27 +9,65 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <!-- Loading State -->
-      <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="i in 8" :key="i" class="animate-pulse">
-          <div class="bg-white rounded-2xl shadow-card overflow-hidden">
-            <div class="aspect-square bg-gray-200"></div>
-            <div class="p-5 space-y-3">
-              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div class="h-6 bg-gray-200 rounded w-1/2"></div>
-              <div class="h-10 bg-gray-200 rounded"></div>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar: Categories -->
+        <aside class="w-full lg:w-64 flex-shrink-0">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+            <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+              Categories
+            </h2>
+            
+            <div class="space-y-1">
+              <button 
+                @click="filterByCategory(null)"
+                :class="[!selectedCategoryId ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50', 'w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between group']"
+              >
+                All Products
+                <span v-if="!selectedCategoryId" class="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
+              </button>
+
+              <!-- Recursive Category Item -->
+              <div v-for="category in categories" :key="category.id">
+                <button 
+                  @click="filterByCategory(category.id)"
+                  :class="[selectedCategoryId === category.id ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50', 'w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-between group']"
+                >
+                  {{ category.name }}
+                  <span v-if="selectedCategoryId === category.id" class="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
+                </button>
+                
+                <!-- Children -->
+                <div v-if="category.children && category.children.length > 0" class="ml-4 mt-1 border-l border-gray-100 pl-2 space-y-1">
+                  <button 
+                    v-for="child in category.children" 
+                    :key="child.id"
+                    @click="filterByCategory(child.id)"
+                    :class="[selectedCategoryId === child.id ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:bg-gray-50', 'w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between group']"
+                  >
+                    {{ child.name }}
+                    <span v-if="selectedCategoryId === child.id" class="w-1 h-1 rounded-full bg-primary-600"></span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </aside>
+
+        <!-- Product List Area -->
+        <div class="flex-1">
+          <!-- Loading State -->
+          <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ProductCardSkeleton v-for="i in 9" :key="i" />
+          </div>
       
-      <!-- Products Grid -->
-      <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Products Grid -->
+          <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div 
           v-for="(product, index) in products" 
           :key="product.id" 
           class="group cursor-pointer animate-fade-in"
-          :style="{ animationDelay: `${index * 50}ms` }"
+          :style="{ animationDelay: (index as number) * 50 + 'ms' }"
           @click="goToProduct(product.slug)"
         >
           <div class="bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden group-hover:-translate-y-2">
@@ -83,40 +121,78 @@
         </div>
       </div>
       
-      <!-- Empty State -->
-      <div v-else class="text-center py-16">
-        <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-        </svg>
-        <p class="text-gray-600 text-lg">No products found</p>
+          <!-- Empty State -->
+          <div v-else class="text-center py-24 bg-white rounded-3xl border border-dashed border-gray-200">
+            <svg class="w-20 h-20 mx-auto text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="text-gray-500 text-lg font-medium">No products found in this category</p>
+            <button @click="filterByCategory(null)" class="mt-4 text-primary-600 hover:text-primary-700 font-bold">View all products</button>
+          </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { productApi } from '@/api/productApi';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { productApi, categoryApi } from '@/api/productApi';
 import { useCartStore } from '@/stores/cartStore';
-import type { Product } from '@/types/product';
+import type { Product, Category } from '@/types/product';
 import AppImage from '@/components/common/AppImage.vue';
+import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton.vue';
 
 const router = useRouter();
+const route = useRoute();
 const cartStore = useCartStore();
 const products = ref<Product[]>([]);
+const categories = ref<Category[]>([]);
 const loading = ref(true);
+const selectedCategoryId = ref<number | null>(null);
 
-onMounted(async () => {
+const fetchProducts = async () => {
+  loading.value = true;
   try {
-    const response = await productApi.getProducts();
+    const response = await productApi.getProducts({
+      categoryId: selectedCategoryId.value || undefined
+    });
     products.value = response.data.data.content;
   } catch (error) {
     console.error('Failed to load products:', error);
   } finally {
     loading.value = false;
   }
+};
+
+const fetchCategories = async () => {
+    try {
+        const response = await categoryApi.getRootCategories();
+        categories.value = response.data.data;
+    } catch (error) {
+        console.error('Failed to load categories:', error);
+    }
+};
+
+onMounted(async () => {
+  if (route.query.categoryId) {
+    selectedCategoryId.value = Number(route.query.categoryId);
+  }
+  await Promise.all([fetchCategories(), fetchProducts()]);
 });
+
+watch(() => route.query.categoryId, (newId) => {
+    selectedCategoryId.value = newId ? Number(newId) : null;
+    fetchProducts();
+});
+
+function filterByCategory(id: number | null) {
+  router.push({
+    path: '/products',
+    query: { ...route.query, categoryId: id || undefined }
+  });
+}
 
 function goToProduct(slug: string) {
   router.push(`/products/${slug}`);

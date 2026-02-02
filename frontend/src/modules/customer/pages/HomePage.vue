@@ -77,7 +77,11 @@
           <p class="text-gray-600 text-lg">Handpicked items just for you</p>
         </div>
         
-        <div v-if="featuredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ProductCardSkeleton v-for="i in 4" :key="i" />
+        </div>
+        
+        <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div 
             v-for="(product, index) in featuredProducts" 
             :key="product.id" 
@@ -160,17 +164,22 @@ import { productApi } from '@/api/productApi';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/types/product';
 import AppImage from "@/components/common/AppImage.vue";
+import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton.vue';
 
 const router = useRouter();
 const cartStore = useCartStore();
 const featuredProducts = ref<Product[]>([]);
+const loading = ref(true);
 
 onMounted(async () => {
+  loading.value = true;
   try {
     const response = await productApi.getFeaturedProducts();
     featuredProducts.value = response.data.data;
   } catch (error) {
     console.error('Failed to load featured products:', error);
+  } finally {
+    loading.value = false;
   }
 });
 
