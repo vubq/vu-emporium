@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
 
-        if (product.getStatus() != ProductStatus.ACTIVE) {
+        if (product.getStatus() != ProductStatus.ACTIVE && product.getStatus() != ProductStatus.ARCHIVED) {
             throw new ResourceNotFoundException("Product", "id", id);
         }
 
@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "slug", slug));
 
-        if (product.getStatus() != ProductStatus.ACTIVE) {
+        if (product.getStatus() != ProductStatus.ACTIVE && product.getStatus() != ProductStatus.ARCHIVED) {
             throw new ResourceNotFoundException("Product", "slug", slug);
         }
 
@@ -159,6 +159,13 @@ public class ProductServiceImpl implements ProductService {
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+
+            // Validation: Cannot assign to non-ACTIVE category
+            if (category.getStatus() != com.ecommerce.model.enums.CategoryStatus.ACTIVE) {
+                throw new com.ecommerce.exception.BadRequestException(
+                        "Cannot assign product to a category with status " + category.getStatus());
+            }
+
             product.setCategory(category);
         }
 
