@@ -29,7 +29,7 @@
           <router-link
             v-if="!item.children"
             :to="item.path"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none"
             :class="isActive(item.path) 
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25' 
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
@@ -46,7 +46,7 @@
           <!-- Group (Disclosure) -->
           <Disclosure v-else as="div" v-slot="{ open }" :defaultOpen="isGroupActive(item)">
              <DisclosureButton
-                class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-300 group"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all duration-300 group outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none"
                 :class="isGroupActive(item) 
                     ? 'bg-slate-800 text-white' 
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/50'"
@@ -80,10 +80,10 @@
                         v-for="child in item.children"
                         :key="child.path"
                         :to="child.path"
-                        class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none border"
                         :class="route.path === child.path 
-                            ? 'text-white bg-blue-500/10 border border-blue-500/20' 
-                            : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800/30'"
+                            ? 'text-white bg-blue-500/10 border-blue-500/20' 
+                            : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800/30 border-transparent'"
                     >
                         <span class="w-1.5 h-1.5 rounded-full transition-colors duration-300" :class="route.path === child.path ? 'bg-blue-400' : 'bg-slate-600 group-hover:bg-slate-500'"></span>
                         {{ child.label }}
