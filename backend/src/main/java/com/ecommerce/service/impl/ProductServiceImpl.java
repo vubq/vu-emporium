@@ -364,6 +364,20 @@ public class ProductServiceImpl implements ProductService {
                     .collect(Collectors.toList()));
         }
 
+        // Calculate isDiscontinued recursively
+        boolean discontinued = product.getStatus() == ProductStatus.ARCHIVED;
+        if (!discontinued && product.getCategory() != null) {
+            com.ecommerce.model.entity.Category cat = product.getCategory();
+            while (cat != null) {
+                if (cat.getStatus() == com.ecommerce.model.enums.CategoryStatus.ARCHIVED) {
+                    discontinued = true;
+                    break;
+                }
+                cat = cat.getParent();
+            }
+        }
+        builder.discontinued(discontinued);
+
         return builder.build();
     }
 

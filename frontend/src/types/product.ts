@@ -56,6 +56,7 @@ export interface Product {
     reviewCount?: number;
     totalSales?: number;
 
+    isDiscontinued?: boolean;
 }
 
 export interface Category {

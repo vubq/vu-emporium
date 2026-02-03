@@ -51,4 +51,7 @@ public class ProductDTO {
     private Boolean hasVariants;
     private List<ProductOptionDTO> options;
     private List<ProductVariantDTO> variants;
+
+    // Status flag calculated recursively
+    private Boolean discontinued;
 }

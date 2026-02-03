@@ -127,38 +127,57 @@
             </div>
 
             <!-- Add to Cart Section -->
-            <div class="mt-8 flex items-center space-x-4">
-                <!-- Quantity -->
-                <div class="flex items-center border border-gray-300 rounded-lg">
-                    <button @click="quantity > 1 ? quantity-- : null" class="p-2 text-gray-600 hover:text-primary-600 focus:outline-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
-                    </button>
-                    <input type="number" v-model.number="quantity" class="w-12 text-center border-none focus:ring-0 text-gray-900 font-medium p-0" min="1" />
-                    <button @click="quantity++" class="p-2 text-gray-600 hover:text-primary-600 focus:outline-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                    </button>
+            <div class="mt-8">
+                 <!-- Discontinued Banner -->
+                <div v-if="isArchived" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                {{ $t('product.discontinued') }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Add to Cart Button -->
-                <button 
-                    @click="addToCart" 
-                    :disabled="isOutOfStock || loadingCart"
-                    class="flex-1 bg-gradient-to-r from-primary-600 to-indigo-600 border border-transparent rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:from-primary-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-                >
-                    <svg v-if="loadingCart" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <svg v-else class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                    {{ isOutOfStock ? $t('product.out_of_stock') : (loadingCart ? $t('product.adding') : $t('product.add_to_cart')) }}
-                </button>
+                <div class="flex items-center space-x-4">
+                    <!-- Quantity -->
+                    <div class="flex items-center border border-gray-300 rounded-lg" :class="{'opacity-50 pointer-events-none': isArchived}">
+                        <button @click="quantity > 1 ? quantity-- : null" class="p-2 text-gray-600 hover:text-primary-600 focus:outline-none" :disabled="isArchived">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+                        </button>
+                        <input type="number" v-model.number="quantity" class="w-12 text-center border-none focus:ring-0 text-gray-900 font-medium p-0" min="1" :disabled="isArchived" />
+                        <button @click="quantity++" class="p-2 text-gray-600 hover:text-primary-600 focus:outline-none" :disabled="isArchived">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        </button>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <button 
+                        @click="addToCart" 
+                        :disabled="isOutOfStock || loadingCart || isArchived"
+                        class="flex-1 bg-gradient-to-r from-primary-600 to-indigo-600 border border-transparent rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:from-primary-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                        <svg v-if="loadingCart" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <svg v-else-if="!isArchived" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                        {{ isArchived ? $t('product.discontinued') : (isOutOfStock ? $t('product.out_of_stock') : (loadingCart ? $t('product.adding') : $t('product.add_to_cart'))) }}
+                    </button>
+                </div>
+                
+                <p v-if="!isArchived && currentVariant && currentVariant.stockQuantity < 5 && currentVariant.stockQuantity > 0" class="mt-2 text-sm text-red-600 font-medium">
+                    {{ $t('product.only_left', { count: currentVariant.stockQuantity }) }}
+                </p>
             </div>
-            
-            <p v-if="currentVariant && currentVariant.stockQuantity < 5 && currentVariant.stockQuantity > 0" class="mt-2 text-sm text-red-600 font-medium">
-                {{ $t('product.only_left', { count: currentVariant.stockQuantity }) }}
-            </p>
-          </div>
           
+           </div>
+
            <!-- Product Features Icons -->
            <div class="mt-8 flex justify-between border-t border-gray-100 pt-6">
                 <div class="flex flex-col items-center text-center group">
@@ -345,7 +364,14 @@ const allImages = computed(() => {
     return product.value?.images || [];
 });
 
+const isArchived = computed(() => {
+    if (!product.value) return false;
+    // Use backend-calculated flag which handles recursive category checks
+    return !!product.value.discontinued;
+});
+
 const isOutOfStock = computed(() => {
+    if (isArchived.value) return true; // Treat archived as out of stock for button state
     if (currentVariant.value) return currentVariant.value.stockQuantity <= 0;
     return (product.value?.stockQuantity || 0) <= 0;
 });
@@ -360,7 +386,7 @@ function getVariantName(variant: any) {
 }
 
 async function addToCart() {
-  if (!product.value) return;
+  if (!product.value || isArchived.value) return;
   
   loadingCart.value = true;
   await new Promise(resolve => setTimeout(resolve, 600)); // Fake network delay for effect
