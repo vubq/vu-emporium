@@ -291,43 +291,85 @@
                          </Switch>
                      </div>
 
-                    <!-- Category -->
+                    <!-- Category (Premium Tree Selection) -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('product.category') }}</label>
-                        <Listbox v-model="selectedCategory" :disabled="submitting">
+                        <Combobox v-model="selectedCategory" :disabled="submitting" nullable>
                             <div class="relative mt-1">
-                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <span class="block truncate font-medium" :class="selectedCategory ? 'text-gray-900' : 'text-gray-400'">
-                                        {{ selectedCategory ? (selectedCategory.fullName || selectedCategory.name) : $t('admin.forms.product.search_category') }}
-                                        <span v-if="selectedCategory?.status === 'ARCHIVED'" class="text-red-500 text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
-                                    </span>
-                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <div class="relative w-full cursor-default overflow-hidden rounded-xl bg-white text-left border border-gray-300 shadow-sm focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 sm:text-sm transition-all hover:border-gray-400">
+                                    <ComboboxInput
+                                        class="w-full border-none py-3 pl-4 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 outline-none font-medium placeholder-gray-400"
+                                        :displayValue="(c: any) => c?.name || ''"
+                                        @change="query = $event.target.value"
+                                        :placeholder="$t('admin.forms.product.search_category')"
+                                    />
+                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                                    </span>
-                                </ListboxButton>
-                                <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                    <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                        <ListboxOption
-                                            v-for="category in displayCategories"
-                                            :key="category.id"
-                                            :value="category"
+                                    </ComboboxButton>
+                                </div>
+                                <transition
+                                    leave-active-class="transition duration-100 ease-in"
+                                    leave-from-class="opacity-100"
+                                    leave-to-class="opacity-0"
+                                    after-leave="query = ''"
+                                >
+                                    <ComboboxOptions class="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-xl bg-white py-2 text-base shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm custom-scrollbar">
+                                        <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-4 px-4 text-gray-500 text-center">
+                                            <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <p class="text-sm font-medium">{{ $t('admin.manage.categories.no_results') }}</p>
+                                        </div>
+
+                                        <ComboboxOption
+                                            v-for="item in filteredCategories"
+                                            :key="item.category.id"
+                                            :value="item.category"
                                             as="template"
                                             v-slot="{ active, selected }"
                                         >
-                                            <li :class="[active ? 'bg-indigo-600 text-white' : 'text-gray-900', 'relative cursor-pointer select-none py-2.5 pl-10 pr-4']">
-                                                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
-                                                    {{ category.fullName }} 
-                                                    <span v-if="category.status === 'ARCHIVED'" :class="active ? 'text-red-200' : 'text-red-500'" class="text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
-                                                </span>
-                                                <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3" :class="{ 'text-white': active, 'text-indigo-600': !active }">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                                                </span>
+                                            <li :class="[active ? 'bg-indigo-50' : 'bg-white', 'relative cursor-pointer select-none py-2.5 pr-4 transition-colors group']"
+                                                :style="{ paddingLeft: `${(item.level * 24) + 12}px` }">
+                                                
+                                                <!-- Visual Tree Lines -->
+                                                <div v-if="item.level > 0" class="absolute left-0 top-0 bottom-0 pointer-events-none">
+                                                    <div v-for="l in item.level" :key="l" 
+                                                         class="absolute top-0 bottom-0 border-l border-gray-100"
+                                                         :style="{ left: `${(l-1) * 24 + 18}px` }"
+                                                         :class="{ 'h-1/2 border-b rounded-bl-lg': l === item.level }">
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex items-center gap-3 relative">
+                                                    <!-- Icon indicator -->
+                                                    <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg shadow-sm border transition-colors"
+                                                         :class="[active ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-gray-50 border-gray-100 text-gray-400']">
+                                                        <svg v-if="item.hasChildren" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                                                        <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                                    </div>
+
+                                                    <!-- Thumbnail (Small) -->
+                                                    <div v-if="item.category.imageUrl" class="flex-shrink-0 w-6 h-6 rounded border border-gray-200 overflow-hidden">
+                                                        <img :src="item.category.imageUrl" class="w-full h-full object-cover" />
+                                                    </div>
+
+                                                    <div class="flex flex-col min-w-0">
+                                                        <span :class="[selected ? 'font-bold text-indigo-600' : 'font-medium text-gray-700', active ? 'text-indigo-900' : '', 'block truncate text-sm transition-colors']">
+                                                            {{ item.category.name }}
+                                                        </span>
+                                                        <span v-if="item.category.status === 'ARCHIVED'" class="text-[10px] uppercase tracking-wider font-bold text-red-500">
+                                                            {{ $t('common.archived') }}
+                                                        </span>
+                                                    </div>
+
+                                                    <span v-if="selected" class="ml-auto flex-shrink-0 text-indigo-600">
+                                                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                                    </span>
+                                                </div>
                                             </li>
-                                        </ListboxOption>
-                                    </ListboxOptions>
+                                        </ComboboxOption>
+                                    </ComboboxOptions>
                                 </transition>
                             </div>
-                        </Listbox>
+                        </Combobox>
                     </div>
                 </div>
             </div>
@@ -875,6 +917,7 @@ import { adminCategoryApi } from '@/api/adminCategoryApi';
 import type { Category } from '@/types/product';
 import { 
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
+    Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption,
     Switch, SwitchGroup, SwitchLabel,
     TransitionRoot,
     Dialog, DialogPanel, TransitionChild, DialogTitle
@@ -894,6 +937,7 @@ const { t } = useI18n();
 const categories = ref<Category[]>([]);
 const hasVariants = ref(false);
 const selectedCategory = ref<Category | null>(null);
+const query = ref('');
 
 interface OptionInput {
   name: string;
@@ -1002,7 +1046,6 @@ watch(() => props.initialData, (newVal) => {
         }
         if (newVal.category) {
             selectedCategory.value = newVal.category;
-            query.value = newVal.category.name;
         }
     } else {
         // Reset form
@@ -1031,36 +1074,53 @@ watch(() => props.initialData, (newVal) => {
         options.value = [];
         variants.value = [];
         selectedCategory.value = null;
-        query.value = '';
     }
 }, { immediate: true });
 
 
-// Helper to get full path
-const getCategoryPath = (categoryId: number | null): string => {
-  if (!categoryId) return '';
-  const path: string[] = [];
-  let currentId: number | null = categoryId;
-  const visited = new Set<number>();
+// Tree logic for Category selection
+const buildCategoryTree = (cats: Category[], parentId: number | null = null): any[] => {
+  return cats
+    .filter(c => c.parentId === parentId)
+    .map(c => ({
+      ...c,
+      children: buildCategoryTree(cats, c.id)
+    }))
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+};
 
-  while (currentId && !visited.has(currentId)) {
-    visited.add(currentId);
-    const category = categories.value.find(c => c.id === currentId);
-    if (category) {
-      path.unshift(category.name);
-      currentId = category.parentId;
-    } else {
-      break;
+const flattenCategoryTree = (nodes: any[], level: number = 0, result: { category: Category, level: number, hasChildren: boolean }[] = []) => {
+  for (const node of nodes) {
+    const hasChildren = node.children && node.children.length > 0;
+    result.push({
+      category: node,
+      level,
+      hasChildren
+    });
+    if (hasChildren) {
+      flattenCategoryTree(node.children, level + 1, result);
     }
   }
-  return path.join(' > ');
+  return result;
 };
 
 const displayCategories = computed(() => {
-  return categories.value.map(c => ({
-    ...c,
-    fullName: getCategoryPath(c.id)
-  }));
+  const tree = buildCategoryTree(categories.value, null);
+  return flattenCategoryTree(tree);
+});
+
+const filteredCategories = computed(() => {
+  if (query.value === '') {
+    return displayCategories.value;
+  }
+  
+  const search = query.value.toLowerCase();
+  // When searching, we keep it hierarchical but filter nodes.
+  // Actually, for search, a flat list might be easier to use, but let's try to keep the indentation logic.
+  return displayCategories.value.filter(item => 
+    item.category.name.toLowerCase().includes(search) || 
+    (item.category.description && item.category.description.toLowerCase().includes(search))
+  );
 });
 
 
