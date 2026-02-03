@@ -141,11 +141,21 @@
                     </tr>
                     <tr v-else v-for="item in flattenedCategories" :key="item.category.id" class="group hover:bg-gray-50 transition-colors">
                         <td class="pl-4 pr-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
+                            <div class="flex items-center relative">
+                                <!-- Indentation Spacer -->
+                                <div :style="{ width: `${item.level * 32}px` }" class="flex-shrink-0 relative h-full">
+                                    <!-- Optional: Visual tree lines could go here if needed, but simple whitespace is cleaner for now -->
+                                     <div v-if="item.level > 0" class="absolute top-1/2 -left-[16px] w-[16px] h-px bg-gray-200"></div>
+                                     <div v-if="item.level > 0" class="absolute -top-1/2 -left-[16px] w-px h-full bg-gray-200"></div> 
+                                </div>
+
                                 <!-- Expand/Collapse or Spacer -->
-                                <button v-if="item.hasChildren" @click.stop="toggleExpand(item.category.id)" class="mr-2 p-1 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none flex-shrink-0">
-                                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'transform rotate-90': expandedIds.has(item.category.id) }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                                </button>
+                                <div class="w-6 h-6 mr-2 flex items-center justify-center flex-shrink-0">
+                                    <button v-if="item.hasChildren" @click.stop="toggleExpand(item.category.id)" class="p-0.5 rounded-md hover:bg-gray-200 text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none bg-gray-50 border border-gray-200">
+                                        <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'transform rotate-90': expandedIds.has(item.category.id) }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                     <div v-else class="w-2 h-2 rounded-full bg-gray-200 mx-auto"></div>
+                                </div>
 
                                 <!-- Image & Name Combined -->
                                 <div class="flex items-center gap-3">
