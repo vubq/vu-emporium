@@ -41,6 +41,7 @@
         "select": "Select",
         "edit": "Edit",
         "actions": "Actions",
+        "archived_suffix": "(ARCHIVED)",
         "status": "Status",
         "active": "Active",
         "inactive": "Inactive",

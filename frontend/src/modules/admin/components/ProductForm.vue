@@ -326,7 +326,7 @@
                                         >
                                             <li class="relative cursor-pointer select-none py-2.5 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
                                                 <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                    {{ category.fullName }}
+                                                    {{ category.fullName }} <span v-if="category.status === 'ARCHIVED'" class="text-red-500 text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
                                                 </span>
                                                 <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3" :class="{ 'text-white': active, 'text-indigo-600': !active }">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
@@ -880,6 +880,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { categoryApi } from '@/api/productApi';
+import { adminCategoryApi } from '@/api/adminCategoryApi';
 import type { Category } from '@/types/product';
 import { 
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
@@ -1275,7 +1276,7 @@ onMounted(async () => {
     isLoadingData.value = true;
     try {
         // 1. Fetch Categories
-        const res = await categoryApi.getCategories();
+        const res = await adminCategoryApi.getAllCategories();
         categories.value = res.data.data.content || res.data.data;
         
         // 2. Initialize Form Data

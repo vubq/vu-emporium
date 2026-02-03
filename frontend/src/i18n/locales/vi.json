@@ -41,6 +41,7 @@
         "select": "Chọn",
         "edit": "Chỉnh sửa",
         "actions": "Hành động",
+        "archived_suffix": "(LƯU TRỮ)",
         "status": "Trạng thái",
         "active": "Hoạt động",
         "inactive": "Ngừng hoạt động",
