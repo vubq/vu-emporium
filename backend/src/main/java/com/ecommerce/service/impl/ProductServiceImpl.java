@@ -96,6 +96,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findByFeaturedTrueAndStatus(ProductStatus.ACTIVE);
         return products.stream()
                 .map(this::convertToDTO)
+                .filter(dto -> !Boolean.TRUE.equals(dto.getDiscontinued()))
                 .collect(Collectors.toList());
     }
 
