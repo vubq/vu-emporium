@@ -294,49 +294,40 @@
                     <!-- Category -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('product.category') }}</label>
-                        <Combobox v-model="selectedCategory" nullable by="id" :disabled="submitting">
+                        <Listbox v-model="selectedCategory" :disabled="submitting">
                             <div class="relative mt-1">
-                                <div class="relative w-full text-left">
-                                    <ComboboxInput
-                                        class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                                        :displayValue="(category: any) => category?.fullName || category?.name"
-                                        @change="query = $event.target.value"
-                                        :placeholder="$t('admin.forms.product.search_category')"
-                                    />
-                                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <span class="block truncate font-medium" :class="selectedCategory ? 'text-gray-900' : 'text-gray-400'">
+                                        {{ selectedCategory ? (selectedCategory.fullName || selectedCategory.name) : $t('admin.forms.product.search_category') }}
+                                        <span v-if="selectedCategory?.status === 'ARCHIVED'" class="text-red-500 text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
+                                    </span>
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                                    </ComboboxButton>
-                                </div>
-                                <TransitionRoot
-                                    leave="transition ease-in duration-100"
-                                    leaveFrom="opacity-100"
-                                    leaveTo="opacity-0"
-                                    @after-leave="query = ''"
-                                >
-                                    <ComboboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                        <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700">
-                                            {{ $t('common.no_results') }}
-                                        </div>
-                                        <ComboboxOption
-                                            v-for="category in filteredCategories"
+                                    </span>
+                                </ListboxButton>
+                                <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <ListboxOption
+                                            v-for="category in displayCategories"
                                             :key="category.id"
                                             :value="category"
                                             as="template"
-                                            v-slot="{ selected, active }"
+                                            v-slot="{ active, selected }"
                                         >
-                                            <li class="relative cursor-pointer select-none py-2.5 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
-                                                <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                    {{ category.fullName }} <span v-if="category.status === 'ARCHIVED'" class="text-red-500 text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
+                                            <li :class="[active ? 'bg-indigo-600 text-white' : 'text-gray-900', 'relative cursor-pointer select-none py-2.5 pl-10 pr-4']">
+                                                <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">
+                                                    {{ category.fullName }} 
+                                                    <span v-if="category.status === 'ARCHIVED'" :class="active ? 'text-red-200' : 'text-red-500'" class="text-xs ml-2 font-bold">{{ $t('common.archived_suffix') }}</span>
                                                 </span>
                                                 <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3" :class="{ 'text-white': active, 'text-indigo-600': !active }">
                                                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                                                 </span>
                                             </li>
-                                        </ComboboxOption>
-                                    </ComboboxOptions>
-                                </TransitionRoot>
+                                        </ListboxOption>
+                                    </ListboxOptions>
+                                </transition>
                             </div>
-                        </Combobox>
+                        </Listbox>
                     </div>
                 </div>
             </div>
@@ -885,7 +876,7 @@ import type { Category } from '@/types/product';
 import { 
     Listbox, ListboxButton, ListboxOptions, ListboxOption,
     Switch, SwitchGroup, SwitchLabel,
-    Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot,
+    TransitionRoot,
     Dialog, DialogPanel, TransitionChild, DialogTitle
 } from '@headlessui/vue';
 import MediaManager from './MediaManager.vue';
@@ -902,7 +893,6 @@ const { t } = useI18n();
 
 const categories = ref<Category[]>([]);
 const hasVariants = ref(false);
-const query = ref('');
 const selectedCategory = ref<Category | null>(null);
 
 interface OptionInput {
@@ -1073,16 +1063,7 @@ const displayCategories = computed(() => {
   }));
 });
 
-const filteredCategories = computed(() =>
-  query.value === ''
-    ? displayCategories.value
-    : displayCategories.value.filter((category) =>
-        category.fullName
-          .toLowerCase()
-          .replace(/\s+/g, '')
-          .includes(query.value.toLowerCase().replace(/\s+/g, ''))
-      )
-);
+
 
 watch(selectedCategory, (newVal) => {
     form.categoryId = newVal ? newVal.id : null;
@@ -1286,9 +1267,11 @@ onMounted(async () => {
             
             if (props.initialData.category) {
                 form.categoryId = props.initialData.category.id;
-                selectedCategory.value = props.initialData.category;
+                // Find in displayCategories to ensure fullName is available
+                const found = displayCategories.value.find(c => c.id === props.initialData.category.id);
+                selectedCategory.value = found || props.initialData.category;
             } else if (form.categoryId) {
-                const found = categories.value.find(c => c.id === form.categoryId);
+                const found = displayCategories.value.find(c => c.id === form.categoryId);
                 if (found) selectedCategory.value = found;
             }
             
