@@ -12,9 +12,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findBySlug(String slug);
 
-    List<Category> findByParentIsNullAndActiveTrue();
+    List<Category> findByParentIsNullAndStatus(com.ecommerce.model.enums.CategoryStatus status);
 
-    List<Category> findByParentIdAndActiveTrue(Long parentId);
+    List<Category> findByParentIdAndStatus(Long parentId, com.ecommerce.model.enums.CategoryStatus status);
 
-    List<Category> findByActiveTrueOrderByDisplayOrderAsc();
+    List<Category> findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus status);
 }

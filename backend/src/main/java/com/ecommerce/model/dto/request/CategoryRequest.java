@@ -22,5 +22,5 @@ public class CategoryRequest {
 
     private Integer displayOrder;
 
-    private Boolean active;
+    private com.ecommerce.model.enums.CategoryStatus status;
 }

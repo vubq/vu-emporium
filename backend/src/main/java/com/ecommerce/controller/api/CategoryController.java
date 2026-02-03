@@ -22,7 +22,8 @@ public class CategoryController {
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<CategoryDTO>>> getAllCategories() {
-        List<Category> categories = categoryRepository.findByActiveTrueOrderByDisplayOrderAsc();
+        List<Category> categories = categoryRepository
+                .findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus.ACTIVE);
         List<CategoryDTO> categoryDTOs = categories.stream()
                 .map(cat -> convertToDTO(cat, false))
                 .collect(Collectors.toList());
@@ -48,7 +49,8 @@ public class CategoryController {
     @GetMapping("/root")
     @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<CategoryDTO>>> getRootCategories() {
-        List<Category> categories = categoryRepository.findByParentIsNullAndActiveTrue();
+        List<Category> categories = categoryRepository
+                .findByParentIsNullAndStatus(com.ecommerce.model.enums.CategoryStatus.ACTIVE);
         List<CategoryDTO> categoryDTOs = categories.stream()
                 .map(cat -> convertToDTO(cat, true))
                 .collect(Collectors.toList());
@@ -62,14 +64,14 @@ public class CategoryController {
                 .slug(category.getSlug())
                 .description(category.getDescription())
                 .imageUrl(category.getImageUrl())
-                .active(category.getActive())
+                .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
 
         if (includeChildren && category.getChildren() != null) {
             dto.setChildren(category.getChildren().stream()
-                    .filter(Category::getActive)
+                    .filter(c -> c.getStatus() == com.ecommerce.model.enums.CategoryStatus.ACTIVE)
                     .map(child -> convertToDTO(child, true))
                     .collect(Collectors.toList()));
         }

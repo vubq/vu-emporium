@@ -52,7 +52,8 @@ public class ProductServiceImpl implements ProductService {
     private List<Long> getAllCategoryIdsRecursive(Long categoryId) {
         List<Long> ids = new java.util.ArrayList<>();
         ids.add(categoryId);
-        List<Category> children = categoryRepository.findByParentIdAndActiveTrue(categoryId);
+        List<Category> children = categoryRepository.findByParentIdAndStatus(categoryId,
+                com.ecommerce.model.enums.CategoryStatus.ACTIVE);
         for (Category child : children) {
             ids.addAll(getAllCategoryIdsRecursive(child.getId()));
         }
@@ -406,7 +407,7 @@ public class ProductServiceImpl implements ProductService {
                 .slug(category.getSlug())
                 .description(category.getDescription())
                 .imageUrl(category.getImageUrl())
-                .active(category.getActive())
+                .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();

@@ -30,7 +30,9 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0);
-        category.setActive(request.getActive() != null ? request.getActive() : true);
+        // Default to DRAFT if not provided
+        category.setStatus(
+                request.getStatus() != null ? request.getStatus() : com.ecommerce.model.enums.CategoryStatus.DRAFT);
 
         category.setSlug(generateSlug(request.getName()));
 
@@ -51,16 +53,20 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder());
-        category.setActive(request.getActive());
 
-        // Update slug if name changes or keep existing? Usually update if needed, but
-        // risky for SEO.
-        // For now, let's update slug if name changes significantly, or just keep it
-        // simple and update always for consistency in admin panel behavior logic
-        // requests
-        // A better approach is to only update slug if explicitly requested or if it's a
-        // new entity.
-        // But here we'll update it to match the name.
+        if (request.getStatus() != null) {
+            // Validate functionality: If already ACTIVE or ARCHIVED, cannot switch to DRAFT
+            if (request.getStatus() == com.ecommerce.model.enums.CategoryStatus.DRAFT) {
+                if (category.getStatus() == com.ecommerce.model.enums.CategoryStatus.ACTIVE ||
+                        category.getStatus() == com.ecommerce.model.enums.CategoryStatus.ARCHIVED) {
+                    throw new com.ecommerce.exception.BadRequestException(
+                            "Cannot change status from " + category.getStatus() + " to DRAFT");
+                }
+            }
+            category.setStatus(request.getStatus());
+        }
+
+        // Update slug if name changes
         if (!category.getName().equals(request.getName())) {
             category.setSlug(generateSlug(request.getName()));
         }
@@ -78,10 +84,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category", "id", id);
+        Category category = getCategoryById(id);
+
+        // Only allow deleting DRAFT categories (or ARCHIVED if policy allows)
+        if (category.getStatus() == com.ecommerce.model.enums.CategoryStatus.ACTIVE) {
+            throw new com.ecommerce.exception.BadRequestException(
+                    "Cannot delete ACTIVE category. Please archive it first or change status to DRAFT.");
         }
-        // Potential check for products or subcategories here
+
         categoryRepository.deleteById(id);
     }
 
@@ -93,12 +103,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll(); // Should probably use a sort order
+        return categoryRepository.findAll();
     }
 
     @Override
     public List<Category> getActiveCategories() {
-        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc();
+        return categoryRepository.findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus.ACTIVE);
     }
 
     private String generateSlug(String input) {

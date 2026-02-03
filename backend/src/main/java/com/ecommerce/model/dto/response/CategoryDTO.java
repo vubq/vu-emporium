@@ -15,7 +15,7 @@ public class CategoryDTO {
     private String slug;
     private String description;
     private String imageUrl;
-    private Boolean active;
+    private com.ecommerce.model.enums.CategoryStatus status;
     private Integer displayOrder;
     private Long parentId;
     private java.util.List<CategoryDTO> children;

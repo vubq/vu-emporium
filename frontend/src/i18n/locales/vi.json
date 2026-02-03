@@ -210,7 +210,8 @@
                 "search_placeholder": "Tên danh mục...",
                 "loading": "Đang tải danh mục...",
                 "no_results": "Không tìm thấy danh mục nào",
-                "no_results_desc": "Thử điều chỉnh truy vấn tìm kiếm của bạn."
+                "no_results_desc": "Thử điều chỉnh truy vấn tìm kiếm của bạn.",
+                "delete_draft_only": "Chỉ có thể xóa danh mục ở trạng thái BẢN NHÁP."
             },
             "media": {
                 "new_folder": "Thư mục mới",
@@ -336,7 +337,7 @@
                 "image": "Hình ảnh danh mục",
                 "organization": "Tổ chức",
                 "status": "Trạng thái",
-                "status_desc": "Bật hoặc tắt danh mục",
+                "status_desc": "Trạng thái vòng đời hiện tại của danh mục",
                 "parent_category": "Danh mục cha",
                 "display_order": "Thứ tự hiển thị",
                 "root": "Không có (Gốc)",

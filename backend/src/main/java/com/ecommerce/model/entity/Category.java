@@ -52,9 +52,10 @@ public class Category {
     @Builder.Default
     private List<Category> children = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     @Builder.Default
-    private Boolean active = true;
+    private com.ecommerce.model.enums.CategoryStatus status = com.ecommerce.model.enums.CategoryStatus.DRAFT;
 
     @Column(nullable = false)
     @Builder.Default

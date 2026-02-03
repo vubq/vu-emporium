@@ -210,7 +210,8 @@
                 "search_placeholder": "Category name...",
                 "loading": "Loading categories...",
                 "no_results": "No categories found",
-                "no_results_desc": "Try adjusting your search query."
+                "no_results_desc": "Try adjusting your search query.",
+                "delete_draft_only": "Only DRAFT categories can be deleted."
             },
             "media": {
                 "new_folder": "New Folder",
@@ -336,7 +337,7 @@
                 "image": "Category Image",
                 "organization": "Organization",
                 "status": "Active Status",
-                "status_desc": "Enable or disable category",
+                "status_desc": "Current lifecycle status of the category",
                 "parent_category": "Parent Category",
                 "display_order": "Display Order",
                 "root": "None (Root)",

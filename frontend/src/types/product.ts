@@ -65,7 +65,7 @@ export interface Category {
     description?: string;
     imageUrl?: string;
     parentId?: number;
-    active: boolean;
+    status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
     displayOrder: number;
     children?: Category[];
 }

@@ -58,7 +58,7 @@ public class AdminCategoryController {
                 .slug(category.getSlug())
                 .description(category.getDescription())
                 .imageUrl(category.getImageUrl())
-                .active(category.getActive())
+                .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
