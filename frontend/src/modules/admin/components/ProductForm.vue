@@ -57,8 +57,11 @@
             
             <div class="space-y-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.name') }}</label>
-                  <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.name_placeholder')" :disabled="submitting" />
+                  <I18nFieldTabs v-model="form.translations" field="name" :label="$t('common.name')">
+                      <template #default="{ value, updateValue }">
+                          <input :value="value" @input="(e: any) => updateValue(e.target.value)" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.name_placeholder')" :disabled="submitting" />
+                      </template>
+                  </I18nFieldTabs>
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.slug') }}</label>
@@ -70,8 +73,11 @@
                    <input v-model="form.brand" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.brand_placeholder')" :disabled="submitting" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.description') }}</label>
-                  <textarea v-model="form.description" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="submitting"></textarea>
+                  <I18nFieldTabs v-model="form.translations" field="description" :label="$t('common.description')">
+                      <template #default="{ value, updateValue }">
+                          <textarea :value="value" @input="(e: any) => updateValue(e.target.value)" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="submitting"></textarea>
+                      </template>
+                  </I18nFieldTabs>
                 </div>
             </div>
             
@@ -86,16 +92,25 @@
             
             <div class="space-y-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_title') }}</label>
-                  <input v-model="form.metaTitle" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_title')" :disabled="submitting" />
+                  <I18nFieldTabs v-model="form.translations" field="metaTitle" :label="$t('admin.forms.product.meta_title')">
+                      <template #default="{ value, updateValue }">
+                          <input :value="value" @input="(e: any) => updateValue(e.target.value)" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_title')" :disabled="submitting" />
+                      </template>
+                  </I18nFieldTabs>
                 </div>
                 <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_description') }}</label>
-                   <textarea v-model="form.metaDescription" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_description')" :disabled="submitting"></textarea>
+                   <I18nFieldTabs v-model="form.translations" field="metaDescription" :label="$t('admin.forms.product.meta_description')">
+                       <template #default="{ value, updateValue }">
+                           <textarea :value="value" @input="(e: any) => updateValue(e.target.value)" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_description')" :disabled="submitting"></textarea>
+                       </template>
+                   </I18nFieldTabs>
                 </div>
                  <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.meta_keywords') }}</label>
-                   <input v-model="form.metaKeywords" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_keywords_placeholder')" :disabled="submitting" />
+                   <I18nFieldTabs v-model="form.translations" field="metaKeywords" :label="$t('admin.forms.product.meta_keywords')">
+                       <template #default="{ value, updateValue }">
+                           <input :value="value" @input="(e: any) => updateValue(e.target.value)" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :placeholder="$t('admin.forms.product.seo_keywords_placeholder')" :disabled="submitting" />
+                       </template>
+                   </I18nFieldTabs>
                 </div>
             </div>
           </div>
@@ -309,7 +324,7 @@
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
                                             </div>
                                             <span class="block truncate font-medium text-gray-900">
-                                                {{ selectedCategory.name }}
+                                                {{ getLocalizedValue(selectedCategory.translations, selectedCategory.name, 'name') }}
                                                 <span v-if="selectedCategory.status === 'ARCHIVED'" class="text-red-500 text-[10px] ml-1 font-bold uppercase tracking-tight">({{ $t('common.archived') }})</span>
                                                 <span v-else-if="selectedCategory.status === 'DRAFT'" class="text-yellow-600 text-[10px] ml-1 font-bold uppercase tracking-tight">({{ $t('common.draft') }})</span>
                                             </span>
@@ -358,7 +373,7 @@
 
                                                     <div class="flex items-center min-w-0">
                                                         <span :class="[selected ? 'font-bold text-indigo-600' : 'font-medium text-gray-700', active ? 'text-indigo-900' : '', 'truncate text-sm transition-colors']">
-                                                            {{ item.category.name }}
+                                                            {{ getLocalizedValue(item.category.translations, item.category.name, 'name') }}
                                                         </span>
                                                         <span v-if="item.category.status === 'ARCHIVED'" class="text-[10px] uppercase tracking-wider font-bold text-red-500 ml-2">
                                                             ({{ $t('common.archived') }})
@@ -929,6 +944,7 @@ import {
     TransitionRoot,
     Dialog, DialogPanel, TransitionChild, DialogTitle
 } from '@headlessui/vue';
+import I18nFieldTabs from '@/components/common/I18nFieldTabs.vue';
 import MediaManager from './MediaManager.vue';
 import AppImage from '@/components/common/AppImage.vue';
 
@@ -1077,7 +1093,9 @@ watch(() => props.initialData, (newVal) => {
              height: 0,
              metaTitle: '',
              metaDescription: '',
-             metaKeywords: ''
+             metaKeywords: '',
+    hasVariants: false,
+    translations: {} as Record<string, any>
         });
         hasVariants.value = false;
         options.value = [];
@@ -1598,10 +1616,27 @@ function getStatusLabel(status: string) {
     return label === key ? status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ') : label;
 }
 
+const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
+    if (!translations) return defaultValue;
+    // @ts-ignore
+    const currentLang = t.locale?.value || 'vi'; 
+    return translations[currentLang]?.[field] || defaultValue;
+};
+
 
 function submitForm() {
     submitting.value = true;
     try {
+        // Sync primary language (vi) to root fields for backend compatibility/validation
+        if (form.translations?.vi) {
+            const vi = form.translations.vi;
+            if (vi.name) form.name = vi.name;
+            if (vi.description) form.description = vi.description;
+            if (vi.metaTitle) form.metaTitle = vi.metaTitle;
+            if (vi.metaDescription) form.metaDescription = vi.metaDescription;
+            if (vi.metaKeywords) form.metaKeywords = vi.metaKeywords;
+        }
+
         const payload = {
             ...form,
             hasVariants: hasVariants.value,

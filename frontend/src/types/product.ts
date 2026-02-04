@@ -57,6 +57,7 @@ export interface Product {
     totalSales?: number;
 
     isDiscontinued?: boolean;
+    translations?: Record<string, Record<string, string>>;
 }
 
 export interface Category {
@@ -69,4 +70,5 @@ export interface Category {
     status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED';
     displayOrder: number;
     children?: Category[];
+    translations?: Record<string, Record<string, string>>;
 }

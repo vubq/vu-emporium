@@ -39,19 +39,25 @@
                  {{ $t('admin.forms.category.general_info') }}
              </h3>
              <div class="space-y-4">
-                 <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.category_name') }}</label>
-                   <input v-model="formData.name" type="text" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.manage.categories.search_placeholder')" :disabled="loading" />
-                 </div>
+                  <div>
+                    <I18nFieldTabs v-model="formData.translations" field="name" :label="$t('admin.forms.category.category_name')">
+                        <template #default="{ value, updateValue }">
+                            <input :value="value" @input="(e: any) => updateValue(e.target.value)" type="text" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.manage.categories.search_placeholder')" :disabled="loading" />
+                        </template>
+                    </I18nFieldTabs>
+                  </div>
                  <div>
                    <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('common.slug') }}</label>
                    <input v-model="formData.slug" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400 bg-gray-50 font-mono text-sm" :placeholder="$t('common.slug_placeholder')" :disabled="loading" />
                    <p class="text-xs text-gray-400 mt-1">{{ $t('common.slug_help') }}</p>
                  </div>
-                 <div>
-                   <label class="block text-sm font-semibold text-gray-700 mb-1">{{ $t('admin.forms.category.description') }}</label>
-                   <textarea v-model="formData.description" rows="4" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="loading"></textarea>
-                 </div>
+                  <div>
+                    <I18nFieldTabs v-model="formData.translations" field="description" :label="$t('admin.forms.category.description')">
+                        <template #default="{ value, updateValue }">
+                            <textarea :value="value" @input="(e: any) => updateValue(e.target.value)" rows="4" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.description_placeholder')" :disabled="loading"></textarea>
+                        </template>
+                    </I18nFieldTabs>
+                  </div>
              </div>
            </div>
  
@@ -139,8 +145,8 @@
                                               </li>
                                           </ListboxOption>
                                           <ListboxOption v-for="cat in parentCategories" :key="cat.id" :value="cat.id" as="template" v-slot="{ active, selected }">
-                                              <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-4 pr-4']">
-                                                  <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ cat.name }}</span>
+                                          <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-4 pr-4']">
+                                                  <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ getLocalizedValue(cat.translations, cat.name, 'name') }}</span>
                                               </li>
                                           </ListboxOption>
                                       </ListboxOptions>
@@ -177,8 +183,9 @@
  import { 
      Listbox, ListboxButton, ListboxOptions, ListboxOption
  } from '@headlessui/vue';
+ import I18nFieldTabs from '@/components/common/I18nFieldTabs.vue';
  
- const { t } = useI18n();
+ const { t, locale } = useI18n();
  
  const props = defineProps<{
     initialData?: Category | null;
@@ -199,7 +206,8 @@
      imageUrl: '',
      parentId: null as number | null,
      displayOrder: 0,
-     status: 'DRAFT'
+     status: 'DRAFT',
+     translations: {} as Record<string, any>
  });
  
  const isEdit = computed(() => !!props.initialData);
@@ -212,8 +220,15 @@
  const getParentName = (id: number | null) => {
      if (!id) return t('admin.forms.category.root');
      const parent = props.categories.find(c => c.id === id);
-     return parent ? parent.name : t('common.unknown');
+     return parent ? getLocalizedValue(parent.translations, parent.name, 'name') : t('common.unknown');
  };
+
+ const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
+    if (!translations) return defaultValue;
+    // @ts-ignore
+    const currentLang = t.locale?.value || 'vi'; 
+    return translations[currentLang]?.[field] || defaultValue;
+};
  
  const getStatusLabel = (status: string) => {
      switch (status) {
@@ -234,7 +249,8 @@ watch(() => props.initialData, (newVal) => {
              imageUrl: newVal.imageUrl || '',
              parentId: null, 
              displayOrder: newVal.displayOrder || 0,
-             status: newVal.status
+             status: newVal.status,
+             translations: newVal.translations || {}
          };
          // If editing existing, assume slug is settled.
      } else {
@@ -245,11 +261,11 @@ watch(() => props.initialData, (newVal) => {
              imageUrl: '',
              parentId: null,
              displayOrder: 0,
-             status: 'DRAFT'
+             status: 'DRAFT',
+             translations: {}
          };
         }
     }, { immediate: true });
-
  
  const openMediaManager = () => {
      showMediaManager.value = true;
@@ -275,6 +291,11 @@ watch(() => props.initialData, (newVal) => {
 });
  
  const submitForm = () => {
+      // Sync primary language (vi) to root fields for backend compatibility/validation
+      if (formData.value.translations?.vi) {
+          if (formData.value.translations.vi.name) formData.value.name = formData.value.translations.vi.name;
+          if (formData.value.translations.vi.description) formData.value.description = formData.value.translations.vi.description;
+      }
       emit('submit', formData.value);
   };
   </script>

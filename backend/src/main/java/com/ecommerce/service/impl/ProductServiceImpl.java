@@ -192,7 +192,10 @@ public class ProductServiceImpl implements ProductService {
         product.setHeight(request.getHeight());
         product.setMetaTitle(request.getMetaTitle());
         product.setMetaDescription(request.getMetaDescription());
+        product.setMetaTitle(request.getMetaTitle());
+        product.setMetaDescription(request.getMetaDescription());
         product.setMetaKeywords(request.getMetaKeywords());
+        product.setTranslations(request.getTranslations());
         // ------------------------
 
         // Slug generation
@@ -352,7 +355,9 @@ public class ProductServiceImpl implements ProductService {
                 // ----------------
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
-                .hasVariants(product.getHasVariants());
+                .updatedAt(product.getUpdatedAt())
+                .hasVariants(product.getHasVariants())
+                .translations(product.getTranslations());
 
         if (Boolean.TRUE.equals(product.getHasVariants())) {
             // Filter only ACTIVE options and variants

@@ -41,7 +41,7 @@
                             <div class="relative w-full text-left">
                                 <ComboboxInput
                                     class="w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
-                                    :displayValue="(category: any) => category?.name"
+                                    :displayValue="(category: any) => getLocalizedValue(category?.translations, category?.name, 'name')"
                                     @change="query = $event.target.value"
                                     :placeholder="$t('admin.manage.products.all_categories')"
                                 />
@@ -73,7 +73,7 @@
                                     >
                                         <li class="relative cursor-pointer select-none py-2 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
                                             <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">
-                                                {{ category.name }}
+                                                {{ getLocalizedValue(category.translations, category.name, 'name') }}
                                             </span>
                                             <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3" :class="{ 'text-white': active, 'text-indigo-600': !active }">
                                                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
@@ -237,8 +237,8 @@
                              />
                         </div>
                         <div class="ml-4">
-                        <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ product.name }}</div>
-                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-[200px] mt-0.5">{{ product.description || $t('product.no_description') }}</div>
+                        <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ getLocalizedValue(product.translations, product.name, 'name') }}</div>
+                        <div class="text-xs text-gray-500 hidden sm:block truncate max-w-[200px] mt-0.5">{{ getLocalizedValue(product.translations, product.description, 'description') || $t('product.no_description') }}</div>
                         </div>
                     </div>
                     </td>
@@ -252,8 +252,8 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         <div v-if="product.category" class="flex items-center">
-                             <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
-                            {{ product.category.name }}
+                            <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
+                            {{ getLocalizedValue(product.category.translations, product.category.name, 'name') }}
                         </div>
                         <span v-else class="text-gray-400 italic text-xs">{{ $t('common.uncategorized') }}</span>
                     </td>
@@ -465,6 +465,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { adminProductApi, categoryApi } from '@/api/productApi';
 import type { Product, Category } from '@/types/product';
 import ProductForm from '../components/ProductForm.vue';
@@ -477,6 +478,7 @@ import {
     Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption
 } from '@headlessui/vue';
 
+const { t, locale } = useI18n();
 const products = ref<Product[]>([]);
 const loading = ref(false);
 const currentPage = ref(0);
@@ -507,7 +509,7 @@ const filteredCategories = computed(() =>
   query.value === ''
     ? categories.value
     : categories.value.filter((category) =>
-        category.name
+        getLocalizedValue(category.translations, category.name, 'name')
           .toLowerCase()
           .replace(/\s+/g, '')
           .includes(query.value.toLowerCase().replace(/\s+/g, ''))
@@ -579,6 +581,12 @@ const statusColor = (status: string | null) => {
         case 'ARCHIVED': return 'text-gray-600';
         default: return 'text-gray-700';
     }
+};
+
+const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
+    if (!translations) return defaultValue;
+    const currentLang = locale.value;
+    return translations[currentLang]?.[field] || defaultValue;
 };
 
 const openCreateModal = () => {

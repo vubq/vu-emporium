@@ -25,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0);
+        category.setTranslations(request.getTranslations());
         // Default to DRAFT if not provided
         category.setStatus(
                 request.getStatus() != null ? request.getStatus() : com.ecommerce.model.enums.CategoryStatus.DRAFT);
@@ -52,6 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder());
+        category.setTranslations(request.getTranslations());
 
         if (request.getStatus() != null) {
             // Validate functionality: If already ACTIVE or ARCHIVED, cannot switch to DRAFT

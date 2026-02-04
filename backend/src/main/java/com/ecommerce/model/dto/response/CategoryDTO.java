@@ -19,4 +19,5 @@ public class CategoryDTO {
     private Integer displayOrder;
     private Long parentId;
     private java.util.List<CategoryDTO> children;
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }

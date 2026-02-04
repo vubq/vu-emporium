@@ -57,4 +57,6 @@ public class ProductRequest {
     private List<ProductOptionRequest> options;
 
     private List<ProductVariantRequest> variants;
+
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }

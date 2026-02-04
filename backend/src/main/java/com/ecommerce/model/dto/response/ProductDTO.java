@@ -54,4 +54,6 @@ public class ProductDTO {
 
     // Status flag calculated recursively
     private Boolean discontinued;
+
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }

@@ -1,5 +1,6 @@
 package com.ecommerce.model.entity;
 
+import com.ecommerce.model.converter.JpaJsonConverter;
 import com.ecommerce.model.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "products")
@@ -120,6 +123,11 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductVariant> variants = new ArrayList<>();
+
+    @Convert(converter = JpaJsonConverter.class)
+    @Column(columnDefinition = "TEXT")
+    @Builder.Default
+    private Map<String, Map<String, String>> translations = new HashMap<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

@@ -167,14 +167,14 @@
                                         />
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.category.name }}</span>
+                                        <span class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ getLocalizedValue(item.category.translations, item.category.name, 'name') }}</span>
                                         <span class="text-xs text-gray-400 font-mono">{{ item.category.slug }}</span>
                                     </div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="text-sm text-gray-500 line-clamp-2 max-w-xs">{{ item.category.description || '-' }}</div>
+                            <div class="text-sm text-gray-500 line-clamp-2 max-w-xs">{{ getLocalizedValue(item.category.translations, item.category.description, 'description') || '-' }}</div>
                         </td>
                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono text-center">
                             {{ item.category.displayOrder }}
@@ -308,7 +308,7 @@ interface FlattenedCategory {
 }
 
 // State
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const categories = ref<Category[]>([]);
 const loading = ref(true);
 const submitting = ref(false);
@@ -479,6 +479,12 @@ const getStatusLabel = (status: string | null) => {
 const statusColor = (status: string | null) => {
     if (!status) return 'text-gray-700';
     return status === 'ACTIVE' ? 'text-green-600' : (status === 'DRAFT' ? 'text-yellow-600' : 'text-gray-600');
+};
+
+const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
+    if (!translations) return defaultValue;
+    const currentLang = locale.value;
+    return translations[currentLang]?.[field] || defaultValue;
 };
 
 // Lifecycle

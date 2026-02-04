@@ -25,4 +25,6 @@ public class CategoryRequest {
     private com.ecommerce.model.enums.CategoryStatus status;
 
     private String slug;
+
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }
