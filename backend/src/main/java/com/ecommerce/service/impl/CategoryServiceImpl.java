@@ -6,6 +6,7 @@ import com.ecommerce.model.entity.Category;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.service.interfaces.CategoryService;
 import lombok.RequiredArgsConstructor;
+import com.ecommerce.util.TranslationMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0);
-        category.setTranslations(request.getTranslations());
+        TranslationMapper.mapCategoryTranslations(category, request.getTranslations());
         // Default to DRAFT if not provided
         category.setStatus(
                 request.getStatus() != null ? request.getStatus() : com.ecommerce.model.enums.CategoryStatus.DRAFT);
@@ -53,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder());
-        category.setTranslations(request.getTranslations());
+        TranslationMapper.mapCategoryTranslations(category, request.getTranslations());
 
         if (request.getStatus() != null) {
             // Validate functionality: If already ACTIVE or ARCHIVED, cannot switch to DRAFT

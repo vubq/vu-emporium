@@ -1,6 +1,5 @@
 package com.ecommerce.model.entity;
 
-import com.ecommerce.model.converter.JpaJsonConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,9 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "categories")
@@ -64,10 +61,9 @@ public class Category {
     @Builder.Default
     private Integer displayOrder = 0;
 
-    @Convert(converter = JpaJsonConverter.class)
-    @Column(columnDefinition = "TEXT")
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Map<String, Map<String, String>> translations = new HashMap<>();
+    private List<CategoryTranslation> translations = new ArrayList<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

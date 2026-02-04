@@ -9,6 +9,7 @@ import com.ecommerce.model.enums.ProductStatus;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.interfaces.ProductService;
 import lombok.RequiredArgsConstructor;
+import com.ecommerce.util.TranslationMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -195,7 +196,7 @@ public class ProductServiceImpl implements ProductService {
         product.setMetaTitle(request.getMetaTitle());
         product.setMetaDescription(request.getMetaDescription());
         product.setMetaKeywords(request.getMetaKeywords());
-        product.setTranslations(request.getTranslations());
+        TranslationMapper.mapProductTranslations(product, request.getTranslations());
         // ------------------------
 
         // Slug generation
@@ -357,7 +358,7 @@ public class ProductServiceImpl implements ProductService {
                 .updatedAt(product.getUpdatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .hasVariants(product.getHasVariants())
-                .translations(product.getTranslations());
+                .translations(TranslationMapper.toProductMap(product.getTranslations()));
 
         if (Boolean.TRUE.equals(product.getHasVariants())) {
             // Filter only ACTIVE options and variants
@@ -438,6 +439,7 @@ public class ProductServiceImpl implements ProductService {
                 .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
+                .translations(TranslationMapper.toCategoryMap(category.getTranslations()))
                 .build();
     }
 

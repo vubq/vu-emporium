@@ -3,7 +3,6 @@ package com.ecommerce.controller.api.admin;
 import com.ecommerce.model.dto.request.ProductRequest;
 import com.ecommerce.model.dto.response.ApiResponse;
 import com.ecommerce.model.dto.response.ProductDTO;
-import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.interfaces.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.math.BigDecimal;
 public class AdminProductController {
 
     private final ProductService productService;
-    private final ProductRepository productRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductDTO>>> getAllProducts(

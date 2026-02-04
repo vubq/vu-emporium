@@ -5,6 +5,7 @@ import com.ecommerce.model.dto.response.ApiResponse;
 import com.ecommerce.model.dto.response.CategoryDTO;
 import com.ecommerce.model.entity.Category;
 import com.ecommerce.service.interfaces.CategoryService;
+import com.ecommerce.util.TranslationMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,7 @@ public class AdminCategoryController {
                 .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
+                .translations(TranslationMapper.toCategoryMap(category.getTranslations()))
                 .build();
 
         if (includeChildren && category.getChildren() != null) {

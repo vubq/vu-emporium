@@ -10,7 +10,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductSpecification {
