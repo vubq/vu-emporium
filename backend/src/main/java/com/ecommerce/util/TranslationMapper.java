@@ -1,9 +1,6 @@
 package com.ecommerce.util;
 
-import com.ecommerce.model.entity.Category;
-import com.ecommerce.model.entity.CategoryTranslation;
-import com.ecommerce.model.entity.Product;
-import com.ecommerce.model.entity.ProductTranslation;
+import com.ecommerce.model.entity.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,5 +111,80 @@ public class TranslationMapper {
 
         // 3. Remove orphaned translations
         product.getTranslations().removeIf(t -> !translationMap.containsKey(t.getLanguageCode()));
+    }
+
+    public static Map<String, Map<String, String>> toProductOptionMap(List<ProductOptionTranslation> translations) {
+        if (translations == null)
+            return new HashMap<>();
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (ProductOptionTranslation t : translations) {
+            Map<String, String> fields = new HashMap<>();
+            fields.put("name", t.getName());
+            map.put(t.getLanguageCode(), fields);
+        }
+        return map;
+    }
+
+    public static void mapProductOptionTranslations(ProductOption option,
+            Map<String, Map<String, String>> translationMap) {
+        if (translationMap == null)
+            return;
+
+        for (ProductOptionTranslation translation : option.getTranslations()) {
+            if (translationMap.containsKey(translation.getLanguageCode())) {
+                translation.setName(translationMap.get(translation.getLanguageCode()).get("name"));
+            }
+        }
+
+        for (Map.Entry<String, Map<String, String>> entry : translationMap.entrySet()) {
+            String langCode = entry.getKey();
+            if (option.getTranslations().stream().noneMatch(t -> t.getLanguageCode().equals(langCode))) {
+                option.getTranslations().add(ProductOptionTranslation.builder()
+                        .productOption(option)
+                        .languageCode(langCode)
+                        .name(entry.getValue().get("name"))
+                        .build());
+            }
+        }
+
+        option.getTranslations().removeIf(t -> !translationMap.containsKey(t.getLanguageCode()));
+    }
+
+    public static Map<String, Map<String, String>> toProductOptionValueMap(
+            List<ProductOptionValueTranslation> translations) {
+        if (translations == null)
+            return new HashMap<>();
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (ProductOptionValueTranslation t : translations) {
+            Map<String, String> fields = new HashMap<>();
+            fields.put("value", t.getValue());
+            map.put(t.getLanguageCode(), fields);
+        }
+        return map;
+    }
+
+    public static void mapProductOptionValueTranslations(ProductOptionValue value,
+            Map<String, Map<String, String>> translationMap) {
+        if (translationMap == null)
+            return;
+
+        for (ProductOptionValueTranslation translation : value.getTranslations()) {
+            if (translationMap.containsKey(translation.getLanguageCode())) {
+                translation.setValue(translationMap.get(translation.getLanguageCode()).get("value"));
+            }
+        }
+
+        for (Map.Entry<String, Map<String, String>> entry : translationMap.entrySet()) {
+            String langCode = entry.getKey();
+            if (value.getTranslations().stream().noneMatch(t -> t.getLanguageCode().equals(langCode))) {
+                value.getTranslations().add(ProductOptionValueTranslation.builder()
+                        .productOptionValue(value)
+                        .languageCode(langCode)
+                        .value(entry.getValue().get("value"))
+                        .build());
+            }
+        }
+
+        value.getTranslations().removeIf(t -> !translationMap.containsKey(t.getLanguageCode()));
     }
 }

@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductOptionRequest {
+public class ProductOptionValueRequest {
 
-    private List<ProductOptionValueRequest> values;
-
-    private java.util.Map<String, java.util.Map<String, String>> translations;
+    private Map<String, Map<String, String>> translations;
 }

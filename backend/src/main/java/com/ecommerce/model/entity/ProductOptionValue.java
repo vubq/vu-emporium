@@ -21,9 +21,6 @@ public class ProductOptionValue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String value;
-
     @Builder.Default
     private Integer position = 0;
 
@@ -38,4 +35,10 @@ public class ProductOptionValue {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private ProductOption productOption;
+
+    @OneToMany(mappedBy = "productOptionValue", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private java.util.List<ProductOptionValueTranslation> translations = new java.util.ArrayList<>();
 }

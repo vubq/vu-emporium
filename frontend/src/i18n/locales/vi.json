@@ -277,7 +277,9 @@
                 "option_name_placeholder": "vd: Màu sắc, Kích thước",
                 "option_values": "Giá trị (phân cách bằng dấu phẩy)",
                 "option_values_placeholder": "vd: Đỏ, Xanh, Vàng",
+                "option_value": "Giá trị",
                 "add_option": "Thêm tùy chọn khác",
+                "add_value": "Thêm giá trị",
                 "variant_table": {
                     "variant": "Biến thể",
                     "sku": "SKU",

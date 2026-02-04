@@ -189,16 +189,38 @@
                         </button>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ $t('admin.forms.product.option_name') }}</label>
-                                <input v-model="option.name" type="text" :placeholder="$t('admin.forms.product.option_name_placeholder')" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" :disabled="submitting" />
-                            </div>
+                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ $t('admin.forms.product.option_name') }}</label>
+                                 <I18nCompactInput 
+                                    v-model="option.translations" 
+                                    field="name" 
+                                    v-model:defaultValue="option.translations.vi.name" 
+                                    :placeholder="$t('admin.forms.product.option_name_placeholder')" 
+                                    :disabled="submitting" 
+                                 />
+                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{{ $t('admin.forms.product.option_values') }}</label>
-                                <input v-model="option.valuesInput" type="text" :placeholder="$t('admin.forms.product.option_values_placeholder')" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all" @change="processOptionValues(index)" :disabled="submitting" />
-                                <div class="mt-3 flex flex-wrap gap-2">
-                                    <span v-for="(val, vIdx) in option.values" :key="vIdx" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                        {{ val.value }}
-                                    </span>
+                                
+                                <div class="space-y-3">
+                                    <div v-for="(val, vIdx) in option.values" :key="vIdx" class="relative group/val flex items-start gap-2">
+                                        <div class="flex-grow">
+                                            <I18nCompactInput 
+                                               v-model="val.translations" 
+                                               field="value" 
+                                               v-model:defaultValue="val.translations.vi.value" 
+                                               :placeholder="`${$t('admin.forms.product.option_value')} ${vIdx + 1}`" 
+                                               :disabled="submitting" 
+                                            />
+                                        </div>
+                                        <button type="button" @click="removeValue(index, vIdx)" class="pt-2 text-gray-400 hover:text-red-500 transition-colors" :title="$t('common.delete')" :disabled="submitting">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+
+                                    <button type="button" @click="addValue(index)" class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors" :disabled="submitting">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                        {{ $t('admin.forms.product.add_value') }}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -945,6 +967,7 @@ import {
     Dialog, DialogPanel, TransitionChild, DialogTitle
 } from '@headlessui/vue';
 import I18nFieldTabs from '@/components/common/I18nFieldTabs.vue';
+import I18nCompactInput from '@/components/common/I18nCompactInput.vue';
 import MediaManager from './MediaManager.vue';
 import AppImage from '@/components/common/AppImage.vue';
 
@@ -963,8 +986,11 @@ const selectedCategory = ref<Category | null>(null);
 
 interface OptionInput {
   name: string;
-  valuesInput: string;
-  values: { value: string }[];
+  translations: Record<string, Record<string, string>>;
+  values: { 
+    value: string;
+    translations: Record<string, Record<string, string>>;
+  }[];
 }
 
 const options = ref<OptionInput[]>([]);
@@ -1059,11 +1085,43 @@ watch(() => props.initialData, (newVal) => {
         });
         hasVariants.value = newVal.hasVariants;
         if (newVal.options) {
-             options.value = newVal.options.map((opt: any) => ({
-                 name: opt.name,
-                 valuesInput: opt.values.map((v: any) => v.value).join(', '),
-                 values: opt.values
-             }));
+            options.value = newVal.options.map((opt: any) => {
+                const translations = opt.translations || {};
+                // If translations['vi'] is missing but o.name exists (legacy or DTO), use it
+                if (!translations['vi'] && opt.name) {
+                    translations['vi'] = { name: opt.name };
+                }
+                
+                return {
+                    name: translations['vi']?.name || '',
+                    translations: translations,
+                    values: opt.values.map((v: any) => {
+                        const vTranslations = v.translations || {};
+                        if (!vTranslations['vi'] && v.value) {
+                            vTranslations['vi'] = { value: v.value };
+                        }
+                        return {
+                            value: vTranslations['vi']?.value || '',
+                            translations: vTranslations
+                        };
+                    })
+                };
+            });
+        }
+        // Prepare data
+        const productData = JSON.parse(JSON.stringify(form));
+        
+        // Debug translations
+        console.log(' Submitting Product Data:', productData);
+        if (productData.options) {
+             productData.options.forEach((opt: any, idx: number) => {
+                 console.log(`Option ${idx}:`, opt.name, opt.translations);
+                 if (opt.values) {
+                     opt.values.forEach((val: any, vIdx: number) => {
+                         console.log(`  Value ${vIdx}:`, val.value, val.translations);
+                     });
+                 }
+             });
         }
         if (newVal.variants) {
             variants.value = JSON.parse(JSON.stringify(newVal.variants));
@@ -1355,15 +1413,27 @@ onMounted(async () => {
             if (props.initialData.hasVariants) {
                 hasVariants.value = true;
                 if (props.initialData.options) {
-                    options.value = props.initialData.options.map((opt: any) => ({
-                        name: opt.name,
-                        values: Array.isArray(opt.values) && typeof opt.values[0] === 'string' 
-                            ? opt.values.map((v: string) => ({ value: v }))
-                            : opt.values,
-                        valuesInput: Array.isArray(opt.values) 
-                            ? opt.values.map((v: any) => typeof v === 'string' ? v : v.value).join(', ') 
-                            : ''
-                    }));
+                    options.value = props.initialData.options.map((opt: any) => {
+                        const translations = opt.translations || {};
+                        if (!translations['vi'] && opt.name) {
+                            translations['vi'] = { name: opt.name };
+                        }
+                        return {
+                            name: translations['vi']?.name || '',
+                            translations: translations,
+                            values: Array.isArray(opt.values) ? opt.values.map((v: any) => {
+                                const vStr = typeof v === 'string' ? v : v.value;
+                                const vTranslations = v.translations || {};
+                                if (!vTranslations['vi'] && vStr) {
+                                    vTranslations['vi'] = { value: vStr };
+                                }
+                                return {
+                                    value: vTranslations['vi']?.value || '',
+                                    translations: vTranslations
+                                };
+                            }) : []
+                        };
+                    });
                 }
                 if (props.initialData.variants) {
                     variants.value = props.initialData.variants.map((v: any) => ({
@@ -1393,8 +1463,10 @@ onMounted(async () => {
 
     // Register watchers AFTER loading initial data
     watch(options, debounce(() => {
+        // Do NOT auto-update variants matrix if only translations changed
+        // This prevents cursor jumps and unnecessary re-renders
         if (hasVariants.value) {
-            updateVariantsMatrix();
+           updateVariantsMatrix();
         }
     }, 500), { deep: true });
 
@@ -1413,19 +1485,34 @@ onMounted(async () => {
 });
 
 function addOption() {
-    options.value.push({ name: '', valuesInput: '', values: [] });
+    options.value.push({ 
+        name: '', 
+        translations: {
+            vi: { name: '' }
+        },
+        values: [] 
+    });
 }
 
 function removeOption(index: number) {
     options.value.splice(index, 1);
 }
 
-function processOptionValues(index: number) {
-    const opt = options.value[index];
-    if (opt.valuesInput) {
-        opt.values = opt.valuesInput.split(',').map(s => ({ value: s.trim() })).filter(v => v.value);
-    }
+function addValue(optionIndex: number) {
+    options.value[optionIndex].values.push({
+        value: '',
+        translations: {
+            vi: { value: '' }
+        }
+    });
 }
+
+function removeValue(optionIndex: number, valueIndex: number) {
+    options.value[optionIndex].values.splice(valueIndex, 1);
+}
+
+// Ensure variants matrix updates when values change (length or content)
+// Watch logic already covers this via deep watch on 'options'
 
 // Debounce utility
 function debounce(fn: Function, delay: number) {
@@ -1439,7 +1526,7 @@ function debounce(fn: Function, delay: number) {
 
 function updateVariantsMatrix() {
     // 1. Prepare valid options
-    options.value.forEach((_, idx) => processOptionValues(idx));
+    // Filter out options with no name or no values to avoid generating useless variants
     const validOptions = options.value.filter(o => o.values && o.values.length > 0);
     
     if (validOptions.length === 0) {
@@ -1574,13 +1661,15 @@ function updateVariantsMatrix() {
         } else {
             // New Variant
               newVariants.push({
-                sku: `${form.sku || t('admin.manage.products.columns.sku')}-${combo.map((c: any) => c.value).join('-')}`,
+                sku: `${form.sku || t('admin.manage.products.columns.sku')}-${combo.map((c: any) => c.translations?.vi?.value || c.value).join('-')}`,
                 basePrice: form.basePrice,
                 salePrice: form.salePrice,
                 costPrice: form.costPrice,
                 stockQuantity: form.stockQuantity, 
                 images: [],
-                optionValues: combo.map((c: any) => ({ value: c.value }))
+                optionValues: combo.map((c: any) => ({ 
+                    value: c.translations?.vi?.value || c.value 
+                }))
             });
         }
     });
@@ -1643,8 +1732,10 @@ function submitForm() {
             // Filter empty strings from product images
             images: form.images.filter(img => img),
             options: hasVariants.value ? options.value.map(o => ({
-                name: o.name,
-                values: o.values.map(v => v.value)
+                translations: o.translations,
+                values: o.values.map(v => ({
+                    translations: v.translations
+                }))
             })) : [],
             variants: hasVariants.value ? variants.value.map(v => ({
                 ...v,

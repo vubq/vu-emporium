@@ -5,6 +5,8 @@ import com.ecommerce.model.dto.response.CategoryDTO;
 import com.ecommerce.model.dto.response.ProductDTO;
 import com.ecommerce.model.entity.Category;
 import com.ecommerce.model.entity.Product;
+import com.ecommerce.model.entity.ProductOptionTranslation;
+import com.ecommerce.model.entity.ProductOptionValueTranslation;
 import com.ecommerce.model.enums.ProductStatus;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.interfaces.ProductService;
@@ -62,13 +64,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+
+        // Debug Log
+        System.out.println("Fetching Product: " + product.getId());
+        if (product.getOptions() != null) {
+            product.getOptions().forEach(opt -> {
+                String viName = opt.getTranslations().stream()
+                        .filter(t -> "vi".equals(t.getLanguageCode()))
+                        .map(ProductOptionTranslation::getName)
+                        .findFirst().orElse("Unknown");
+                System.out.println(" Opt: " + viName + ", Trans Count: " + opt.getTranslations().size());
+                opt.getTranslations()
+                        .forEach(t -> System.out.println("  - " + t.getLanguageCode() + ": " + t.getName()));
+            });
+        }
+
         return convertToDTO(product);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDTO getStorefrontProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
@@ -81,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDTO getProductBySlug(String slug) {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "slug", slug));
@@ -93,6 +113,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductDTO> getFeaturedProducts() {
         List<Product> products = productRepository.findByFeaturedTrueAndStatus(ProductStatus.ACTIVE);
         return products.stream()
@@ -231,13 +252,18 @@ public class ProductServiceImpl implements ProductService {
         });
 
         for (com.ecommerce.model.dto.request.ProductOptionRequest optionReq : request.getOptions()) {
-            // Find existing option by name
+            String targetName = optionReq.getTranslations() != null && optionReq.getTranslations().get("vi") != null
+                    ? optionReq.getTranslations().get("vi").get("name")
+                    : "";
+
+            // Find existing option by 'vi' translation name
             com.ecommerce.model.entity.ProductOption option = product.getOptions().stream()
-                    .filter(o -> o.getName().equalsIgnoreCase(optionReq.getName()))
+                    .filter(o -> o.getTranslations().stream()
+                            .anyMatch(
+                                    t -> "vi".equals(t.getLanguageCode()) && t.getName().equalsIgnoreCase(targetName)))
                     .findFirst()
                     .orElseGet(() -> {
                         com.ecommerce.model.entity.ProductOption newOpt = new com.ecommerce.model.entity.ProductOption();
-                        newOpt.setName(optionReq.getName());
                         newOpt.setProduct(product);
                         product.getOptions().add(newOpt);
                         return newOpt;
@@ -248,29 +274,56 @@ public class ProductServiceImpl implements ProductService {
 
             // Merge Values for this option
             if (optionReq.getValues() != null) {
-                for (String valStr : optionReq.getValues()) {
+                for (com.ecommerce.model.dto.request.ProductOptionValueRequest valReq : optionReq.getValues()) {
+                    String targetVal = valReq.getTranslations() != null && valReq.getTranslations().get("vi") != null
+                            ? valReq.getTranslations().get("vi").get("value")
+                            : "";
+
                     com.ecommerce.model.entity.ProductOptionValue val = option.getValues().stream()
-                            .filter(v -> v.getValue().equalsIgnoreCase(valStr))
+                            .filter(v -> v.getTranslations().stream()
+                                    .anyMatch(t -> "vi".equals(t.getLanguageCode())
+                                            && t.getValue().equalsIgnoreCase(targetVal)))
                             .findFirst()
                             .orElseGet(() -> {
                                 com.ecommerce.model.entity.ProductOptionValue newVal = new com.ecommerce.model.entity.ProductOptionValue();
-                                newVal.setValue(valStr);
                                 newVal.setProductOption(option);
                                 option.getValues().add(newVal);
                                 return newVal;
                             });
 
                     // Reactivate value
-                    val.setStatus(ProductStatus.ACTIVE);
+                    val.setStatus(com.ecommerce.model.enums.ProductStatus.ACTIVE);
+
+                    // Map value translations
+                    TranslationMapper.mapProductOptionValueTranslations(val, valReq.getTranslations());
                 }
             }
+
+            // Map option translations
+            TranslationMapper.mapProductOptionTranslations(option, optionReq.getTranslations());
+
+            // Remove orphaned values
+            List<String> requestValueStrings = optionReq.getValues().stream()
+                    .map(vr -> vr.getTranslations() != null && vr.getTranslations().get("vi") != null
+                            ? vr.getTranslations().get("vi").get("value")
+                            : "")
+                    .toList();
+            option.getValues().removeIf(v -> {
+                String vViVal = v.getTranslations().stream()
+                        .filter(t -> "vi".equals(t.getLanguageCode()))
+                        .map(ProductOptionValueTranslation::getValue)
+                        .findFirst().orElse("");
+                return !requestValueStrings.contains(vViVal);
+            });
         }
 
         // 2. Merge Variants (Match by SKU, Soft Delete others)
         // First, mark all as ARCHIVED
         product.getVariants().forEach(v -> v.setStatus(ProductStatus.ARCHIVED));
 
-        if (request.getVariants() != null) {
+        if (request.getVariants() != null)
+
+        {
             for (com.ecommerce.model.dto.request.ProductVariantRequest variantReq : request.getVariants()) {
                 // Find existing variant by SKU
                 java.util.Optional<com.ecommerce.model.entity.ProductVariant> existingVariant = product.getVariants()
@@ -314,7 +367,9 @@ public class ProductServiceImpl implements ProductService {
             List<com.ecommerce.model.entity.ProductOption> options, String value) {
         for (com.ecommerce.model.entity.ProductOption option : options) {
             for (com.ecommerce.model.entity.ProductOptionValue ov : option.getValues()) {
-                if (ov.getValue().equals(value)) {
+                boolean match = ov.getTranslations().stream()
+                        .anyMatch(t -> "vi".equals(t.getLanguageCode()) && t.getValue().equals(value));
+                if (match) {
                     return java.util.Optional.of(ov);
                 }
             }
@@ -327,7 +382,6 @@ public class ProductServiceImpl implements ProductService {
                 .id(product.getId())
                 .name(product.getName())
                 .slug(product.getSlug())
-                .description(product.getDescription())
                 .description(product.getDescription())
                 .stockQuantity(product.getStockQuantity())
                 .sku(product.getSku())
@@ -364,12 +418,12 @@ public class ProductServiceImpl implements ProductService {
             // Filter only ACTIVE options and variants
             builder.options(product.getOptions().stream()
                     .filter(o -> o.getStatus() == ProductStatus.ACTIVE)
-                    .map(this::convertOptionToDTO)
-                    .collect(Collectors.toList()));
+                    .map(this::convertToOptionDTO)
+                    .toList());
             builder.variants(product.getVariants().stream()
                     .filter(v -> v.getStatus() == ProductStatus.ACTIVE)
                     .map(this::convertVariantToDTO)
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         // Calculate isDiscontinued recursively
@@ -389,19 +443,35 @@ public class ProductServiceImpl implements ProductService {
         return builder.build();
     }
 
-    private com.ecommerce.model.dto.response.ProductOptionDTO convertOptionToDTO(
+    private com.ecommerce.model.dto.response.ProductOptionDTO convertToOptionDTO(
             com.ecommerce.model.entity.ProductOption option) {
+        String viName = option.getTranslations().stream()
+                .filter(t -> "vi".equals(t.getLanguageCode()))
+                .map(ProductOptionTranslation::getName)
+                .findFirst().orElse("");
+
         return com.ecommerce.model.dto.response.ProductOptionDTO.builder()
                 .id(option.getId())
-                .name(option.getName())
-                // Filter only ACTIVE values
+                .name(viName)
+                .translations(TranslationMapper.toProductOptionMap(option.getTranslations()))
                 .values(option.getValues().stream()
-                        .filter(v -> v.getStatus() == ProductStatus.ACTIVE)
-                        .map(v -> com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
-                                .id(v.getId())
-                                .value(v.getValue())
-                                .build())
-                        .collect(Collectors.toList()))
+                        .filter(v -> v.getStatus() == com.ecommerce.model.enums.ProductStatus.ACTIVE)
+                        .map(this::convertToOptionValueDTO)
+                        .toList())
+                .build();
+    }
+
+    private com.ecommerce.model.dto.response.ProductOptionValueDTO convertToOptionValueDTO(
+            com.ecommerce.model.entity.ProductOptionValue value) {
+        String viVal = value.getTranslations().stream()
+                .filter(t -> "vi".equals(t.getLanguageCode()))
+                .map(ProductOptionValueTranslation::getValue)
+                .findFirst().orElse("");
+
+        return com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
+                .id(value.getId())
+                .value(viVal)
+                .translations(TranslationMapper.toProductOptionValueMap(value.getTranslations()))
                 .build();
     }
 
@@ -417,10 +487,7 @@ public class ProductServiceImpl implements ProductService {
                 .images(variant.getImages() != null ? new java.util.ArrayList<>(variant.getImages())
                         : new java.util.ArrayList<>())
                 .optionValues(variant.getOptionValues().stream()
-                        .map(v -> com.ecommerce.model.dto.response.ProductOptionValueDTO.builder()
-                                .id(v.getId())
-                                .value(v.getValue())
-                                .build())
+                        .map(this::convertToOptionValueDTO)
                         .collect(Collectors.toList()))
                 .build();
     }

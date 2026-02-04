@@ -277,7 +277,9 @@
                 "option_name_placeholder": "e.g. Color, Size",
                 "option_values": "Values (comma-separated)",
                 "option_values_placeholder": "e.g. Red, Blue, Yellow",
+                "option_value": "Option Value",
                 "add_option": "Add Another Option",
+                "add_value": "Add Value",
                 "variant_table": {
                     "variant": "Variant",
                     "sku": "SKU",

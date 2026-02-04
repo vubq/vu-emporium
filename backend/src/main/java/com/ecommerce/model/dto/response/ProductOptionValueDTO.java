@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductOptionValueDTO {
     private Long id;
-    private String value;
+    private String value; // Derived from translations
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductOptionDTO {
     private Long id;
-    private String name;
+    private String name; // Derived from translations
     private List<ProductOptionValueDTO> values;
+    private java.util.Map<String, java.util.Map<String, String>> translations;
 }
