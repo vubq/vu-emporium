@@ -311,6 +311,7 @@
                                             <span class="block truncate font-medium text-gray-900">
                                                 {{ selectedCategory.name }}
                                                 <span v-if="selectedCategory.status === 'ARCHIVED'" class="text-red-500 text-[10px] ml-1 font-bold uppercase tracking-tight">({{ $t('common.archived') }})</span>
+                                                <span v-else-if="selectedCategory.status === 'DRAFT'" class="text-yellow-600 text-[10px] ml-1 font-bold uppercase tracking-tight">({{ $t('common.draft') }})</span>
                                             </span>
                                         </template>
                                         <span v-else class="block truncate text-gray-400 font-medium">
@@ -355,12 +356,15 @@
                                                         <img :src="item.category.imageUrl" class="w-full h-full object-cover" />
                                                     </div>
 
-                                                    <div class="flex flex-col min-w-0">
-                                                        <span :class="[selected ? 'font-bold text-indigo-600' : 'font-medium text-gray-700', active ? 'text-indigo-900' : '', 'block truncate text-sm transition-colors']">
+                                                    <div class="flex items-center min-w-0">
+                                                        <span :class="[selected ? 'font-bold text-indigo-600' : 'font-medium text-gray-700', active ? 'text-indigo-900' : '', 'truncate text-sm transition-colors']">
                                                             {{ item.category.name }}
                                                         </span>
-                                                        <span v-if="item.category.status === 'ARCHIVED'" class="text-[10px] uppercase tracking-wider font-bold text-red-500">
-                                                            {{ $t('common.archived') }}
+                                                        <span v-if="item.category.status === 'ARCHIVED'" class="text-[10px] uppercase tracking-wider font-bold text-red-500 ml-2">
+                                                            ({{ $t('common.archived') }})
+                                                        </span>
+                                                        <span v-else-if="item.category.status === 'DRAFT'" class="text-[10px] uppercase tracking-wider font-bold text-yellow-600 ml-2">
+                                                            ({{ $t('common.draft') }})
                                                         </span>
                                                     </div>
 
