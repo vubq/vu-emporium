@@ -67,13 +67,19 @@ public class ProductSpecification {
                 predicates.add(cb.equal(cb.lower(root.get("brand")), brand.toLowerCase()));
             }
 
-            // Search (Name or Description)
+            // Search (Name or Description in Translations)
             if (StringUtils.hasText(search)) {
                 String searchPattern = "%" + search.toLowerCase() + "%";
-                Predicate namePredicate = cb.like(cb.lower(root.get("name")), searchPattern);
-                Predicate descPredicate = cb.like(cb.lower(root.get("description")),
-                        searchPattern);
+                Join<Product, com.ecommerce.model.entity.ProductTranslation> transJoin = root.join("translations",
+                        JoinType.LEFT);
+
+                Predicate namePredicate = cb.like(cb.lower(transJoin.get("name")), searchPattern);
+                Predicate descPredicate = cb.like(cb.lower(transJoin.get("description")), searchPattern);
+
+                // Ensure only searching in relevant languages if needed, but for now search ALL
+                // translations and distictify
                 predicates.add(cb.or(namePredicate, descPredicate));
+                query.distinct(true);
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

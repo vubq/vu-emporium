@@ -28,14 +28,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
-    private String name;
-
     @Column(unique = true, length = 200)
     private String slug;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
 
     @Column(nullable = false)
     @Builder.Default
@@ -93,15 +87,6 @@ public class Product {
     private Double length;
     private Double width;
     private Double height;
-
-    // SEO
-    @Column(length = 200)
-    private String metaTitle;
-
-    @Column(columnDefinition = "TEXT")
-    private String metaDescription;
-
-    private String metaKeywords;
 
     // Stats
     @Builder.Default

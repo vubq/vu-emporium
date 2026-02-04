@@ -174,8 +174,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void updateProductFromRequest(Product product, com.ecommerce.model.dto.request.ProductRequest request) {
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
         product.setStockQuantity(request.getStockQuantity());
         product.setSku(request.getSku());
 
@@ -212,18 +210,18 @@ public class ProductServiceImpl implements ProductService {
         product.setLength(request.getLength());
         product.setWidth(request.getWidth());
         product.setHeight(request.getHeight());
-        product.setMetaTitle(request.getMetaTitle());
-        product.setMetaDescription(request.getMetaDescription());
-        product.setMetaTitle(request.getMetaTitle());
-        product.setMetaDescription(request.getMetaDescription());
-        product.setMetaKeywords(request.getMetaKeywords());
+
         TranslationMapper.mapProductTranslations(product, request.getTranslations());
         // ------------------------
 
         // Slug generation
         String slug = request.getSlug();
         if (slug == null || slug.trim().isEmpty()) {
-            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
+            // Get name from 'vi' translation for slug generation
+            String viName = request.getTranslations() != null && request.getTranslations().containsKey("vi")
+                    ? request.getTranslations().get("vi").get("name")
+                    : "";
+            slug = com.ecommerce.util.SlugUtils.toSlug(viName);
         }
         product.setSlug(ensureUniqueSlug(slug, product.getId()));
     }
@@ -378,11 +376,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductDTO convertToDTO(Product product) {
+        String viName = "";
+        String viDesc = "";
+        String viMetaTitle = "";
+        String viMetaDesc = "";
+        String viMetaKeywords = "";
+
+        if (product.getTranslations() != null) {
+            var viTrans = product.getTranslations().stream()
+                    .filter(t -> "vi".equals(t.getLanguageCode()))
+                    .findFirst();
+            if (viTrans.isPresent()) {
+                viName = viTrans.get().getName();
+                viDesc = viTrans.get().getDescription();
+                viMetaTitle = viTrans.get().getMetaTitle();
+                viMetaDesc = viTrans.get().getMetaDescription();
+                viMetaKeywords = viTrans.get().getMetaKeywords();
+            }
+        }
+
         ProductDTO.ProductDTOBuilder builder = ProductDTO.builder()
                 .id(product.getId())
-                .name(product.getName())
+                .name(viName)
                 .slug(product.getSlug())
-                .description(product.getDescription())
+                .description(viDesc)
                 .stockQuantity(product.getStockQuantity())
                 .sku(product.getSku())
                 .category(convertCategoryToDTO(product.getCategory()))
@@ -401,9 +418,9 @@ public class ProductServiceImpl implements ProductService {
                 .length(product.getLength())
                 .width(product.getWidth())
                 .height(product.getHeight())
-                .metaTitle(product.getMetaTitle())
-                .metaDescription(product.getMetaDescription())
-                .metaKeywords(product.getMetaKeywords())
+                .metaTitle(viMetaTitle)
+                .metaDescription(viMetaDesc)
+                .metaKeywords(viMetaKeywords)
                 .averageRating(product.getAverageRating())
                 .reviewCount(product.getReviewCount())
                 .totalSales(product.getTotalSales())
@@ -497,11 +514,23 @@ public class ProductServiceImpl implements ProductService {
             return null;
         }
 
+        String viName = "";
+        String viDesc = "";
+        if (category.getTranslations() != null) {
+            var viTrans = category.getTranslations().stream()
+                    .filter(t -> "vi".equals(t.getLanguageCode()))
+                    .findFirst();
+            if (viTrans.isPresent()) {
+                viName = viTrans.get().getName();
+                viDesc = viTrans.get().getDescription();
+            }
+        }
+
         return CategoryDTO.builder()
                 .id(category.getId())
-                .name(category.getName())
+                .name(viName)
                 .slug(category.getSlug())
-                .description(category.getDescription())
+                .description(viDesc)
                 .imageUrl(category.getImageUrl())
                 .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())

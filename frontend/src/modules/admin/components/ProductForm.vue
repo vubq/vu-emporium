@@ -1716,16 +1716,6 @@ const getLocalizedValue = (translations: any, defaultValue: string, field: strin
 function submitForm() {
     submitting.value = true;
     try {
-        // Sync primary language (vi) to root fields for backend compatibility/validation
-        if (form.translations?.vi) {
-            const vi = form.translations.vi;
-            if (vi.name) form.name = vi.name;
-            if (vi.description) form.description = vi.description;
-            if (vi.metaTitle) form.metaTitle = vi.metaTitle;
-            if (vi.metaDescription) form.metaDescription = vi.metaDescription;
-            if (vi.metaKeywords) form.metaKeywords = vi.metaKeywords;
-        }
-
         const payload = {
             ...form,
             hasVariants: hasVariants.value,

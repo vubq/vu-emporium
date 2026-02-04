@@ -26,9 +26,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
         List<Product> findByFeaturedTrueAndStatus(ProductStatus status);
 
-        @Query("SELECT p FROM Product p WHERE " +
-                        "(LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-                        "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+        @Query("SELECT DISTINCT p FROM Product p JOIN p.translations t WHERE " +
+                        "(LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
                         "p.status = :status")
         Page<Product> searchProducts(@Param("keyword") String keyword,
                         @Param("status") ProductStatus status,

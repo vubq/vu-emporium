@@ -16,13 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductRequest {
 
-    @NotBlank(message = "Product name is required")
-    @Size(max = 200, message = "Product name must not exceed 200 characters")
-    private String name;
-
     private String slug;
-
-    private String description;
 
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock quantity must be non-negative")

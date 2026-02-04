@@ -53,11 +53,23 @@ public class AdminCategoryController {
     }
 
     private CategoryDTO convertToDTO(Category category, boolean includeChildren) {
+        String viName = "";
+        String viDesc = "";
+        if (category.getTranslations() != null) {
+            var viTrans = category.getTranslations().stream()
+                    .filter(t -> "vi".equals(t.getLanguageCode()))
+                    .findFirst();
+            if (viTrans.isPresent()) {
+                viName = viTrans.get().getName();
+                viDesc = viTrans.get().getDescription();
+            }
+        }
+
         CategoryDTO dto = CategoryDTO.builder()
                 .id(category.getId())
-                .name(category.getName())
+                .name(viName)
                 .slug(category.getSlug())
-                .description(category.getDescription())
+                .description(viDesc)
                 .imageUrl(category.getImageUrl())
                 .status(category.getStatus())
                 .displayOrder(category.getDisplayOrder())

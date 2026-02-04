@@ -22,8 +22,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public Category createCategory(CategoryRequest request) {
         Category category = new Category();
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0);
         TranslationMapper.mapCategoryTranslations(category, request.getTranslations());
@@ -33,7 +31,11 @@ public class CategoryServiceImpl implements CategoryService {
 
         String slug = request.getSlug();
         if (slug == null || slug.trim().isEmpty()) {
-            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
+            // Get name from 'vi' translation for slug generation
+            String viName = request.getTranslations() != null && request.getTranslations().containsKey("vi")
+                    ? request.getTranslations().get("vi").get("name")
+                    : "";
+            slug = com.ecommerce.util.SlugUtils.toSlug(viName);
         }
         category.setSlug(ensureUniqueSlug(slug, null));
 
@@ -50,8 +52,6 @@ public class CategoryServiceImpl implements CategoryService {
     public Category updateCategory(Long id, CategoryRequest request) {
         Category category = getCategoryById(id);
 
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
         category.setImageUrl(request.getImageUrl());
         category.setDisplayOrder(request.getDisplayOrder());
         TranslationMapper.mapCategoryTranslations(category, request.getTranslations());
@@ -71,7 +71,11 @@ public class CategoryServiceImpl implements CategoryService {
         // Update slug
         String slug = request.getSlug();
         if (slug == null || slug.trim().isEmpty()) {
-            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
+            // Get name from 'vi' translation for slug generation
+            String viName = request.getTranslations() != null && request.getTranslations().containsKey("vi")
+                    ? request.getTranslations().get("vi").get("name")
+                    : "";
+            slug = com.ecommerce.util.SlugUtils.toSlug(viName);
         }
         category.setSlug(ensureUniqueSlug(slug, id));
 

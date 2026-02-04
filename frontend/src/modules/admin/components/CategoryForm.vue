@@ -290,12 +290,7 @@ watch(() => props.initialData, (newVal) => {
     return statuses;
 });
  
- const submitForm = () => {
-      // Sync primary language (vi) to root fields for backend compatibility/validation
-      if (formData.value.translations?.vi) {
-          if (formData.value.translations.vi.name) formData.value.name = formData.value.translations.vi.name;
-          if (formData.value.translations.vi.description) formData.value.description = formData.value.translations.vi.description;
-      }
+  const submitForm = () => {
       emit('submit', formData.value);
   };
   </script>
