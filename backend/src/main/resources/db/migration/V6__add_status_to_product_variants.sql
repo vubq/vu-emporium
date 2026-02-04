@@ -1,2 +1,0 @@
-ALTER TABLE product_variants
-ADD COLUMN status VARCHAR(20) DEFAULT 'ACTIVE';
