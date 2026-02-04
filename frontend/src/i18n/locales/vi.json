@@ -50,7 +50,10 @@
         "error": "Đã xảy ra lỗi. Vui lòng thử lại.",
         "uncategorized": "Chưa phân loại",
         "unknown": "Không xác định",
-        "pagination_info": "Trang {current} / {total}"
+        "pagination_info": "Trang {current} / {total}",
+        "slug": "Đường dẫn (Slug)",
+        "slug_placeholder": "duong-dan-tuy-chinh",
+        "slug_help": "Để trống để tự động tạo từ tên"
     },
     "nav": {
         "all_products": "Tất cả sản phẩm",

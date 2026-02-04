@@ -23,4 +23,6 @@ public class CategoryRequest {
     private Integer displayOrder;
 
     private com.ecommerce.model.enums.CategoryStatus status;
+
+    private String slug;
 }

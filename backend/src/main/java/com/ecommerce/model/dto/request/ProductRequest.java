@@ -20,6 +20,8 @@ public class ProductRequest {
     @Size(max = 200, message = "Product name must not exceed 200 characters")
     private String name;
 
+    private String slug;
+
     private String description;
 
     @NotNull(message = "Stock quantity is required")

@@ -9,18 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.Normalizer;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
-    private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
 
     @Override
     @Transactional
@@ -34,7 +29,11 @@ public class CategoryServiceImpl implements CategoryService {
         category.setStatus(
                 request.getStatus() != null ? request.getStatus() : com.ecommerce.model.enums.CategoryStatus.DRAFT);
 
-        category.setSlug(generateSlug(request.getName()));
+        String slug = request.getSlug();
+        if (slug == null || slug.trim().isEmpty()) {
+            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
+        }
+        category.setSlug(ensureUniqueSlug(slug, null));
 
         if (request.getParentId() != null) {
             Category parent = getCategoryById(request.getParentId());
@@ -66,10 +65,12 @@ public class CategoryServiceImpl implements CategoryService {
             category.setStatus(request.getStatus());
         }
 
-        // Update slug if name changes
-        if (!category.getName().equals(request.getName())) {
-            category.setSlug(generateSlug(request.getName()));
+        // Update slug
+        String slug = request.getSlug();
+        if (slug == null || slug.trim().isEmpty()) {
+            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
         }
+        category.setSlug(ensureUniqueSlug(slug, id));
 
         if (request.getParentId() != null) {
             Category parent = getCategoryById(request.getParentId());
@@ -111,12 +112,20 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus.ACTIVE);
     }
 
-    private String generateSlug(String input) {
-        if (input == null)
+    private String ensureUniqueSlug(String slug, Long currentId) {
+        if (slug == null || slug.isEmpty())
             return "";
-        String nowhitespace = WHITESPACE.matcher(input).replaceAll("-");
-        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        String slug = NONLATIN.matcher(normalized).replaceAll("");
-        return slug.toLowerCase(Locale.ENGLISH);
+
+        String originalSlug = slug;
+        int counter = 1;
+
+        while (true) {
+            java.util.Optional<Category> existing = categoryRepository.findBySlug(slug);
+            if (existing.isEmpty() || (currentId != null && existing.get().getId().equals(currentId))) {
+                return slug;
+            }
+            slug = originalSlug + "-" + counter;
+            counter++;
+        }
     }
 }

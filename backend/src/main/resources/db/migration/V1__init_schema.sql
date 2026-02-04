@@ -28,7 +28,7 @@ CREATE TABLE admins (
 -- Create categories table
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) UNIQUE,
     description TEXT,
     image_url VARCHAR(500),

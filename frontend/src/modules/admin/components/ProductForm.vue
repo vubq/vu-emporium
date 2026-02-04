@@ -61,6 +61,11 @@
                   <input v-model="form.name" type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.name_placeholder')" :disabled="submitting" />
                 </div>
                 <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.slug') }}</label>
+                  <input v-model="form.slug" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400 bg-gray-50 font-mono text-sm" :placeholder="$t('common.slug_placeholder')" :disabled="submitting" />
+                   <p class="text-xs text-gray-400 mt-1">{{ $t('common.slug_help') }}</p>
+                </div>
+                <div>
                    <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('admin.forms.product.brand') }}</label>
                    <input v-model="form.brand" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400" :placeholder="$t('admin.forms.product.brand_placeholder')" :disabled="submitting" />
                 </div>
@@ -974,6 +979,7 @@ const submitting = ref(false);
 
 const form = reactive({
   name: '',
+  slug: '',
   description: '',
   stockQuantity: 0,
   sku: '',
@@ -1019,6 +1025,7 @@ watch(() => props.initialData, (newVal) => {
     if (newVal) {
         Object.assign(form, {
             ...newVal,
+            slug: newVal.slug || '',
             // Ensure zeros if null/undefined for numeric fields
 // ... (rest of watch)
             basePrice: newVal.basePrice || 0,
@@ -1048,6 +1055,7 @@ watch(() => props.initialData, (newVal) => {
         // Reset form
         Object.assign(form, {
              name: '',
+             slug: '',
              description: '',
              stockQuantity: 0,
              sku: '',

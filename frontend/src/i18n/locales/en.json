@@ -50,7 +50,10 @@
         "error": "An error occurred. Please try again.",
         "uncategorized": "Uncategorized",
         "unknown": "Unknown",
-        "pagination_info": "Page {current} of {total}"
+        "pagination_info": "Page {current} of {total}",
+        "slug": "URL Slug",
+        "slug_placeholder": "custom-url-slug",
+        "slug_help": "Leave empty to auto-generate from name"
     },
     "nav": {
         "all_products": "All Products",

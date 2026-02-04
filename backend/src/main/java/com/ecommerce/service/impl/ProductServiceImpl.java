@@ -195,12 +195,12 @@ public class ProductServiceImpl implements ProductService {
         product.setMetaKeywords(request.getMetaKeywords());
         // ------------------------
 
-        // Slug generation (simplistic)
-        if (product.getSlug() == null || !product.getName().equals(request.getName())) {
-            String baseSlug = request.getName().toLowerCase().replaceAll("[^a-z0-9]", "-").replaceAll("-+", "-");
-            // Add randomness or check unique in real app
-            product.setSlug(baseSlug + "-" + System.currentTimeMillis());
+        // Slug generation
+        String slug = request.getSlug();
+        if (slug == null || slug.trim().isEmpty()) {
+            slug = com.ecommerce.util.SlugUtils.toSlug(request.getName());
         }
+        product.setSlug(ensureUniqueSlug(slug, product.getId()));
     }
 
     private void handleProductOptionsAndVariants(Product product,
@@ -434,5 +434,22 @@ public class ProductServiceImpl implements ProductService {
                 .displayOrder(category.getDisplayOrder())
                 .parentId(category.getParent() != null ? category.getParent().getId() : null)
                 .build();
+    }
+
+    private String ensureUniqueSlug(String slug, Long currentId) {
+        if (slug == null || slug.isEmpty())
+            return "";
+
+        String originalSlug = slug;
+        int counter = 1;
+
+        while (true) {
+            java.util.Optional<Product> existing = productRepository.findBySlug(slug);
+            if (existing.isEmpty() || (currentId != null && existing.get().getId().equals(currentId))) {
+                return slug;
+            }
+            slug = originalSlug + "-" + counter;
+            counter++;
+        }
     }
 }
