@@ -139,7 +139,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr v-else v-for="item in flattenedCategories" :key="item.category.id" class="group hover:bg-gray-50 transition-colors">
+                    <tr v-else v-for="(item, index) in flattenedCategories" :key="item.category.id" class="group hover:bg-gray-50 transition-colors">
                         <td class="pl-4 pr-6 py-4 whitespace-nowrap">
                             <div class="flex items-center relative">
                                 <!-- Indentation Spacer -->
@@ -204,7 +204,12 @@
                                         </svg>
                                     </MenuButton>
                                     <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                                        <MenuItems class="absolute right-0 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100 z-50 mt-2 origin-top-right">
+                                        <MenuItems 
+                                            class="absolute right-0 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100"
+                                            :class="[
+                                                (Number(index) >= flattenedCategories.length - 3 && flattenedCategories.length > 4) ? 'bottom-full mb-2 origin-bottom-right' : 'mt-2 origin-top-right'
+                                            ]"
+                                        >
                                             <div class="py-1">
                                                     <button @click="openEditModal(item.category)" class="group flex items-center px-4 py-3 text-sm w-full text-left text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
                                                         <svg class="mr-3 h-4 w-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
