@@ -226,7 +226,7 @@
  const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
     if (!translations) return defaultValue;
     // @ts-ignore
-    const currentLang = t.locale?.value || 'vi'; 
+    const currentLang = locale.value || 'vi'; 
     return translations[currentLang]?.[field] || defaultValue;
 };
  

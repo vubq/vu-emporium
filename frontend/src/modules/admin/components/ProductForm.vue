@@ -978,7 +978,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit', 'cancel']);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const categories = ref<Category[]>([]);
 const hasVariants = ref(false);
@@ -1708,7 +1708,7 @@ function getStatusLabel(status: string) {
 const getLocalizedValue = (translations: any, defaultValue: string, field: string) => {
     if (!translations) return defaultValue;
     // @ts-ignore
-    const currentLang = t.locale?.value || 'vi'; 
+    const currentLang = locale.value || 'vi'; 
     return translations[currentLang]?.[field] || defaultValue;
 };
 
