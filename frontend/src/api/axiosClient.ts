@@ -11,7 +11,9 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         // Check if this is an admin route
-        const isAdminRoute = config.url?.startsWith('/admin') || config.url?.includes('/api/admin');
+        const isAdminRoute = config.url?.startsWith('/admin') ||
+            config.url?.includes('/api/admin') ||
+            config.url?.includes('/v1/admin');
 
         // Get appropriate token based on route (no fallback to prevent conflicts)
         let token = null;
@@ -44,7 +46,9 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
 
             // Check if this is an admin route
-            const isAdminRoute = originalRequest.url?.startsWith('/admin') || originalRequest.url?.includes('/api/admin');
+            const isAdminRoute = originalRequest.url?.startsWith('/admin') ||
+                originalRequest.url?.includes('/api/admin') ||
+                originalRequest.url?.includes('/v1/admin');
 
             if (isAdminRoute) {
                 // Handle admin token refresh

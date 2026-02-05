@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authApi } from '@/api/authApi';
 import type { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/auth';
+import { useI18nStore } from './i18nStore';
 
 export const useAuthStore = defineStore('auth', () => {
     const customer = ref<User | null>(null);
@@ -10,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAuthenticated = computed(() => !!customerToken.value);
     const isAdmin = computed(() => customer.value?.roles.includes('ROLE_ADMIN') ?? false);
+    const i18nStore = useI18nStore();
 
     function setAuthData(data: AuthResponse) {
         // Set customer data (keep admin tokens if they exist)
@@ -31,6 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
         // The i18n plugin will automatically load it on next page load
         if (data.user.preferredLanguage) {
             localStorage.setItem('customerLocale', data.user.preferredLanguage);
+            i18nStore.changeLanguage(data.user.preferredLanguage);
         }
     }
 

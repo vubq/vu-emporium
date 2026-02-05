@@ -1,29 +1,28 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useI18nStore } from '@/stores/i18nStore';
 
 interface Props {
   modelValue?: Record<string, Record<string, string>>;
   field: string;
   placeholder?: string;
-  defaultValue?: string; // The value of the default language (vi)
+  defaultValue?: string; // The value of the default language (code from store)
   disabled?: boolean;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue', 'update:defaultValue']);
 
-const locales = [
-  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-  { code: 'en', name: 'English', flag: '🇺🇸' }
-];
+const i18nStore = useI18nStore();
+const locales = computed(() => i18nStore.activeLanguages);
 
 // Local state for all translations
 const translations = ref<Record<string, string>>({});
 
 // Sync from props
 watch([() => props.modelValue, () => props.defaultValue], ([newVal, defaultVal]) => {
-  locales.forEach(loc => {
-    if (loc.code === 'vi') {
+  locales.value.forEach(loc => {
+    if (loc.code === i18nStore.defaultLanguage?.code) {
         translations.value[loc.code] = defaultVal || '';
     } else {
         const localeMap = newVal?.[loc.code] || {};
@@ -38,10 +37,10 @@ const updateValue = (locale: string, value: string) => {
   // Clone current structure
   const updatedTranslations = JSON.parse(JSON.stringify(props.modelValue || {}));
   
-  if (locale === 'vi') {
-      // Create/Update VI entry in translations map as well for consistency
-      if (!updatedTranslations['vi']) updatedTranslations['vi'] = {};
-      updatedTranslations['vi'][props.field] = value;
+  if (locale === i18nStore.defaultLanguage?.code) {
+      // Create/Update default entry in translations map as well for consistency
+      if (!updatedTranslations[locale]) updatedTranslations[locale] = {};
+      updatedTranslations[locale][props.field] = value;
       
       // Emit primary v-model:defaultValue update
       emit('update:defaultValue', value);

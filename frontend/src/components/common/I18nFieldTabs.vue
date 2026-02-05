@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+import { useI18nStore } from '@/stores/i18nStore';
 
 interface Props {
   modelValue: Record<string, Record<string, string>>;
@@ -12,10 +13,8 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue']);
 
-const locales = [
-  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-  { code: 'en', name: 'English', flag: '🇺🇸' }
-];
+const i18nStore = useI18nStore();
+const locales = computed(() => i18nStore.activeLanguages);
 
 // Local state for the specific field across languages
 const localTranslations = ref<Record<string, string>>({});

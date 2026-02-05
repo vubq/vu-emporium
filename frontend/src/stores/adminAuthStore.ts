@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import { useI18nStore } from './i18nStore';
 
 interface Admin {
     id: number;
@@ -22,6 +23,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
     const admin = ref<Admin | null>(storedAdmin ? JSON.parse(storedAdmin) : null);
     const token = ref<string | null>(localStorage.getItem('adminToken'));
     const isAuthenticated = ref<boolean>(!!token.value);
+    const i18nStore = useI18nStore();
 
     async function login(email: string, password: string) {
         try {
@@ -62,6 +64,7 @@ export const useAdminAuthStore = defineStore('adminAuth', () => {
             // The i18n plugin will automatically load it on next page load
             if (admin.value.preferredLanguage) {
                 localStorage.setItem('adminLocale', admin.value.preferredLanguage);
+                i18nStore.changeLanguage(admin.value.preferredLanguage);
             }
         } catch (error) {
             console.error('Failed to fetch admin info:', error);

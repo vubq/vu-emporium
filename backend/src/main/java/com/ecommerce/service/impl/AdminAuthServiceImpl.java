@@ -47,6 +47,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                                 .refreshToken(refreshToken)
                                 .tokenType("Bearer")
                                 .expiresIn(jwtService.getExpirationTime())
+                                .user(AuthResponse.UserInfo.builder()
+                                                .id(admin.getId())
+                                                .email(admin.getEmail())
+                                                .fullName(admin.getFullName())
+                                                .roles(new String[] { "ROLE_ADMIN" })
+                                                .preferredLanguage(admin.getPreferredLanguage())
+                                                .build())
                                 .build();
         }
 

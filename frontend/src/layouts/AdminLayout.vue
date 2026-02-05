@@ -164,7 +164,9 @@ import {
     ShoppingBagIcon, 
     UsersIcon, 
     PhotoIcon,
-    TagIcon
+    TagIcon,
+    GlobeAltIcon,
+    ChatBubbleLeftRightIcon
 } from '@heroicons/vue/24/outline';
 import LoadingBar from '@/components/common/LoadingBar.vue';
 import LanguageSelector from '@/components/common/LanguageSelector.vue';
@@ -184,7 +186,9 @@ const iconMap: Record<string, any> = {
     'ShoppingBagIcon': ShoppingBagIcon,
     'UsersIcon': UsersIcon,
     'PhotoIcon': PhotoIcon,
-    'TagIcon': TagIcon
+    'TagIcon': TagIcon,
+    'LanguageIcon': GlobeAltIcon,
+    'TranslateIcon': ChatBubbleLeftRightIcon
 };
 
 interface MenuItem {

@@ -146,6 +146,28 @@ const router = createRouter({
                         showInSidebar: true
                     },
                 },
+                {
+                    path: 'languages',
+                    name: 'admin-languages',
+                    component: () => import('@/modules/admin/pages/LanguageManagementPage.vue'),
+                    meta: {
+                        title: 'Languages',
+                        model: 'Settings',
+                        icon: 'LanguageIcon',
+                        showInSidebar: true
+                    },
+                },
+                {
+                    path: 'translations',
+                    name: 'admin-translations',
+                    component: () => import('@/modules/admin/pages/TranslationManagementPage.vue'),
+                    meta: {
+                        title: 'Translations',
+                        model: 'Settings',
+                        icon: 'TranslateIcon',
+                        showInSidebar: true
+                    },
+                },
             ],
         },
         // 404 Route
