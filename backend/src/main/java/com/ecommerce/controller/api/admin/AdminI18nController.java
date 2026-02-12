@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,8 +19,11 @@ public class AdminI18nController {
 
     // Language Management
     @GetMapping("/languages")
-    public ResponseEntity<List<Language>> getAllLanguages() {
-        return ResponseEntity.ok(languageService.getAllLanguages());
+    public ResponseEntity<org.springframework.data.domain.Page<Language>> getAllLanguages(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean status,
+            org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(languageService.getLanguages(search, status, pageable));
     }
 
     @PostMapping("/languages")
@@ -48,8 +50,10 @@ public class AdminI18nController {
 
     // Translation Management
     @GetMapping("/matrix")
-    public ResponseEntity<Map<String, Map<String, String>>> getTranslationMatrix() {
-        return ResponseEntity.ok(i18nService.getTranslationMatrix());
+    public ResponseEntity<org.springframework.data.domain.Page<com.ecommerce.model.dto.response.TranslationMatrixDTO>> getTranslationMatrix(
+            @RequestParam(required = false) String search,
+            org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(i18nService.getTranslationMatrix(pageable, search));
     }
 
     @PostMapping("/translations/{lang}")

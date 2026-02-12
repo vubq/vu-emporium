@@ -16,5 +16,6 @@ public interface I18nService {
 
     List<String> getAllTranslationKeys();
 
-    Map<String, Map<String, String>> getTranslationMatrix(); // key -> (lang -> value)
+    org.springframework.data.domain.Page<com.ecommerce.model.dto.response.TranslationMatrixDTO> getTranslationMatrix(
+            org.springframework.data.domain.Pageable pageable, String search); // key -> (lang -> value)
 }

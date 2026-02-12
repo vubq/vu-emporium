@@ -115,6 +115,27 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public org.springframework.data.domain.Page<Category> getAllCategories(
+            org.springframework.data.domain.Pageable pageable) {
+        return categoryRepository.findAll(pageable);
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<Category> getCategories(String search,
+            com.ecommerce.model.enums.CategoryStatus status, org.springframework.data.domain.Pageable pageable) {
+        if (search != null && !search.isEmpty() && status != null) {
+            return categoryRepository.findDistinctByTranslations_NameContainingIgnoreCaseAndStatus(search, status,
+                    pageable);
+        } else if (search != null && !search.isEmpty()) {
+            return categoryRepository.findDistinctByTranslations_NameContainingIgnoreCase(search, pageable);
+        } else if (status != null) {
+            return categoryRepository.findByStatus(status, pageable);
+        } else {
+            return categoryRepository.findAll(pageable);
+        }
+    }
+
+    @Override
     public List<Category> getActiveCategories() {
         return categoryRepository.findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus.ACTIVE);
     }

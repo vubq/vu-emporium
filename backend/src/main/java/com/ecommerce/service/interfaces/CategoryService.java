@@ -16,5 +16,10 @@ public interface CategoryService {
 
     List<Category> getAllCategories();
 
+    org.springframework.data.domain.Page<Category> getAllCategories(org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<Category> getCategories(String search,
+            com.ecommerce.model.enums.CategoryStatus status, org.springframework.data.domain.Pageable pageable);
+
     List<Category> getActiveCategories();
 }

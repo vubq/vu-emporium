@@ -18,5 +18,10 @@ public interface I18nTranslationRepository extends JpaRepository<I18nTranslation
 
     List<I18nTranslation> findAllByTranslationKey(String translationKey);
 
+    @org.springframework.data.jpa.repository.Query(value = "SELECT DISTINCT translation_key FROM i18n_translations WHERE (?1 IS NULL OR translation_key ILIKE CONCAT('%', ?1, '%'))", countQuery = "SELECT count(DISTINCT translation_key) FROM i18n_translations WHERE (?1 IS NULL OR translation_key ILIKE CONCAT('%', ?1, '%'))", nativeQuery = true)
+    org.springframework.data.domain.Page<String> findDistinctKeys(
+            String search,
+            org.springframework.data.domain.Pageable pageable);
+
     void deleteAllByTranslationKey(String translationKey);
 }

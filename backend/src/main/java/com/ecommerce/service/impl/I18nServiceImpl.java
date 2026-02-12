@@ -93,15 +93,36 @@ public class I18nServiceImpl implements I18nService {
     }
 
     @Override
-    public Map<String, Map<String, String>> getTranslationMatrix() {
-        List<I18nTranslation> all = translationRepository.findAll();
-        Map<String, Map<String, String>> matrix = new HashMap<>();
+    public org.springframework.data.domain.Page<com.ecommerce.model.dto.response.TranslationMatrixDTO> getTranslationMatrix(
+            org.springframework.data.domain.Pageable pageable, String search) {
+        // 1. Get paginated keys
+        org.springframework.data.domain.Page<String> keysPage = translationRepository.findDistinctKeys(search,
+                pageable);
+        List<String> keys = keysPage.getContent();
 
-        for (I18nTranslation t : all) {
-            matrix.computeIfAbsent(t.getTranslationKey(), k -> new HashMap<>())
+        if (keys.isEmpty()) {
+            return org.springframework.data.domain.Page.empty(pageable);
+        }
+
+        // 2. Fetch all translations for these keys
+        List<I18nTranslation> translations = translationRepository.findAllByTranslationKeyIn(keys);
+
+        // 3. Group by key
+        Map<String, Map<String, String>> matrixMap = new HashMap<>();
+        for (I18nTranslation t : translations) {
+            matrixMap.computeIfAbsent(t.getTranslationKey(), k -> new HashMap<>())
                     .put(t.getLanguageCode(), t.getTranslationValue());
         }
 
-        return matrix;
+        // 4. Convert to DTOs (preserving order of keys from the page)
+        List<com.ecommerce.model.dto.response.TranslationMatrixDTO> dtos = keys.stream()
+                .map(key -> com.ecommerce.model.dto.response.TranslationMatrixDTO.builder()
+                        .key(key)
+                        .translations(matrixMap.getOrDefault(key, new HashMap<>()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return new org.springframework.data.domain.PageImpl<>(dtos, pageable, keysPage.getTotalElements());
     }
+
 }

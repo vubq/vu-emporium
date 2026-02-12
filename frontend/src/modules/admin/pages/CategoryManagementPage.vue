@@ -200,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue'; // Added watch
 import { useI18n } from 'vue-i18n';
 import { adminCategoryApi } from '@/api/adminCategoryApi';
 import type { Category } from '@/types/product';
@@ -210,7 +210,7 @@ import {
   Dialog, DialogPanel, TransitionChild, TransitionRoot,
   Listbox, ListboxButton, ListboxOptions, ListboxOption
 } from '@headlessui/vue';
-import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'; // Install @heroicons/vue if missing
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 // Shared Components
 import AdminPageHeader from '@/components/admin/AdminPageHeader.vue';
@@ -219,8 +219,8 @@ import AdminDataTable from '@/components/admin/AdminDataTable.vue';
 import StatusBadge from '@/components/admin/StatusBadge.vue';
 import ActionMenu, { type ActionMenuItem } from '@/components/admin/ActionMenu.vue';
 
-// Types for Tree
-interface FlattenedCategory {
+// Types for List Item (Simplified from Tree)
+interface CategoryListItem {
   category: Category;
   level: number;
   hasChildren: boolean;
@@ -238,107 +238,50 @@ const filters = reactive({
   status: null as string | null
 });
 
-// Applied Filters (Snapshot for filtering)
+// Applied Filters (for API)
 const appliedFilters = reactive({
   search: '',
   status: null as string | null
 });
 
-// Pagination State (Client-side)
+// Pagination State (Server-side)
 const currentPage = ref(0);
 const pageSize = ref(20);
+const totalElements = ref(0);
+const totalPages = ref(0);
 
 const showModal = ref(false);
 const editingCategory = ref<Category | null>(null);
-const expandedIds = ref<Set<number>>(new Set());
+// expandedIds removed as we are doing flat list for server pagination
 
-// Tree Logic
-const buildTree = (cats: Category[], parentId: number | null = null): any[] => {
-  return cats
-    .filter(c => c.parentId === parentId)
-    .map(c => ({
-      ...c,
-      children: buildTree(cats, c.id)
-    }))
-    .sort((a, b) => a.displayOrder - b.displayOrder);
-};
-
-const flattenTree = (nodes: any[], level: number = 0, result: FlattenedCategory[] = []) => {
-  for (const node of nodes) {
-    const hasChildren = node.children && node.children.length > 0;
-    
-    result.push({
-      category: node,
-      level,
-      hasChildren
-    });
-
-    if (hasChildren && expandedIds.value.has(node.id)) {
-      flattenTree(node.children, level + 1, result);
-    }
-  }
-  return result;
-};
-
-// Computed: Filtered Flat List
-const filteredFlattenedCategories = computed(() => {
-  // 1. Basic Filtering first
-  let filtered = categories.value;
-  
-  // Use APPLIED filters, not the live inputs
-  const isFiltering = appliedFilters.search || appliedFilters.status;
-
-  if (isFiltering) {
-    if (appliedFilters.search) {
-      const query = appliedFilters.search.toLowerCase();
-      filtered = filtered.filter(cat => 
-        cat.name.toLowerCase().includes(query) || 
-        cat.slug.toLowerCase().includes(query)
-      );
-    }
-
-    if (appliedFilters.status) {
-      filtered = filtered.filter(cat => cat.status === appliedFilters.status);
-    }
-    
-    // Return as flat list with level 0
-    return filtered.map(c => ({ category: c, level: 0, hasChildren: false }));
-  } else {
-    // Build Tree
-    const tree = buildTree(categories.value, null);
-    const result: FlattenedCategory[] = [];
-    flattenTree(tree, 0, result);
-    return result;
-  }
-});
-
-// Computed: Paginated List
+// Computed: Display List (Transform to flat structure wrapping)
 const paginatedCategories = computed(() => {
-  const start = currentPage.value * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredFlattenedCategories.value.slice(start, end);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredFlattenedCategories.value.length / pageSize.value);
+  return categories.value.map(c => ({
+    category: c,
+    level: 0, // Flat list for now
+    hasChildren: false // No children in flat view
+  }));
 });
 
 // Methods
-const toggleExpand = (id: number) => {
-  if (expandedIds.value.has(id)) {
-    expandedIds.value.delete(id);
-  } else {
-    expandedIds.value.add(id);
-  }
-};
-
 const fetchCategories = async () => {
   loading.value = true;
   try {
-    const res = await adminCategoryApi.getAllCategories();
-    categories.value = res.data.data;
+    const params = {
+      page: currentPage.value,
+      size: pageSize.value,
+      search: appliedFilters.search || undefined, // Send undefined if empty
+      status: appliedFilters.status || undefined
+    };
+    
+    const res = await adminCategoryApi.getAllCategories(params);
+    categories.value = res.data.data.content;
+    totalPages.value = res.data.data.totalPages;
+    totalElements.value = res.data.data.totalElements;
   } catch (error) {
     console.error('Failed to fetch categories', error);
+    categories.value = [];
+    totalPages.value = 0;
   } finally {
     loading.value = false;
   }
@@ -348,6 +291,7 @@ const applyFilters = () => {
   appliedFilters.search = filters.search;
   appliedFilters.status = filters.status;
   currentPage.value = 0; // Reset page on filter
+  fetchCategories();
 };
 
 const resetFilters = () => {
@@ -359,11 +303,13 @@ const resetFilters = () => {
 const changePage = (page: number) => {
   currentPage.value = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  fetchCategories();
 };
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size;
   currentPage.value = 0;
+  fetchCategories();
 };
 
 const openCreateModal = () => {
@@ -404,7 +350,7 @@ const confirmDelete = async (category: Category) => {
     try {
       await adminCategoryApi.deleteCategory(category.id);
       await fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete category', error);
       alert(error.response?.data?.message || t('common.error'));
     }

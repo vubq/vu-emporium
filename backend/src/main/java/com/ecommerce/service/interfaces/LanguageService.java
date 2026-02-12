@@ -6,7 +6,13 @@ import java.util.List;
 public interface LanguageService {
     List<Language> getAllLanguages();
 
+    org.springframework.data.domain.Page<Language> getAllLanguages(org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<Language> getLanguages(String search, Boolean isActive,
+            org.springframework.data.domain.Pageable pageable);
+
     List<Language> getActiveLanguages();
+    // ... rest of file
 
     Language getLanguageByCode(String code);
 

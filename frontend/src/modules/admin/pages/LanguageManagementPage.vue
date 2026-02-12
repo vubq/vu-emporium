@@ -72,7 +72,7 @@
       <!-- Shared Data Table -->
       <AdminDataTable
         :loading="loading"
-        :is-empty="paginatedLanguages.length === 0"
+        :is-empty="languages.length === 0"
         :empty-title="$t('admin.manage.products.no_results')"
         :empty-subtitle="$t('admin.manage.products.no_results_desc')"
         :current-page="currentPage"
@@ -108,7 +108,7 @@
         </template>
 
         <template #default>
-          <tr v-for="lang in paginatedLanguages" :key="lang.code" class="group hover:bg-gray-50 transition-colors">
+          <tr v-for="lang in languages" :key="lang.code" class="group hover:bg-gray-50 transition-colors">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="w-10 h-7 overflow-hidden rounded shadow-sm border border-gray-100 group-hover:scale-105 transition-transform duration-300">
                 <img :src="lang.flagIcon" :alt="lang.name" class="w-full h-full object-cover" />
@@ -245,7 +245,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { i18nApi } from '@/api/i18nApi';
 import ConfirmModal from '@/components/common/ConfirmModal.vue';
@@ -273,12 +273,6 @@ const filters = reactive({
   status: null as boolean | null
 });
 
-// Applied Filters for client-side filtering + pagination
-const appliedFilters = reactive({
-  search: '',
-  status: null as boolean | null
-});
-
 // Delete Modal State
 const showDeleteModal = ref(false);
 const languageToDelete = ref<any | null>(null);
@@ -295,42 +289,12 @@ const form = reactive({
 // Pagination State
 const currentPage = ref(0);
 const pageSize = ref(20);
-
-// Filtered List
-const filteredLanguages = computed(() => {
-  let result = languages.value;
-
-  if (appliedFilters.search) {
-    const query = appliedFilters.search.toLowerCase();
-    result = result.filter(l => 
-      l.name.toLowerCase().includes(query) || 
-      l.code.toLowerCase().includes(query)
-    );
-  }
-
-  if (appliedFilters.status !== null) {
-    result = result.filter(l => l.isActive === appliedFilters.status);
-  }
-
-  // Sort by displayOrder
-  return result.sort((a, b) => a.displayOrder - b.displayOrder);
-});
-
-// Paginated List
-const paginatedLanguages = computed(() => {
-  const start = currentPage.value * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredLanguages.value.slice(start, end);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredLanguages.value.length / pageSize.value);
-});
+const totalPages = ref(0);
+const totalElements = ref(0);
 
 const applyFilters = () => {
-  appliedFilters.search = filters.search;
-  appliedFilters.status = filters.status;
   currentPage.value = 0;
+  fetchLanguages();
 };
 
 const resetFilters = () => {
@@ -342,18 +306,45 @@ const resetFilters = () => {
 const changePage = (page: number) => {
   currentPage.value = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  fetchLanguages();
 };
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size;
   currentPage.value = 0;
+  fetchLanguages();
 };
 
 async function fetchLanguages() {
   loading.value = true;
   try {
-    const res = await i18nApi.admin.getAllLanguages();
-    languages.value = res.data;
+    const params: any = {
+      page: currentPage.value,
+      size: pageSize.value,
+    };
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    if (filters.status !== null) {
+      params.status = filters.status;
+    }
+
+    const res = await i18nApi.admin.getAllLanguages(params);
+    
+    if (res.data && Array.isArray(res.data.content)) {
+      languages.value = res.data.content;
+      totalPages.value = res.data.totalPages;
+      totalElements.value = res.data.totalElements;
+    } else if (Array.isArray(res.data)) {
+        languages.value = res.data;
+        totalPages.value = 1;
+        totalElements.value = res.data.length;
+    } else {
+       languages.value = [];
+       totalPages.value = 0;
+       totalElements.value = 0;
+    }
+
   } catch (error) {
     console.error('Failed to fetch languages', error);
   } finally {

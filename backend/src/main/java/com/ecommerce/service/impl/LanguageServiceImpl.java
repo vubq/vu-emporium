@@ -21,6 +21,26 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
+    public org.springframework.data.domain.Page<Language> getAllLanguages(
+            org.springframework.data.domain.Pageable pageable) {
+        return languageRepository.findAll(pageable);
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<Language> getLanguages(String search, Boolean isActive,
+            org.springframework.data.domain.Pageable pageable) {
+        if (search != null && !search.isEmpty() && Boolean.TRUE.equals(isActive)) {
+            return languageRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(search, pageable);
+        } else if (search != null && !search.isEmpty()) {
+            return languageRepository.findByNameContainingIgnoreCase(search, pageable);
+        } else if (Boolean.TRUE.equals(isActive)) {
+            return languageRepository.findByIsActiveTrue(pageable);
+        } else {
+            return languageRepository.findAll(pageable);
+        }
+    }
+
+    @Override
     public List<Language> getActiveLanguages() {
         return languageRepository.findAllByIsActiveTrueOrderByDisplayOrderAsc();
     }

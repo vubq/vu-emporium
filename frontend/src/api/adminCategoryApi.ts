@@ -1,10 +1,10 @@
 import apiClient from './axiosClient';
-import type { ApiResponse } from '@/types/common';
+import type { ApiResponse, Page } from '@/types/common';
 import type { Category } from '@/types/product';
 
 export const adminCategoryApi = {
-    getAllCategories() {
-        return apiClient.get<ApiResponse<Category[]>>('/admin/categories');
+    getAllCategories(params?: { page?: number; size?: number; search?: string; status?: string }) {
+        return apiClient.get<ApiResponse<Page<Category>>>('/admin/categories', { params });
     },
 
     createCategory(data: any) {

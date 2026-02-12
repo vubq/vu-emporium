@@ -10,11 +10,22 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<Category> findBySlug(String slug);
+        Optional<Category> findBySlug(String slug);
 
-    List<Category> findByParentIsNullAndStatus(com.ecommerce.model.enums.CategoryStatus status);
+        List<Category> findByParentIsNullAndStatus(com.ecommerce.model.enums.CategoryStatus status);
 
-    List<Category> findByParentIdAndStatus(Long parentId, com.ecommerce.model.enums.CategoryStatus status);
+        List<Category> findByParentIdAndStatus(Long parentId, com.ecommerce.model.enums.CategoryStatus status);
 
-    List<Category> findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus status);
+        List<Category> findByStatusOrderByDisplayOrderAsc(com.ecommerce.model.enums.CategoryStatus status);
+
+        org.springframework.data.domain.Page<Category> findDistinctByTranslations_NameContainingIgnoreCase(String name,
+                        org.springframework.data.domain.Pageable pageable);
+
+        org.springframework.data.domain.Page<Category> findByStatus(com.ecommerce.model.enums.CategoryStatus status,
+                        org.springframework.data.domain.Pageable pageable);
+
+        org.springframework.data.domain.Page<Category> findDistinctByTranslations_NameContainingIgnoreCaseAndStatus(
+                        String name,
+                        com.ecommerce.model.enums.CategoryStatus status,
+                        org.springframework.data.domain.Pageable pageable);
 }

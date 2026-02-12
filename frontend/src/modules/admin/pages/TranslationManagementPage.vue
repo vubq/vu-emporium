@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch } from 'vue'; // Added watch
 import { useI18n } from 'vue-i18n';
 import { i18nApi } from '@/api/i18nApi';
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue';
@@ -214,8 +214,9 @@ import ActionMenu, { type ActionMenuItem } from '@/components/admin/ActionMenu.v
 
 const { t } = useI18n();
 const languages = ref<any[]>([]);
+// matrix state now used as cache or just current page's translations
 const matrix = ref<Record<string, Record<string, string>>>({});
-const keys = ref<string[]>([]);
+const keys = ref<string[]>([]); // Keys for the current page
 const loading = ref(false);
 const submitting = ref(false);
 
@@ -237,61 +238,84 @@ const filters = reactive({
   search: '',
 });
 
-// Applied Filters for client-side functionality
+// Applied Filters for API
 const appliedFilters = reactive({
   search: '',
 });
 
-// Pagination State
+// Pagination State (Server-side)
 const currentPage = ref(0);
 const pageSize = ref(20);
+const totalElements = ref(0);
+const totalPages = ref(0);
 
-// Filtered List
-const filteredKeys = computed(() => {
-  if (!appliedFilters.search) return keys.value;
-  const q = appliedFilters.search.toLowerCase();
-  
-  return keys.value.filter(key => {
-    if (key.toLowerCase().includes(q)) return true;
-    const row = matrix.value[key];
-    if (!row) return false;
-    return Object.values(row).some(val => val && (val as string).toLowerCase().includes(q));
-  });
-});
+// Paginated Keys (Directly use the fetched keys)
+const paginatedKeys = computed(() => keys.value);
 
-// Paginated Keys
-const paginatedKeys = computed(() => {
-  const start = currentPage.value * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredKeys.value.slice(start, end);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredKeys.value.length / pageSize.value);
-});
-
-async function fetchData() {
+async function fetchData(loadLanguages = false) {
   loading.value = true;
   try {
-    const [langsRes, matrixRes] = await Promise.all([
-      i18nApi.admin.getAllLanguages(),
-      i18nApi.admin.getMatrix()
-    ]);
+    const promises = [];
+    if (loadLanguages || languages.value.length === 0) {
+      promises.push(i18nApi.admin.getAllLanguages({ page: 0, size: 100 })); // Fetch all languages (assuming < 100)
+    }
     
-    languages.value = langsRes.data;
-    matrix.value = matrixRes.data;
-    keys.value = Object.keys(matrix.value).sort();
+    // Fetch Matrix
+    promises.push(i18nApi.admin.getMatrix({
+      page: currentPage.value,
+      size: pageSize.value,
+      search: appliedFilters.search || undefined
+    }));
+
+    const results = await Promise.all(promises);
     
-    // Ensure every key has every language entry
-    keys.value.forEach(key => {
-      languages.value.forEach(lang => {
-        if (matrix.value[key][lang.code] === undefined) {
-          matrix.value[key][lang.code] = '';
-        }
-      });
+    // Handle Languages Response
+    if (loadLanguages || languages.value.length === 0) {
+      const langsRes = results[0];
+      // Assuming getAllLanguages returns list or page. If page, content is in data.content
+      // Based on API update, getAllLanguages returns Page<Language> if params sent, or List if not. 
+      // But we sent params. So it returns Page.
+      if (langsRes.data.content) {
+          languages.value = langsRes.data.content;
+      } else if (Array.isArray(langsRes.data)) {
+          languages.value = langsRes.data;
+      } else {
+          languages.value = langsRes.data?.data || [];
+      }
+    }
+
+    // Handle Matrix Response
+    const matrixRes = results[results.length - 1];
+    
+    // matrixRes.data is Page<TranslationMatrixDTO>
+    const content = matrixRes.data.content;
+    totalPages.value = matrixRes.data.totalPages;
+    totalElements.value = matrixRes.data.totalElements;
+
+    // Transform content to matrix structure
+    const newMatrix: Record<string, Record<string, string>> = {};
+    const newKeys: string[] = [];
+
+    content.forEach((item: any) => {
+        newKeys.push(item.key);
+        newMatrix[item.key] = item.translations || {};
+        
+        // Ensure all languages exist
+        languages.value.forEach(lang => {
+            if (newMatrix[item.key][lang.code] === undefined) {
+                newMatrix[item.key][lang.code] = '';
+            }
+        });
     });
+
+    keys.value = newKeys;
+    matrix.value = newMatrix;
+
   } catch (error) {
     console.error('Failed to fetch translations matrix', error);
+    keys.value = [];
+    matrix.value = {};
+    totalPages.value = 0;
   } finally {
     loading.value = false;
   }
@@ -300,6 +324,7 @@ async function fetchData() {
 const applyFilters = () => {
   appliedFilters.search = filters.search;
   currentPage.value = 0;
+  fetchData(false);
 };
 
 const resetFilters = () => {
@@ -310,11 +335,13 @@ const resetFilters = () => {
 const changePage = (page: number) => {
   currentPage.value = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  fetchData(false);
 };
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size;
   currentPage.value = 0;
+  fetchData(false);
 };
 
 // Modal Logic
@@ -378,7 +405,7 @@ async function handleModalSubmit() {
 
     await Promise.all(updatePromises);
 
-    await fetchData();
+    await fetchData(false);
     closeModal();
   } catch (error) {
     console.error('Action failed', error);
@@ -403,7 +430,7 @@ async function handleConfirmDelete() {
   deleteLoading.value = true;
   try {
     await i18nApi.admin.deleteKey(keyToDelete.value);
-    await fetchData();
+    await fetchData(false);
     closeDeleteModal();
   } catch (error) {
     console.error('Delete failed', error);
@@ -428,5 +455,5 @@ const getTranslationActions = (key: string): ActionMenuItem[] => {
   ];
 };
 
-onMounted(fetchData);
+onMounted(() => fetchData(true));
 </script>

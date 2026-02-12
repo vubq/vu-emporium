@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,11 +22,14 @@ public class AdminCategoryController {
 
     @GetMapping
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<List<CategoryDTO>>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        List<CategoryDTO> categoryDTOs = categories.stream()
-                .map(cat -> convertToDTO(cat, false))
-                .collect(Collectors.toList());
+    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<CategoryDTO>>> getAllCategories(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) com.ecommerce.model.enums.CategoryStatus status,
+            org.springframework.data.domain.Pageable pageable) {
+        org.springframework.data.domain.Page<Category> categories = categoryService.getCategories(search, status,
+                pageable);
+        org.springframework.data.domain.Page<CategoryDTO> categoryDTOs = categories
+                .map(cat -> convertToDTO(cat, false));
         return ResponseEntity.ok(ApiResponse.success(categoryDTOs));
     }
 
