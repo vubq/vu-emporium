@@ -2,7 +2,9 @@ package com.ecommerce.service.impl;
 
 import com.ecommerce.model.entity.I18nTranslation;
 import com.ecommerce.repository.I18nTranslationRepository;
+import com.ecommerce.model.entity.Language;
 import com.ecommerce.service.interfaces.I18nService;
+import com.ecommerce.service.interfaces.LanguageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,14 +19,31 @@ import java.util.stream.Collectors;
 public class I18nServiceImpl implements I18nService {
 
     private final I18nTranslationRepository translationRepository;
+    private final LanguageService languageService;
 
     @Override
     public Map<String, String> getTranslationsForLanguage(String languageCode) {
-        return translationRepository.findAllByLanguageCode(languageCode).stream()
-                .collect(Collectors.toMap(
-                        I18nTranslation::getTranslationKey,
-                        I18nTranslation::getTranslationValue,
-                        (existing, replacement) -> existing));
+        // Start with default language translations as fallback base
+        Language defaultLang = languageService.getDefaultLanguage();
+        Map<String, String> result = new HashMap<>();
+
+        if (defaultLang != null && !defaultLang.getCode().equals(languageCode)) {
+            // Load default language translations first as base
+            for (I18nTranslation t : translationRepository.findAllByLanguageCode(defaultLang.getCode())) {
+                result.put(t.getTranslationKey(), t.getTranslationValue());
+            }
+            // Override with requested language translations
+            for (I18nTranslation t : translationRepository.findAllByLanguageCode(languageCode)) {
+                result.put(t.getTranslationKey(), t.getTranslationValue());
+            }
+        } else {
+            // Requested language IS the default, just return its translations
+            for (I18nTranslation t : translationRepository.findAllByLanguageCode(languageCode)) {
+                result.put(t.getTranslationKey(), t.getTranslationValue());
+            }
+        }
+
+        return result;
     }
 
     @Override
