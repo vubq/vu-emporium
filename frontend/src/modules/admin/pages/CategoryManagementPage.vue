@@ -105,7 +105,7 @@
         </template>
 
         <template #default>
-          <tr v-for="(item, index) in paginatedCategories" :key="item.category.id" class="group hover:bg-gray-50 transition-colors">
+          <tr v-for="(item, index) in paginatedCategories" :key="item.category.id" class="group hover:bg-gray-50 transition-colors cursor-pointer" @click="openEditModal(item.category)">
             <td class="pl-4 pr-6 py-4 whitespace-nowrap">
               <div class="flex items-center relative">
                 <!-- Indentation Spacer -->

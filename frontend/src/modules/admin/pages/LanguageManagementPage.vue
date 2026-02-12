@@ -108,7 +108,7 @@
         </template>
 
         <template #default>
-          <tr v-for="lang in languages" :key="lang.code" class="group hover:bg-gray-50 transition-colors">
+          <tr v-for="lang in languages" :key="lang.code" class="group hover:bg-gray-50 transition-colors cursor-pointer" @click="openEditModal(lang)">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="w-10 h-7 overflow-hidden rounded shadow-sm border border-gray-100 group-hover:scale-105 transition-transform duration-300">
                 <img :src="lang.flagIcon" :alt="lang.name" class="w-full h-full object-cover" />
@@ -140,7 +140,7 @@
                 <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                 {{ $t('common.default') }}
               </div>
-              <button v-else @click="makeDefault(lang)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
+              <button v-else @click.stop="makeDefault(lang)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
                 {{ $t('admin.i18n.languages.make_default') }}
               </button>
             </td>
