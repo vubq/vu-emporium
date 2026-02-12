@@ -193,7 +193,7 @@
                                  <I18nCompactInput 
                                     v-model="option.translations" 
                                     field="name" 
-                                    v-model:defaultValue="option.translations.vi.name" 
+                                    v-model:defaultValue="option.translations[defaultLangCode].name" 
                                     :placeholder="$t('admin.forms.product.option_name_placeholder')" 
                                     :disabled="submitting" 
                                  />
@@ -207,7 +207,7 @@
                                             <I18nCompactInput 
                                                v-model="val.translations" 
                                                field="value" 
-                                               v-model:defaultValue="val.translations.vi.value" 
+                                               v-model:defaultValue="val.translations[defaultLangCode].value" 
                                                :placeholder="`${$t('admin.forms.product.option_value')} ${vIdx + 1}`" 
                                                :disabled="submitting" 
                                             />
@@ -981,6 +981,8 @@ const props = defineProps<{
 const emit = defineEmits(['submit', 'cancel']);
 
 const { t, locale } = useI18n();
+const i18nStore = useI18nStore();
+const defaultLangCode = computed(() => i18nStore.defaultLanguage?.code || 'vi');
 
 const categories = ref<Category[]>([]);
 const hasVariants = ref(false);
@@ -1090,21 +1092,22 @@ watch(() => props.initialData, (newVal) => {
         if (newVal.options) {
             options.value = newVal.options.map((opt: any) => {
                 const translations = opt.translations || {};
-                // If translations['vi'] is missing but o.name exists (legacy or DTO), use it
-                if (!translations['vi'] && opt.name) {
-                    translations['vi'] = { name: opt.name };
+                const langCode = defaultLangCode.value;
+                // If translations[langCode] is missing but o.name exists (legacy or DTO), use it
+                if (!translations[langCode] && opt.name) {
+                    translations[langCode] = { name: opt.name };
                 }
                 
                 return {
-                    name: translations['vi']?.name || '',
+                    name: translations[langCode]?.name || '',
                     translations: translations,
                     values: opt.values.map((v: any) => {
                         const vTranslations = v.translations || {};
-                        if (!vTranslations['vi'] && v.value) {
-                            vTranslations['vi'] = { value: v.value };
+                        if (!vTranslations[langCode] && v.value) {
+                            vTranslations[langCode] = { value: v.value };
                         }
                         return {
-                            value: vTranslations['vi']?.value || '',
+                            value: vTranslations[langCode]?.value || '',
                             translations: vTranslations
                         };
                     })
@@ -1418,20 +1421,21 @@ onMounted(async () => {
                 if (props.initialData.options) {
                     options.value = props.initialData.options.map((opt: any) => {
                         const translations = opt.translations || {};
-                        if (!translations['vi'] && opt.name) {
-                            translations['vi'] = { name: opt.name };
+                        const langCode = defaultLangCode.value;
+                        if (!translations[langCode] && opt.name) {
+                            translations[langCode] = { name: opt.name };
                         }
                         return {
-                            name: translations['vi']?.name || '',
+                            name: translations[langCode]?.name || '',
                             translations: translations,
                             values: Array.isArray(opt.values) ? opt.values.map((v: any) => {
                                 const vStr = typeof v === 'string' ? v : v.value;
                                 const vTranslations = v.translations || {};
-                                if (!vTranslations['vi'] && vStr) {
-                                    vTranslations['vi'] = { value: vStr };
+                                if (!vTranslations[langCode] && vStr) {
+                                    vTranslations[langCode] = { value: vStr };
                                 }
                                 return {
-                                    value: vTranslations['vi']?.value || '',
+                                    value: vTranslations[langCode]?.value || '',
                                     translations: vTranslations
                                 };
                             }) : []
@@ -1466,6 +1470,20 @@ onMounted(async () => {
 
     // Register watchers AFTER loading initial data
     watch(options, debounce(() => {
+        // Sync translations to root fields for Options & Values
+        const langCode = defaultLangCode.value;
+        options.value.forEach(opt => {
+             const tName = opt.translations?.[langCode]?.name;
+             if (tName && tName !== opt.name) opt.name = tName;
+             
+             if (opt.values) {
+                 opt.values.forEach(val => {
+                     const tVal = val.translations?.[langCode]?.value;
+                     if (tVal && tVal !== val.value) val.value = tVal;
+                 });
+             }
+        });
+
         // Do NOT auto-update variants matrix if only translations changed
         // This prevents cursor jumps and unnecessary re-renders
         if (hasVariants.value) {
@@ -1487,12 +1505,11 @@ onMounted(async () => {
     }, 500));
 
     // Watch Translations to Sync Root Fields (Dynamic Default Language)
-    const i18nStore = useI18nStore();
-    
     watch(() => form.translations, (newVal) => {
         if (!newVal) return;
         
-        const defaultLangCode = i18nStore.defaultLanguage?.code || 'vi';
+        // Use top-level defaultLangCode computed
+        const langCode = defaultLangCode.value;
 
         // Sync Name (Default Lang) to Root
         const defaultName = newVal[defaultLangCode]?.name;
@@ -1531,7 +1548,7 @@ function addOption() {
     options.value.push({ 
         name: '', 
         translations: {
-            vi: { name: '' }
+            [defaultLangCode.value]: { name: '' }
         },
         values: [] 
     });
@@ -1545,7 +1562,7 @@ function addValue(optionIndex: number) {
     options.value[optionIndex].values.push({
         value: '',
         translations: {
-            vi: { value: '' }
+            [defaultLangCode.value]: { value: '' }
         }
     });
 }
