@@ -111,7 +111,7 @@
               <!-- Product Info -->
               <div class="p-5">
                 <h3 class="font-display font-bold text-lg mb-2 text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
-                  {{ product.name }}
+                  {{ getLocalized(product, 'name') }}
                 </h3>
                 <p class="text-2xl font-bold gradient-text mb-4">
                   ${{ (product.salePrice && product.salePrice > 0 ? product.salePrice : (product.basePrice || 0)).toFixed(2) }}
@@ -165,9 +165,11 @@ import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/types/product';
 import AppImage from "@/components/common/AppImage.vue";
 import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton.vue';
+import { useLocalized } from '@/composables/useLocalized';
 
 const router = useRouter();
 const cartStore = useCartStore();
+const { getLocalized } = useLocalized();
 const featuredProducts = ref<Product[]>([]);
 const loading = ref(true);
 

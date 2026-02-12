@@ -55,11 +55,11 @@
                         :to="`/products?categoryId=${category.id}`"
                         :class="[active ? 'bg-primary-50 text-primary-700' : 'text-gray-700', 'group flex flex-col px-4 py-2 text-sm rounded-lg transition-colors']"
                       >
-                        <span class="font-bold">{{ category.name }}</span>
+                        <span class="font-bold">{{ getLocalized(category, 'name') }}</span>
                         <!-- Subcategories hint -->
                         <div v-if="category.children && category.children.length > 0" class="flex flex-wrap gap-1 mt-1">
                           <span v-for="child in category.children.slice(0, 3)" :key="child.id" class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">
-                            {{ child.name }}
+                            {{ getLocalized(child, 'name') }}
                           </span>
                           <span v-if="category.children.length > 3" class="text-[10px] text-gray-400">...</span>
                         </div>
@@ -244,10 +244,12 @@ import type { Category } from '@/types/product';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import LoadingBar from '@/components/common/LoadingBar.vue';
 import LanguageSelector from '@/components/common/LanguageSelector.vue';
+import { useLocalized } from '@/composables/useLocalized';
 
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const router = useRouter();
+const { getLocalized } = useLocalized();
 const categories = ref<Category[]>([]);
 
 onMounted(async () => {

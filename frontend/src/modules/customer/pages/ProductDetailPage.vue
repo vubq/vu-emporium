@@ -14,7 +14,7 @@
           <li><span class="text-gray-400">/</span></li>
           <li><router-link to="/products" class="text-gray-500 hover:text-primary-600 transition-colors">{{ $t('common.products') }}</router-link></li>
           <li><span class="text-gray-400">/</span></li>
-          <li class="text-gray-900 font-medium truncate max-w-xs">{{ product.name }}</li>
+          <li class="text-gray-900 font-medium truncate max-w-xs">{{ getLocalized(product, 'name') }}</li>
         </ol>
       </nav>
 
@@ -67,7 +67,7 @@
         <!-- Product Info -->
         <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
           <div class="flex justify-between">
-              <h1 class="text-3xl font-display font-extrabold tracking-tight text-gray-900 sm:text-4xl">{{ product.name }}</h1>
+              <h1 class="text-3xl font-display font-extrabold tracking-tight text-gray-900 sm:text-4xl">{{ getLocalized(product, 'name') }}</h1>
               <span v-if="currentStrikethroughPrice" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 self-start mt-2">
                  {{ $t('product.save') }} {{ calculateDiscount(currentDisplayPrice, currentStrikethroughPrice) }}%
               </span>
@@ -94,7 +94,7 @@
 
           <div class="mt-6">
             <h3 class="sr-only">Description</h3>
-            <div class="text-base text-gray-700 space-y-6" v-html="product.description"></div>
+            <div class="text-base text-gray-700 space-y-6" v-html="getLocalized(product, 'description')"></div>
           </div>
 
           <div class="mt-8 border-t border-gray-200 pt-8">
@@ -102,7 +102,7 @@
             <div v-if="product.hasVariants && product.options && product.options.length > 0" class="space-y-6">
                  <div v-for="option in product.options" :key="option.id">
                      <RadioGroup v-model="selectedOptions[option.name]" class="mt-2">
-                        <RadioGroupLabel class="text-sm font-medium text-gray-900 block mb-2">{{ option.name }}</RadioGroupLabel>
+                        <RadioGroupLabel class="text-sm font-medium text-gray-900 block mb-2">{{ getLocalized(option, 'name') }}</RadioGroupLabel>
                         <div class="flex items-center space-x-3">
                             <RadioGroupOption 
                                 as="template" 
@@ -118,7 +118,7 @@
                                         checked ? 'bg-primary-600 border-transparent text-white hover:bg-primary-700' : 'bg-white border-gray-200 text-gray-900',
                                     ]"
                                 >
-                                    <RadioGroupLabel as="span">{{ value.value }}</RadioGroupLabel>
+                                    <RadioGroupLabel as="span">{{ getLocalized(value, 'value') }}</RadioGroupLabel>
                                 </div>
                             </RadioGroupOption>
                         </div>
@@ -275,9 +275,9 @@ import type { Product } from '@/types/product';
 import { useCartStore } from '@/stores/cartStore';
 import { RadioGroup, RadioGroupLabel, RadioGroupOption, TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import ProductDetailSkeleton from '@/components/skeleton/ProductDetailSkeleton.vue';
+import { useLocalized } from '@/composables/useLocalized';
 
-
-
+const { getLocalized } = useLocalized();
 const route = useRoute();
 const cartStore = useCartStore();
 

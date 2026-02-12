@@ -33,7 +33,7 @@
                   @click="filterByCategory(category.id)"
                   :class="[selectedCategoryId === category.id ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50', 'w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-between group']"
                 >
-                  {{ category.name }}
+                  {{ getLocalized(category, 'name') }}
                   <span v-if="selectedCategoryId === category.id" class="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
                 </button>
                 
@@ -45,7 +45,7 @@
                     @click="filterByCategory(child.id)"
                     :class="[selectedCategoryId === child.id ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:bg-gray-50', 'w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between group']"
                   >
-                    {{ child.name }}
+                    {{ getLocalized(child, 'name') }}
                     <span v-if="selectedCategoryId === child.id" class="w-1 h-1 rounded-full bg-primary-600"></span>
                   </button>
                 </div>
@@ -93,9 +93,9 @@
             <!-- Product Info -->
             <div class="p-5">
               <h3 class="font-display font-bold text-lg mb-2 text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
-                {{ product.name }}
+                {{ getLocalized(product, 'name') }}
               </h3>
-              <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ getLocalized(product, 'description') }}</p>
               <div class="flex items-center space-x-2">
                 <div class="flex items-center space-x-2 mb-4">
                   <p class="text-2xl font-bold gradient-text">
@@ -144,9 +144,12 @@ import type { Product, Category } from '@/types/product';
 import AppImage from '@/components/common/AppImage.vue';
 import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton.vue';
 
+import { useLocalized } from '@/composables/useLocalized';
+
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
+const { getLocalized } = useLocalized();
 const products = ref<Product[]>([]);
 const categories = ref<Category[]>([]);
 const loading = ref(true);
