@@ -29,7 +29,7 @@
         <!-- Stats Display Slot -->
         <div class="lg:col-span-1 items-end flex pb-2">
            <span class="text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-             {{ $t('admin.i18n.translations.keys_found', { count: filteredKeys.length }) }}
+             {{ $t('admin.i18n.translations.keys_found', { count: totalElements }) }}
           </span>
         </div>
       </AdminFilterBar>
