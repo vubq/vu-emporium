@@ -275,7 +275,13 @@
                     >
                         <DialogPanel class="w-full max-w-7xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all">
                              <div class="max-h-[90vh] overflow-y-auto">
-                                <ProductForm :initialData="selectedProduct" :isEdit="!!selectedProduct" @submit="handleFormSubmit" @cancel="closeModal" />
+                                <ProductForm 
+                                    :initialData="selectedProduct" 
+                                    :isEdit="!!selectedProduct" 
+                                    :loading="submitting"
+                                    @submit="handleFormSubmit" 
+                                    @cancel="closeModal" 
+                                />
                              </div>
                         </DialogPanel>
                     </TransitionChild>
@@ -438,7 +444,10 @@ const closeModal = () => {
     selectedProduct.value = null;
 };
 
+const submitting = ref(false);
+
 const handleFormSubmit = async (payload: any) => {
+    submitting.value = true;
     try {
         const productId = selectedProduct.value?.id;
         
@@ -452,6 +461,8 @@ const handleFormSubmit = async (payload: any) => {
     } catch (error) {
         console.error("Failed to save product:", error);
         alert("Failed to save product. Check console for details.");
+    } finally {
+        submitting.value = false;
     }
 };
 

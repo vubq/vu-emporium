@@ -118,7 +118,7 @@
                            </p>
                       </div>
                      
-                      <button @click="closeModal" class="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                      <button @click="closeModal" class="text-gray-400 hover:text-gray-500 p-1 rounded-full hover:bg-gray-100 transition-colors" :disabled="submitting">
                           <span class="sr-only">Close</span>
                           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
@@ -133,6 +133,7 @@
                         type="text" 
                         placeholder="e.g. common.save_changes"
                         class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400 font-mono text-sm"
+                        :disabled="submitting"
                       />
                       <p class="mt-2 text-xs text-gray-500 flex items-center gap-1">
                            Use dots to group keys (e.g. <code class="bg-gray-100 px-1 py-0.5 rounded text-gray-800 mx-1 border border-gray-200">admin.dashboard.title</code>)
@@ -157,6 +158,7 @@
                                       rows="2" 
                                       class="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder-gray-400 resize-y min-h-[80px]"
                                       :placeholder="lang.isDefault ? 'Enter translation...' : $t('admin.i18n.translations.same_as_default')"
+                                      :disabled="submitting"
                                     ></textarea>
                                     <div v-if="modal.translations[lang.code] && modal.translations[lang.code] !== matrix[modal.oldKey]?.[lang.code]" class="absolute right-3 top-3 w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
                                 </div>
@@ -166,10 +168,11 @@
                   </div>
 
                   <div class="mt-8 flex gap-3 pt-6 border-t border-gray-100 justify-end">
-                    <button type="button" class="px-6 py-2.5 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm" @click="closeModal">
+                    <button type="button" class="px-6 py-2.5 rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 font-medium transition-all shadow-sm" @click="closeModal" :disabled="submitting">
                       {{ $t('common.cancel') }}
                     </button>
-                     <button type="button" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" @click="handleModalSubmit">
+                     <button type="button" class="px-6 py-2.5 rounded-xl bg-gray-900 text-white hover:bg-black font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center" @click="handleModalSubmit" :disabled="submitting">
+                      <svg v-if="submitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                       {{ modal.type === 'add' ? $t('common.create') : $t('common.save_changes') }}
                     </button>
                   </div>
@@ -179,6 +182,18 @@
           </div>
         </Dialog>
       </TransitionRoot>
+
+      <!-- Delete Confirm Modal -->
+      <ConfirmModal 
+        :isOpen="showDeleteModal" 
+        :title="$t('common.delete') + ' ' + $t('admin.translations')" 
+        :message="$t('admin.i18n.translations.delete_key_confirm', { key: keyToDelete })"
+        :confirmText="$t('common.delete')"
+        type="danger"
+        :loading="deleteLoading"
+        @close="closeDeleteModal"
+        @confirm="handleConfirmDelete"
+      />
     </div>
   </div>
 </template>
@@ -188,7 +203,8 @@ import { ref, onMounted, computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { i18nApi } from '@/api/i18nApi';
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue';
-import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'; // Install if missing
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 
 // Shared Components
 import AdminPageHeader from '@/components/admin/AdminPageHeader.vue';
@@ -201,6 +217,7 @@ const languages = ref<any[]>([]);
 const matrix = ref<Record<string, Record<string, string>>>({});
 const keys = ref<string[]>([]);
 const loading = ref(false);
+const submitting = ref(false);
 
 const modal = reactive({
   show: false,
@@ -209,6 +226,11 @@ const modal = reactive({
   keyName: '',
   translations: {} as Record<string, string>
 });
+
+// Delete Modal State
+const showDeleteModal = ref(false);
+const keyToDelete = ref<string | null>(null);
+const deleteLoading = ref(false);
 
 // Filters
 const filters = reactive({
@@ -323,6 +345,7 @@ function openEditKeyModal(key: string) {
 
 async function handleModalSubmit() {
   if (!modal.keyName.trim()) return;
+  submitting.value = true;
 
   try {
     // 1. Rename Key if changed (Edit Mode Only)
@@ -359,17 +382,33 @@ async function handleModalSubmit() {
     closeModal();
   } catch (error) {
     console.error('Action failed', error);
+  } finally {
+    submitting.value = false;
   }
 }
 
-async function handleDeleteKey(key: string) {
-  if (confirm(t('admin.i18n.translations.delete_key_confirm', { key }))) {
-    try {
-      await i18nApi.admin.deleteKey(key);
-      await fetchData();
-    } catch (error) {
-      console.error('Delete failed', error);
-    }
+function confirmDeleteKey(key: string) {
+  keyToDelete.value = key;
+  showDeleteModal.value = true;
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false;
+  keyToDelete.value = null;
+}
+
+async function handleConfirmDelete() {
+  if (!keyToDelete.value) return;
+  
+  deleteLoading.value = true;
+  try {
+    await i18nApi.admin.deleteKey(keyToDelete.value);
+    await fetchData();
+    closeDeleteModal();
+  } catch (error) {
+    console.error('Delete failed', error);
+  } finally {
+    deleteLoading.value = false;
   }
 }
 
@@ -384,7 +423,7 @@ const getTranslationActions = (key: string): ActionMenuItem[] => {
       label: `${t('common.delete')} ${t('admin.translations')}`,
       type: 'danger',
       icon: TrashIcon,
-      onClick: () => handleDeleteKey(key),
+      onClick: () => confirmDeleteKey(key),
     }
   ];
 };

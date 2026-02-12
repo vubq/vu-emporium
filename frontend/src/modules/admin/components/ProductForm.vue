@@ -974,6 +974,7 @@ import AppImage from '@/components/common/AppImage.vue';
 const props = defineProps<{
   initialData?: any;
   isEdit?: boolean;
+  loading?: boolean;
 }>();
 
 const emit = defineEmits(['submit', 'cancel']);
@@ -1021,7 +1022,7 @@ const editingVariant = ref<any>(null); // Temporary copy for editing
 
 // Loading States
 const isLoadingData = ref(true);
-const submitting = ref(false);
+
 
 const form = reactive({
   name: '',
@@ -1712,9 +1713,20 @@ const getLocalizedValue = (translations: any, defaultValue: string, field: strin
     return translations[currentLang]?.[field] || defaultValue;
 };
 
+// Internal submitting state
+const internalSubmitting = ref(false);
+
+// Combined submitting state
+const submitting = computed(() => props.loading || internalSubmitting.value);
 
 function submitForm() {
-    submitting.value = true;
+    if (submitting.value) return;
+    
+    // Only set internal state if loading prop is not provided (legacy mode)
+    if (props.loading === undefined) {
+        internalSubmitting.value = true;
+    }
+
     try {
         const payload = {
             ...form,
