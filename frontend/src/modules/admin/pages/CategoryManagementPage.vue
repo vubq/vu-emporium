@@ -430,12 +430,12 @@ const getLocalizedValue = (translations: any, defaultValue: string, field: strin
 const getCategoryActions = (category: Category): ActionMenuItem[] => {
   return [
     {
-      label: t('admin.forms.category.edit_title'),
+      label: t('common.edit'),
       icon: PencilSquareIcon,
       onClick: () => openEditModal(category),
     },
     {
-      label: `${t('common.delete')} ${t('product.category')}`,
+      label: t('common.delete'),
       type: 'danger',
       icon: TrashIcon,
       disabled: category.status !== 'DRAFT',

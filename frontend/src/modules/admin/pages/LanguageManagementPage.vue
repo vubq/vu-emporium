@@ -448,7 +448,7 @@ async function handleConfirmDelete() {
 const getLanguageActions = (lang: any): ActionMenuItem[] => {
   return [
     {
-      label: `${t('common.edit')} ${t('admin.i18n.languages.title')}`,
+      label: t('common.edit'),
       icon: PencilSquareIcon,
       onClick: () => openEditModal(lang),
     },
@@ -458,7 +458,7 @@ const getLanguageActions = (lang: any): ActionMenuItem[] => {
       onClick: () => toggleActive(lang),
     },
     {
-      label: `${t('common.delete')} ${t('admin.i18n.languages.title')}`,
+      label: t('common.delete'),
       type: 'danger',
       icon: TrashIcon,
       disabled: lang.isDefault,
