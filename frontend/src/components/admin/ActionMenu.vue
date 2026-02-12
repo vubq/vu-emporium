@@ -38,15 +38,17 @@
                     ? (active ? 'bg-red-50 text-red-700' : 'text-red-600')
                     : (active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'),
                   item.disabled ? 'opacity-50 cursor-not-allowed' : '',
-                  'group flex items-center px-4 py-3 text-sm w-full text-left transition-colors'
+                  'group flex items-center px-3 py-2 text-sm w-[calc(100%-8px)] mx-1 my-0.5 rounded-lg text-left transition-colors first:mt-1 last:mb-1'
                 ]"
               >
-                <component
-                  v-if="item.icon"
-                  :is="item.icon"
-                  class="mr-3 h-4 w-4"
-                  :class="item.type === 'danger' ? 'text-red-500' : 'text-indigo-500'"
-                />
+                <span class="flex items-center justify-center mr-2 w-5 h-5">
+                  <component
+                    v-if="item.icon"
+                    :is="item.icon"
+                    class="h-4 w-4"
+                    :class="item.type === 'danger' ? 'text-red-500' : 'text-indigo-500'"
+                  />
+                </span>
                 {{ item.label }}
               </button>
             </MenuItem>

@@ -59,5 +59,18 @@ Trải nghiệm người dùng phải mượt mà với các phản hồi trực
 -   Tất cả nhãn (labels), tiêu đề (headers), và thông báo (messages) phải sử dụng `$t('key')`.
 -   Không được hardcode chuỗi ký tự (string).
 
+## 5. Styling Components (Headless UI)
+Các component như `Listbox`, `Combobox`, `Menu` (Dropdown) cần tuân thủ style sau để đảm bảo giao diện hiện đại:
+
+-   **Container Options**:
+    -   Padding: `p-1`
+    -   Border Radius: `rounded-xl`
+    -   Shadow: `shadow-lg`
+-   **Items (Option/MenuItem)**:
+    -   Margin: `mx-1 my-0.5` (tạo khoảng cách với lề)
+    -   Border Radius: `rounded-lg`
+    -   Background Active/Hover: `bg-indigo-50`
+    -   Icon (nếu có): Kích thước cố định `w-5 h-5` container, icon thực `w-4 h-4`.
+
 ---
 *Tuân thủ tiêu chuẩn này cho tất cả các Trang Quản lý Admin trong tương lai (Sản phẩm, Đơn hàng, Người dùng, v.v.).*

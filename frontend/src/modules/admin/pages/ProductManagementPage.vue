@@ -54,12 +54,12 @@
                         leaveTo="opacity-0"
                         @after-leave="query = ''"
                     >
-                        <ComboboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                            <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700">
+                        <ComboboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm p-1">
+                            <div v-if="filteredCategories.length === 0 && query !== ''" class="relative cursor-default select-none py-2 px-4 text-gray-700 rounded-lg">
                                 {{ $t('media.empty') }}
                             </div>
                             <ComboboxOption :value="null" as="template" v-slot="{ selected, active }">
-                                <li class="relative cursor-pointer select-none py-2 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
+                                <li class="relative cursor-pointer select-none py-2 pl-10 pr-4 rounded-lg my-0.5" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
                                     <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">{{ $t('admin.manage.products.all_categories') }}</span>
                                 </li>
                             </ComboboxOption>
@@ -70,7 +70,7 @@
                                 as="template"
                                 v-slot="{ selected, active }"
                             >
-                                <li class="relative cursor-pointer select-none py-2 pl-10 pr-4" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
+                                <li class="relative cursor-pointer select-none py-2 pl-10 pr-4 rounded-lg my-0.5" :class="{ 'bg-indigo-600 text-white': active, 'text-gray-900': !active }">
                                     <span class="block truncate" :class="{ 'font-medium': selected, 'font-normal': !selected }">
                                         {{ getLocalizedValue(category.translations, category.name, 'name') }}
                                     </span>
@@ -97,14 +97,14 @@
                 </span>
               </ListboxButton>
               <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <ListboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                <ListboxOptions class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm p-1">
                   <ListboxOption :value="null" as="template" v-slot="{ active, selected }">
-                    <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
+                    <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4 rounded-lg']">
                       <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ $t('admin.manage.products.all_statuses') }}</span>
                     </li>
                   </ListboxOption>
                   <ListboxOption v-for="status in ['ACTIVE', 'DRAFT', 'ARCHIVED']" :key="status" :value="status" as="template" v-slot="{ active, selected }">
-                    <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4']">
+                    <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-10 pr-4 rounded-lg']">
                       <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ getStatusLabel(status) }}</span>
                       <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
