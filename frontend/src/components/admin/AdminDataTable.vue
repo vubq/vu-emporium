@@ -88,8 +88,8 @@
           <!-- Page Size Selector -->
           <div class="w-20">
             <Listbox :model-value="pageSize" @update:model-value="handlePageSizeUpdate">
-              <div class="relative">
-                <ListboxButton class="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <div class="relative" ref="triggerRef">
+                <ListboxButton @click="updateDropdownPosition" class="relative w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                   <span class="block truncate">{{ pageSize }}</span>
                   <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -97,15 +97,20 @@
                     </svg>
                   </span>
                 </ListboxButton>
-                <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                  <ListboxOptions class="absolute bottom-full mb-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    <ListboxOption v-for="size in pageSizes" :key="size" :value="size" as="template" v-slot="{ active, selected }">
-                      <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-3 pr-4']">
-                        <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ size }}</span>
-                      </li>
-                    </ListboxOption>
-                  </ListboxOptions>
-                </transition>
+                <Teleport to="body">
+                  <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                    <ListboxOptions 
+                      class="fixed z-[9999] max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                      :style="dropdownStyles"
+                    >
+                      <ListboxOption v-for="size in pageSizes" :key="size" :value="size" as="template" v-slot="{ active, selected }">
+                        <li :class="[active ? 'bg-indigo-50 text-indigo-900' : 'text-gray-900', 'relative cursor-pointer select-none py-2 pl-3 pr-4']">
+                          <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ size }}</span>
+                        </li>
+                      </ListboxOption>
+                    </ListboxOptions>
+                  </transition>
+                </Teleport>
               </div>
             </Listbox>
           </div>
@@ -141,6 +146,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, nextTick } from 'vue';
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue';
 
 const props = withDefaults(defineProps<{
@@ -182,6 +188,30 @@ const handlePageChange = (page: number) => {
 
 const handlePageSizeUpdate = (size: number) => {
   emit('page-size-change', size);
+};
+
+// Dropdown Positioning Logic
+const triggerRef = ref<HTMLElement | null>(null);
+const dropdownStyles = reactive({
+  top: 'auto',
+  left: '0px',
+  bottom: '0px',
+  width: '0px',
+});
+
+const updateDropdownPosition = async () => {
+  await nextTick();
+  if (!triggerRef.value) return;
+
+  const rect = triggerRef.value.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  
+  // Always open up for pagination logic unless extremely close to top (unlikely)
+  // Position above the trigger
+  dropdownStyles.left = `${rect.left}px`;
+  dropdownStyles.width = `${rect.width}px`;
+  dropdownStyles.bottom = `${windowHeight - rect.top + 6}px`; // 6px gap
+  dropdownStyles.top = 'auto';
 };
 </script>
 
