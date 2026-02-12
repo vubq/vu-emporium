@@ -184,6 +184,7 @@
      Listbox, ListboxButton, ListboxOptions, ListboxOption
  } from '@headlessui/vue';
  import I18nFieldTabs from '@/components/common/I18nFieldTabs.vue';
+ import { useI18nStore } from '@/stores/i18nStore';
  
  const { t, locale } = useI18n();
  
@@ -266,6 +267,27 @@ watch(() => props.initialData, (newVal) => {
          };
         }
     }, { immediate: true });
+
+ // Watch Translations to Sync Root Fields (Dynamic Default Language)
+ const i18nStore = useI18nStore();
+
+ watch(() => formData.value.translations, (newVal) => {
+     if (!newVal) return;
+     
+     const defaultLangCode = i18nStore.defaultLanguage?.code || 'vi';
+
+     // Sync Name (Default Lang) to Root
+     const defaultName = newVal[defaultLangCode]?.name;
+     if (defaultName && defaultName !== formData.value.name) {
+         formData.value.name = defaultName;
+     }
+
+     // Sync Description (Default Lang) to Root
+     const defaultDesc = newVal[defaultLangCode]?.description;
+     if (defaultDesc !== undefined && defaultDesc !== formData.value.description) {
+         formData.value.description = defaultDesc;
+     }
+ }, { deep: true });
  
  const openMediaManager = () => {
      showMediaManager.value = true;

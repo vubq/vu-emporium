@@ -968,6 +968,7 @@ import {
 } from '@headlessui/vue';
 import I18nFieldTabs from '@/components/common/I18nFieldTabs.vue';
 import I18nCompactInput from '@/components/common/I18nCompactInput.vue';
+import { useI18nStore } from '@/stores/i18nStore';
 import MediaManager from './MediaManager.vue';
 import AppImage from '@/components/common/AppImage.vue';
 
@@ -1082,7 +1083,8 @@ watch(() => props.initialData, (newVal) => {
             length: newVal.length || 0,
             width: newVal.width || 0,
             height: newVal.height || 0,
-            images: newVal.images && newVal.images.length > 0 ? newVal.images : ['']
+            images: newVal.images && newVal.images.length > 0 ? newVal.images : [''],
+            translations: newVal.translations || {}
         });
         hasVariants.value = newVal.hasVariants;
         if (newVal.options) {
@@ -1483,6 +1485,46 @@ onMounted(async () => {
             updateVariantsMatrix();
         }
     }, 500));
+
+    // Watch Translations to Sync Root Fields (Dynamic Default Language)
+    const i18nStore = useI18nStore();
+    
+    watch(() => form.translations, (newVal) => {
+        if (!newVal) return;
+        
+        const defaultLangCode = i18nStore.defaultLanguage?.code || 'vi';
+
+        // Sync Name (Default Lang) to Root
+        const defaultName = newVal[defaultLangCode]?.name;
+        if (defaultName && defaultName !== form.name) {
+            form.name = defaultName;
+        }
+
+        // Sync Description (Default Lang) to Root
+        const defaultDesc = newVal[defaultLangCode]?.description;
+        if (defaultDesc !== undefined && defaultDesc !== form.description) {
+            form.description = defaultDesc;
+        }
+        
+        // Sync Meta Title
+        const defaultMetaTitle = newVal[defaultLangCode]?.metaTitle;
+        if (defaultMetaTitle !== undefined && defaultMetaTitle !== form.metaTitle) {
+            form.metaTitle = defaultMetaTitle;
+        }
+
+        // Sync Meta Description
+        const defaultMetaDesc = newVal[defaultLangCode]?.metaDescription;
+        if (defaultMetaDesc !== undefined && defaultMetaDesc !== form.metaDescription) {
+            form.metaDescription = defaultMetaDesc;
+        }
+
+        // Sync Meta Keywords
+        const defaultMetaKeywords = newVal[defaultLangCode]?.metaKeywords;
+        if (defaultMetaKeywords !== undefined && defaultMetaKeywords !== form.metaKeywords) {
+            form.metaKeywords = defaultMetaKeywords;
+        }
+
+    }, { deep: true });
 });
 
 function addOption() {

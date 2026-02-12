@@ -20,10 +20,22 @@ const locales = computed(() => i18nStore.activeLanguages);
 const localTranslations = ref<Record<string, string>>({});
 
 // Initialize and sync
-watch(() => props.modelValue, (newVal) => {
-  locales.forEach(loc => {
+watch([() => props.modelValue, locales], ([newVal, newLocales]) => {
+  newLocales.forEach(loc => {
     const localeMap = newVal?.[loc.code] || {};
-    localTranslations.value[loc.code] = localeMap[props.field] || '';
+    // Only update if local is empty to avoid overwriting user input during race conditions? 
+    // Actually, localTranslations should strictly reflect modelValue + user edits.
+    // If modelValue changes, we overwrite. If locales change, we populate missing slots.
+    if (localTranslations.value[loc.code] === undefined || localTranslations.value[loc.code] === '') {
+         localTranslations.value[loc.code] = localeMap[props.field] || '';
+    } else if (newVal) {
+        // If modelValue changed, force update. But how to distinguish?
+        // Simple approach: Always sync from modelValue. 
+        // But localTranslations is 'local state'. 
+        // Usage pattern: modelValue is v-model. 
+        // If parent updates modelValue (e.g. from API load), we MUST update local.
+        localTranslations.value[loc.code] = localeMap[props.field] || '';
+    }
   });
 }, { immediate: true, deep: true });
 
