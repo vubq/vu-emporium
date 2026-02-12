@@ -1,9 +1,9 @@
 ---
 name: full-stack-scaffold
-description: >
-  Unified project scaffolding for Node.js, Python, Rust, and Mobile. 
-  Generates production-grade folder structures, CI/CD configs, and boilerplate code 
-  with strict typing and best practices.
+description: Unified project scaffolding for Node.js, Python, Rust, and Mobile.
+category: development
+version: 4.1.0-fractal
+layer: master-skill
 ---
 
 # 🏗️ Full-Stack Scaffolding Master Kit

@@ -14,10 +14,10 @@ Tệp này kiểm soát hành vi của AI Agent.
 ## 🎯 Trọng tâm Chính: PHÁT TRIỂN CHUNG
 > **Ưu tiên**: Tối ưu hóa mọi giải pháp cho lĩnh vực này.
 
-## Quy tắc hành vi: FLEXIBLE
+## Quy tắc hành vi: SME
 
-**Tự động chạy lệnh**: true
-**Mức độ xác nhận**: Tối thiểu, tự chủ cao
+**Tự động chạy lệnh**: false
+**Mức độ xác nhận**: Hỏi trước các tác vụ quan trọng
 
 ## 🌐 Giao thức Ngôn ngữ (Language Protocol)
 
@@ -39,7 +39,7 @@ Vui lòng sử dụng các kỹ năng phù hợp nhất cho **Phát triển chun
 - Kiểm thử và gỡ lỗi
 
 ## 📚 Tiêu chuẩn Dùng chung (Tự động Kích hoạt)
-**13 Module Chia sẻ** sau trong `.agent/.shared` phải được tuân thủ:
+**17 Module Chia sẻ** sau trong `.agent/.shared` phải được tuân thủ:
 1.  **AI Master**: Mô hình LLM & RAG.
 2.  **API Standards**: Chuẩn OpenAPI & REST.
 3.  **Compliance**: Giao thức GDPR/HIPAA.
@@ -63,4 +63,4 @@ Vui lòng sử dụng các kỹ năng phù hợp nhất cho **Phát triển chun
 Thêm các hướng dẫn cụ thể cho dự án của bạn tại đây.
 
 ---
-*Được tạo bởi Google Antigravity*
+*Được tạo bởi Antigravity IDE*

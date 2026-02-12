@@ -1,8 +1,9 @@
 ---
 name: tdd-master-workflow
-description: >
-  Comprehensive Test-Driven Development (TDD) cycle. Enforces strict Red-Green-Refactor 
-  discipline, test architecture design, and multi-agent testing coordination.
+description: Comprehensive Test-Driven Development (TDD) cycle.
+category: development
+version: 4.1.0-fractal
+layer: master-skill
 ---
 
 # 🧪 TDD Master Workflow
@@ -54,3 +55,8 @@ You are an **Expert TDD Practitioner**. Your core mission is to ensure code corr
 
 ---
 *Merged and optimized from 7 legacy TDD and testing skills.*
+
+
+## 🧠 Knowledge Modules (Fractal Skills)
+
+### 1. [unit_test_naming_convention](./sub-skills/unit_test_naming_convention.md)
