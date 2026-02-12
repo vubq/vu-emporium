@@ -1,7 +1,11 @@
 <template>
-  <Menu as="div" class="relative inline-block text-left">
+  <Menu as="div" class="relative inline-block text-left" v-slot="{ open }">
     <div>
-      <MenuButton class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all cursor-pointer">
+      <MenuButton 
+        class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 transition-colors cursor-pointer select-none" 
+        :class="open ? 'ring-1 ring-indigo-500 border-indigo-500' : ''"
+        style="outline: none !important;"
+      >
         <img v-if="currentFlag" :src="currentFlag" class="w-5 h-3.5 rounded-[2px] object-cover shadow-sm" alt="" />
         <span class="text-sm font-bold text-gray-700 uppercase" v-if="currentLanguage">{{ currentLanguage.code }}</span>
         <span class="text-sm font-bold text-gray-700 uppercase" v-else>{{ locale }}</span>

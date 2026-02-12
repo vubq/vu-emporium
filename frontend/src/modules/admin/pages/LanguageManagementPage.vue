@@ -29,9 +29,9 @@
         <!-- Status Filter -->
         <div class="lg:col-span-1">
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">{{ $t('common.status') }}</label>
-          <Listbox v-model="filters.status">
+          <Listbox v-model="filters.status" v-slot="{ open }">
             <div class="relative">
-              <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-2 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-2 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" :class="open ? 'ring-1 ring-indigo-500 border-indigo-500' : ''">
                 <span class="block truncate font-medium" :class="filters.status === null ? 'text-gray-700' : (filters.status ? 'text-green-600' : 'text-gray-500')">
                   {{ filters.status === null ? $t('common.all') : (filters.status ? $t('common.active') : $t('common.inactive')) }}
                 </span>

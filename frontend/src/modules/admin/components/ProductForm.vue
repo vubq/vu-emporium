@@ -298,9 +298,9 @@
                     <!-- Status -->
                     <div>
                              <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('common.status') }}</label>
-                             <Listbox v-model="form.status" :disabled="submitting">
+                             <Listbox v-model="form.status" :disabled="submitting" v-slot="{ open }">
                                 <div class="relative mt-1">
-                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" :class="open ? 'ring-1 ring-indigo-500 border-indigo-500' : ''">
                                     <span class="block truncate font-medium" :class="{'text-green-600': form.status === 'ACTIVE', 'text-yellow-600': form.status === 'DRAFT', 'text-gray-500': form.status === 'ARCHIVED'}">{{ getStatusLabel(form.status || 'ACTIVE') }}</span>
                                     <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
@@ -336,9 +336,9 @@
                     <!-- Category (Premium Tree Selection - No Search) -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('product.category') }}</label>
-                        <Listbox v-model="selectedCategory" :disabled="submitting" nullable>
+                        <Listbox v-model="selectedCategory" :disabled="submitting" nullable v-slot="{ open }">
                             <div class="relative mt-1">
-                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all hover:border-gray-400">
+                                <ListboxButton class="relative w-full cursor-pointer rounded-xl bg-white py-3 pl-4 pr-10 text-left border border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm transition-all hover:border-gray-400" :class="open ? 'ring-1 ring-indigo-500 border-indigo-500' : ''">
                                     <div class="flex items-center gap-2 truncate">
                                         <template v-if="selectedCategory">
                                             <!-- Icon for selected item -->

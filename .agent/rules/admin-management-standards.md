@@ -1,7 +1,3 @@
----
-description: Tiêu chuẩn cho các trang quản lý Admin (CRUD, Phân trang, Giao diện đồng nhất)
-trigger: always_on
----
 
 # Tiêu chuẩn Quản lý Admin
 
@@ -71,6 +67,24 @@ Các component như `Listbox`, `Combobox`, `Menu` (Dropdown) cần tuân thủ s
     -   Border Radius: `rounded-lg`
     -   Background Active/Hover: `bg-indigo-50`
     -   Icon (nếu có): Kích thước cố định `w-5 h-5` container, icon thực `w-4 h-4`.
+
+## 6. Select & Dropdown Styling (QUAN TRỌNG)
+Để tránh lỗi "nháy đen" (black flash) và đảm bảo đồng nhất độ dày viền:
+
+-   **Tắt outline mặc định của trình duyệt**: Luôn thêm `focus:outline-none`, `focus:ring-0`, `focus-visible:outline-none`.
+-   **Không dùng border dày**: Sử dụng `ring-1` (thay vì `ring-2`) kết hợp với `ring-indigo-500` và `border-indigo-500` khi state là `open`.
+-   **Ngăn chọn text**: Thêm `select-none` vào button dropdown.
+-   **Chỉ hiện border khi mở (Open State Only)**: Border `ring-1` và màu highlight `indigo-500` CHỈ ĐƯỢC hiện khi menu đang mở (`open` state). Khi đóng hoặc đã chọn xong, border phải biến mất hoặc quay về trạng thái mặc định (gray-300), không được giữ trạng thái focus.
+-   **Force Style nếu cần**: Với `MenuButton` hoặc `ListboxButton`, nếu vẫn bị browser override, có thể dùng style inline: `style="outline: none !important;"`.
+
+Ví dụ chuẩn:
+```html
+<MenuButton 
+  class="focus:outline-none focus:ring-0 select-none ..." 
+  :class="open ? 'ring-1 ring-indigo-500 border-indigo-500' : ''"
+  style="outline: none !important;"
+>
+```
 
 ---
 *Tuân thủ tiêu chuẩn này cho tất cả các Trang Quản lý Admin trong tương lai (Sản phẩm, Đơn hàng, Người dùng, v.v.).*
