@@ -148,7 +148,10 @@
               <span class="text-sm text-gray-500 font-mono font-medium bg-gray-50 px-2 py-1 rounded">{{ lang.displayOrder }}</span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <ActionMenu :items="getLanguageActions(lang)" />
+              <ActionMenu 
+                :items="getLanguageActions(lang)" 
+                :header="lang.name"
+              />
             </td>
           </tr>
         </template>

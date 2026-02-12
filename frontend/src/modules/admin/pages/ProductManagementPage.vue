@@ -241,7 +241,10 @@
               <StatusBadge :status="product.status" />
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <ActionMenu :items="getProductActions(product)" />
+              <ActionMenu 
+                :items="getProductActions(product)" 
+                :header="getLocalizedValue(product.translations, product.name, 'name')"
+              />
             </td>
           </tr>
         </template>

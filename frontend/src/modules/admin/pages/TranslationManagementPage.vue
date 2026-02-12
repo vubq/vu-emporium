@@ -87,7 +87,10 @@
                 </div>
             </td>
             <td class="px-6 py-4 text-right">
-              <ActionMenu :items="getTranslationActions(key)" />
+              <ActionMenu 
+                :items="getTranslationActions(key)" 
+                :header="key"
+              />
             </td>
           </tr>
         </template>

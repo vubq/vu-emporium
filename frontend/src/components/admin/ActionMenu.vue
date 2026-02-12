@@ -23,6 +23,11 @@
           class="fixed z-[9999] w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100"
           :style="menuStyles"
         >
+          <!-- Optional Header -->
+          <div v-if="header" class="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100 truncate rounded-t-xl">
+            {{ header }}
+          </div>
+
           <div v-for="(group, gIdx) in groupedItems" :key="gIdx" class="py-1">
             <MenuItem v-for="item in group" :key="item.label" v-slot="{ active }">
               <button
@@ -67,6 +72,7 @@ export interface ActionMenuItem {
 
 const props = withDefaults(defineProps<{
   items: ActionMenuItem[];
+  header?: string;
 }>(), {});
 
 const triggerRef = ref<HTMLElement | null>(null);

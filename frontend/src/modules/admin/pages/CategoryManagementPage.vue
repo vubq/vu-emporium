@@ -149,7 +149,10 @@
               <StatusBadge :status="item.category.status" />
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <ActionMenu :items="getCategoryActions(item.category)" />
+              <ActionMenu 
+                :items="getCategoryActions(item.category)" 
+                :header="getLocalizedValue(item.category.translations, item.category.name, 'name')"
+              />
             </td>
           </tr>
         </template>
